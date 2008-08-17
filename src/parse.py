@@ -45,12 +45,11 @@ obj2tzidref = Suppress('#') + number2('obj2tzid')
 obj2ref = obj2nameref | obj2tzidref
 
 
-look_verb1 = CaselessLiteral('look ')
-look_verb2 = CaselessLiteral('l ')
+look_verb1 = CaselessLiteral('look')
+look_verb2 = CaselessLiteral('l')
 look_verb = (look_verb1|look_verb2)('verb')
 look_verb.setParseAction(replaceWith('look'))
 look = look_verb + Optional(CaselessLiteral('at ')) + Optional(objref) + LineEnd()
-look2_verb = CaselessLiteral('l')('verb')
 look2_verb.setParseAction(replaceWith('look'))
 look2 = look2_verb + LineEnd()
 
