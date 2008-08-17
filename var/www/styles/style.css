@@ -1,0 +1,71 @@
+/*
+# Copyright 2008 Lee Harr
+#
+# This file is part of TZMud.
+#
+# TZMud is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# TZMud is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with TZMud.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+body{
+    background-color: #5E5B49;
+}
+a{
+    color: #1D92FF;
+}
+a:hover{
+    color: #17C1FF;
+}
+a:visited{
+    color: #B254A9;
+}
+
+h1{
+    text-align: center;
+    color: #203270;
+}
+h2{
+    text-align: center;
+}
+
+div.header{
+    background-color: black;
+}
+
+div.footer{
+    background-color: black;
+    text-align: center;
+}
+
+div.players{
+    width: 45%;
+    float: left;
+    padding: 0;
+    padding-left: 25px;
+}
+
+div.rooms{
+    width: 45%;
+    float: right;
+    padding: 0;
+    padding-left: 25px;
+}
+
+td.roomtzid{
+    text-align:right;
+    width: 3em;
+}
+td.roomname{
+    padding-left: 1em;
+}

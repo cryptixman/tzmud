@@ -1,0 +1,31 @@
+# MUD Server
+- Give objects __add__ methods so they can combine with strings
+    without having to cast to strings.
+- unify parsed object names so that all parse actions can access
+    the same set of objects. Right now, some actions cannot access
+    objects with names that have "to " in them, while others are
+    blind to "as " or "is ".
+- allow exits to react to actions
+- make character.home read-only. This should only be set by the
+    .move() method because a player also needs to have its
+    connection updated with the new room.
+
+    Another possibility (maybe better...) would be to make the
+    room a property on the connection and read that dynamically
+    from the player.
+- look for any other attrs that might get corrupted by someone
+    manually setting something. (like character.home)
+- aka names for players, rooms, mobs, etc.
+- remember most recently used item, so that a pronoun will work.
+    for example ...
+    get rose
+    drop it
+- minotaur mob digs a maze and patrols it
+- combat system
+- switch everything over to new message style
+- try unlocking with any key you are holding automatically
+- add a wizard action @lock to lock any door
+- show name of rooms that you go to when following
+
+# Web Server
+- Build MUD areas by web.

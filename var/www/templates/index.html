@@ -1,0 +1,46 @@
+<!--
+# Copyright 2008 Lee Harr
+#
+# This file is part of TZMud.
+#
+# TZMud is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# TZMud is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with TZMud.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+
+<html xmlns:nevow="http://nevow.com/ns/nevow/0.1">
+<head nevow:render="head" />
+<body>
+    <div nevow:render="header" />
+
+    <h1>TZMud Web Interface</h1>
+    <h2>New, and Improved!</h2>
+
+    <h3 nevow:data="trial" nevow:render="data">(replace)</h3>
+
+    <div class="players">
+    <h3>Players</h3>
+    <div nevow:data="players" nevow:render="players" />
+    </div>
+
+    <div class="rooms">
+    <h3>Rooms</h3>
+    <div nevow:data="rooms" nevow:render="rooms" />
+    </div>
+
+    <br clear="all" />
+    <a href="NON">LINK COLOR</a>
+
+    <div nevow:render="footer" />
+</body>
+</html>

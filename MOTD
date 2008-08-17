@@ -1,0 +1,23 @@
+Welcome to TZMud
+
+TTTTTTT  ZZZZZZZ  M     M                 d
+   T          Z   MM   MM                 d
+   T         Z    M M M M  u     u   dddddd
+   T        Z     M  M  M  u     u  d     d
+   T       Z      M     M  u     u  d     d
+   T     ZZZZZZZ  M     M   uuuuu    dddddd
+
+
+TZMud is free software: you can redistribute
+it and/or modify it under the terms of the GNU
+General Public License (GPL).
+
+Source code is available online at:
+    http://code.google.com/p/tzmud/
+
+
+Log in with
+    login <name> <password>
+
+Create a new character with
+    create <name> <password>
