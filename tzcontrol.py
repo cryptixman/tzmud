@@ -42,6 +42,24 @@ def create_conf():
     f.write('\n')
     f.close()
 
+def check_db():
+    if not os.path.exists(conf.datafs):
+        print
+        print 'There is no database in the location given in'
+        print 'in your configuration file [etc/conf.py].'
+        print
+        print 'If this is your first time running the server,'
+        print 'you should initialize the database with:'
+        print 'tzcontrol -f'
+        print 'to create a "fresh" install.'
+        print
+        print 'Be sure to change the passwords before putting'
+        print 'putting the server on the network.'
+        print
+        return False
+    else:
+        return True
+
 try:
     import conf
 except ImportError:
@@ -50,15 +68,7 @@ except ImportError:
     print
     print 'Please check configuration before starting server.'
     print
-    print
-    print 'If this is your first time running the server,'
-    print 'you should start initialize the database with'
-    print 'tzcontrol -f'
-    print 'to create a "fresh" install.'
-    print
-    print 'Be sure to change the passwords before putting'
-    print 'putting the server on the network.'
-    print
+    check_db()
     sys.exit(0)
 
 
@@ -97,7 +107,8 @@ def start():
                                     conf.twistdpid,
                                     conf.tztac,
                                     conf.twistdlog)
-        os.system(cmd)
+        if check_db():
+            os.system(cmd)
     else:
         print 'Server is already running.'
 
