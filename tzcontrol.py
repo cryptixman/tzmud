@@ -49,6 +49,16 @@ except ImportError:
     print 'etc/conf.py created'
     print
     print 'Please check configuration before starting server.'
+    print
+    print
+    print 'If this is your first time running the server,'
+    print 'you should start initialize the database with'
+    print 'tzcontrol -f'
+    print 'to create a "fresh" install.'
+    print
+    print 'Be sure to change the passwords before putting'
+    print 'putting the server on the network.'
+    print
     sys.exit(0)
 
 

@@ -207,16 +207,15 @@ else:
         dbroot['players']['_index'] = TZDict()
 
         import players
-        player = players.Player('lee', 'Some guy named lee', 'If we had more time, I could write a book, but suffice to say that this is all can say about this at this time.')
+        player = players.Player('Admin', 'Initial Admin User.')
         player.set_password('pw')
-        dbroot['players']['lee'] = player
 
-        player = players.Player('lee2', 'Another guy named lee')
+        player = players.Player('Awiz', 'Initial Wizard User.')
         player.set_password('pw')
         player.home = rooms.getname('house')
-        rooms.getname('house').owner = players.getname('lee2').tzid
+        rooms.getname('house').owner = players.getname('Awiz').tzid
 
-        player = players.Player('lee3', 'Yet another guy named lee')
+        player = players.Player('Aplayer', 'Initial player.')
         player.set_password('pw')
 
 
