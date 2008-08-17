@@ -226,12 +226,12 @@ else:
         house = rooms.getname('house')
         house.add(rose)
         cup = items.Cup()
-        lee3 = players.getname('lee3')
+        lee3 = players.getname('Aplayer')
         lee3.add(cup)
 
 
-        dbroot['admin'] = PersistentList(['lee'])
-        dbroot['wizard'] = PersistentList(['lee', 'lee2'])
+        dbroot['admin'] = PersistentList(['Admin'])
+        dbroot['wizard'] = PersistentList(['Admin', 'Awiz'])
 
         dbroot['mobs'] = TZDict()
 
