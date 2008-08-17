@@ -1,0 +1,4 @@
+*.pyc
+Data.*
+twistd*
+conf.py
