@@ -1,0 +1,58 @@
+TZMud is a Python MUD server.
+
+Check for the latest updates at:
+    http://code.google.com/p/tzmud/
+
+
+INSTALLING
+
+First install the requirements:
+    Python (http://www.python.org/)
+        [tested with Python-2.5.2]
+    Twisted (http://twistedmatrix.com/)
+        [tested with Twisted-8.1.0]
+    ZODB3 (http://pypi.python.org/pypi/ZODB3/)
+        [tested with ZODB3-3.8.1b6]
+    Pyparsing (http://pyparsing.wikispaces.com/)
+        [tested with Pyparsing-1.4.7]
+
+Unpack the TZMud distribution and run the
+TZMud control program tzcontrol.py with:
+    python tzcontrol.py -s
+
+That command will generate an empty configuration
+file at etc/conf.py where you can add changes to
+the settings from etc/defaults.py
+
+
+RUNNING
+
+The first time you run the server, run the TZMud
+control program as:
+    python tzcontrol -f
+
+That command will generate a "fresh" database with
+a few users and a couple of rooms. Be sure to change
+the passwords for those users if you plan to put the
+server on the internet.
+
+
+CONNECTING
+
+Use a MUD client (or telnet if you want to play the
+old-school way). The default port is 4444. If you
+are running the server on your own computer, try
+connecting to localhost:4444 or 127.0.0.1:4444
+
+
+DEVELOPING
+
+TZMud is Free Software, released under the GPL.
+
+If you are considering making any changes, please
+consider checking the source code out from the source
+code repository, and sharing your changes with the
+project.
+
+See the instructions here:
+    http://code.google.com/p/tzmud/source/checkout
