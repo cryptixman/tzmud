@@ -50,8 +50,6 @@ look_verb2 = CaselessLiteral('l')
 look_verb = (look_verb1|look_verb2)('verb')
 look_verb.setParseAction(replaceWith('look'))
 look = look_verb + Optional(CaselessLiteral('at ')) + Optional(objref) + LineEnd()
-look2_verb.setParseAction(replaceWith('look'))
-look2 = look2_verb + LineEnd()
 
 info_verb = CaselessLiteral('info')('verb')
 info = info_verb + Optional(objref) + LineEnd()
@@ -169,7 +167,7 @@ help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (look | look2 | info | time | take | get | drop | put | inventory | wear | remove | lock | lock2 | unlock | unlock2 | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
+actions_parser = section + (look | info | time | take | get | drop | put | inventory | wear | remove | lock | lock2 | unlock | unlock2 | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
 
 
 
