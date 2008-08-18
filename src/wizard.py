@@ -32,6 +32,7 @@ dbroot = TZODB().root
 
 import conf
 
+import admin
 import players
 import rooms
 import items
@@ -49,6 +50,8 @@ def verify(player):
     'return True if player is a wizard, False otherwise'
 
     if player.name in dbroot['wizard']:
+        return True
+    elif admin.verify(player):
         return True
     else:
         return False
