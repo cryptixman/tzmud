@@ -182,41 +182,20 @@ else:
         zodb.commit()
 
 
-
         dbroot['rooms'] = TZDict()
         zodb.commit()
 
+
         import rooms
         void = rooms.Room('void', 'A very dark darkness')
-        rooms.add(void)
         house = rooms.Room('house', 'A nice little house.')
-        rooms.add(house)
 
-        #void = rooms.getname('void')
-        #while len(void.players):
-            #void.players.pop()
-
-        house = rooms.getname('house')
-        north = rooms.Exit('north', destination=house)
-        void.addexit(north)
-        south = rooms.Exit('south', destination=void)
-        house.addexit(south)
+        north = rooms.Exit('north', room=void,
+                            destination=house, return_name='south')
 
 
         dbroot['players'] = TZDict()
         dbroot['players']['_index'] = TZDict()
-
-        import players
-        player = players.Player('Admin', 'Initial Admin User.')
-        player.set_password('pw')
-
-        player = players.Player('Awiz', 'Initial Wizard User.')
-        player.set_password('pw')
-        player.home = rooms.getname('house')
-        rooms.getname('house').owner = players.getname('Awiz').tzid
-
-        player = players.Player('Aplayer', 'Initial player.')
-        player.set_password('pw')
 
 
         dbroot['items'] = TZDict()
@@ -225,13 +204,10 @@ else:
         items.add(rose)
         house = rooms.getname('house')
         house.add(rose)
-        cup = items.Cup()
-        lee3 = players.getname('Aplayer')
-        lee3.add(cup)
 
 
-        dbroot['admin'] = PersistentList(['Admin'])
-        dbroot['wizard'] = PersistentList(['Admin', 'Awiz'])
+        dbroot['admin'] = PersistentList()
+        dbroot['wizard'] = PersistentList()
 
         dbroot['mobs'] = TZDict()
 

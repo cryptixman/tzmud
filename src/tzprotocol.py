@@ -164,7 +164,8 @@ class TZ(basic.LineReceiver):
         else:
             player = players.Player(player_name)
             player.set_password(pwtext)
-            players.add(player)
+            if len(players.ls()) == 1:
+                admin.add(player)
 
             self.simessage('Account created.')
             self.simessage('Log in with "login <name> <password>"')
