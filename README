@@ -32,9 +32,8 @@ control program as:
     python tzcontrol -f
 
 That command will generate a "fresh" database with
-a few users and a couple of rooms. Be sure to change
-the passwords for those users if you plan to put the
-server on the internet.
+a couple of simple rooms. The first character you
+create will be an administrator.
 
 
 CONNECTING
@@ -43,6 +42,12 @@ Use a MUD client (or telnet if you want to play the
 old-school way). The default port is 4444. If you
 are running the server on your own computer, try
 connecting to localhost:4444 or 127.0.0.1:4444
+
+Once connected, create a character with
+    create <make up a name> <make up a password>
+(Do not include the angle brackets <>)
+
+The first character created will be an administrator.
 
 
 DEVELOPING
