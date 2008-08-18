@@ -68,6 +68,7 @@ except ImportError:
     print
     print 'Please check configuration before starting server.'
     print
+    import conf
     check_db()
     sys.exit(0)
 
