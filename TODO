@@ -25,6 +25,7 @@
 - switch everything over to new message style
 - try unlocking with any key you are holding automatically
 - add a wizard action @lock to lock any door
+- make first user created an admin
 
 # Web Server
 - Build MUD areas by web.
