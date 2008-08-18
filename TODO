@@ -25,7 +25,6 @@
 - switch everything over to new message style
 - try unlocking with any key you are holding automatically
 - add a wizard action @lock to lock any door
-- show name of rooms that you go to when following
 
 # Web Server
 - Build MUD areas by web.

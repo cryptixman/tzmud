@@ -268,6 +268,12 @@ Player (%s): %s  [%s]
             self.message('You follow', leaver, '.')
             reactor.callLater(0, self._follow, leaver, x)
 
+    def _follow(self, leaver, x):
+        'Override Character._follow to show room name when arriving.'
+
+        Character._follow(self, leaver, x)
+        self.message(self.room)
+
     def near_arrive(self, info):
         'Someone has "arrive"d near this player.'
 
