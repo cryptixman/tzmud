@@ -37,8 +37,10 @@ import conf
 from db import TZODB
 dbroot = TZODB().root
 
+import players
 import rooms
 import mobs
+import wizard
 
 
 def verify(player):
@@ -48,6 +50,43 @@ def verify(player):
         return True
     else:
         return False
+
+
+def add(player):
+    'Add player to the admin list.'
+
+    if not verify(player):
+        dbroot['admin'].append(player.name)
+
+
+def cmd_admin(s, r):
+    '''admin <player>
+
+    Create a new admin.
+
+    '''
+
+    player = players.getname(r)
+    if player is not None:
+        add(player)
+        s.message(player, 'is now an admin.')
+    else:
+        s.message('No such player.')
+
+
+def cmd_wizard(s, r):
+    '''wizard <player>
+
+    Create a new wizard.
+
+    '''
+
+    player = players.getname(r)
+    if player is not None:
+        wizard.add(player)
+        s.message(player, 'is now a wizard.')
+    else:
+        s.message('No such player.')
 
 
 def cmd_py(s, r):
