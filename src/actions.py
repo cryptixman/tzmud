@@ -360,7 +360,7 @@ def cmd_go(s, r):
 
         s.player.move(destination)
 
-        s.message(str(s.room))
+        s.message(s.room)
 
         if len(s.room.players()) > 1:
             for player in s.room.players():

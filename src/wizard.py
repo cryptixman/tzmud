@@ -134,9 +134,9 @@ def cmd_teleport(s, r=None):
             x = s.room.exit(objtzid) or s.room.exitname(objname)
             s.room.rmexit(x)
             destination.addexit(x)
-            s.message('Exit ' + str(x) + ' moved.')
+            s.message('Exit', x, 'moved.')
         else:
-            s.message('Cannot teleport the ' + str(obj) + '.')
+            s.message('Cannot teleport the', obj, '.')
 
     else:
         obj = s.player
@@ -191,7 +191,7 @@ def cmd_dig(s, r):
     if destination is None and destname:
         destination = rooms.Room(destname)
     elif destination is None:
-        s.message('#' + str(desttzid) + ' is not a room.')
+        s.message('#', desttzid, 'is not a room.')
         return
 
 
@@ -205,7 +205,7 @@ def cmd_dig(s, r):
         x = rooms.Exit(exitoutname, destination=destination)
         s.room.addexit(x)
     else:
-        s.message('#%s is not an exit in this room.' % exitouttzid)
+        s.message('#', exitouttzid, 'is not an exit in this room.')
 
 
     exitinname = r.get('exitinname', '')
@@ -219,7 +219,7 @@ def cmd_dig(s, r):
             x = rooms.Exit(exitinname, destination=s.room)
             destination.addexit(x)
         else:
-            s.message('#%s is not an exit.' % exitintzid)
+            s.message('#', exitintzid, 'is not an exit.')
             raise TypeError
 
 
@@ -245,7 +245,7 @@ def cmd_list(s, r):
         msgs = ['(%s) %s' % (obj.tzid, obj.name) for obj in objs]
         s.mlmessage(msgs)
     else:
-        s.message('No ' + listing + ' yet.')
+        s.message('No', listing, 'yet.')
 
 
 def cmd_clone(s, r):
@@ -280,7 +280,7 @@ def cmd_clone(s, r):
     if obj:
         if newname:
             obj.name = newname
-        s.message(str(obj) + ' created.')
+        s.message(obj, 'created.')
         s.player.add(obj)
         s.room.action(dict(act='clone_item', actor=s.player, item=obj))
         return
@@ -303,7 +303,7 @@ def cmd_clone(s, r):
     if obj:
         if newname:
             obj.name = newname
-        s.message(str(obj) + ' created.')
+        s.message(obj, 'created.')
         obj.move(s.room)
         obj.home = s.room
         s.room.action(dict(act='clone_mob', actor=s.player, mob=obj))
@@ -325,12 +325,12 @@ def cmd_clone(s, r):
     if obj:
         if newname:
             obj.name = newname
-        s.message(str(obj) + ' created.')
+        s.message(obj, 'created.')
         return
 
     else:
         name = objname or '#%s' % objtzid
-        s.message('No ' + name + ' to clone.')
+        s.message('No', name, 'to clone.')
         return
 
 
@@ -348,7 +348,7 @@ def cmd_rename(s, r):
     if obj is not None:
         oldname = obj.name
         obj.name = newname
-        s.message(oldname + ' renamed to ' + newname + '.')
+        s.message(oldname, 'renamed to', newname, '.')
 
     else:
         s.message('No such object to rename.')
@@ -367,7 +367,7 @@ def cmd_short(s, r):
 
     if obj is not None:
         obj.short = newshort
-        s.message('Short description set on ' + str(obj) + '.')
+        s.message('Short description set on', obj, '.')
 
     else:
         s.message('No such object to rename.')
@@ -386,7 +386,7 @@ def cmd_long(s, r):
 
     if obj is not None:
         obj.long = newlong
-        s.message('Long description set on ' + str(obj) + '.')
+        s.message('Long description set on', obj, '.')
 
     else:
         s.message('No such object to rename.')
@@ -419,7 +419,7 @@ def cmd_destroy(s, r):
             s.room.action(dict(act='destroy_mob', actor=s.player, mob=obj))
 
         obj.destroy()
-        s.message(class_as_string(obj) + ' ' + str(obj) + ' destroyed.')
+        s.message(class_as_string(obj), obj, 'destroyed.')
     else:
         s.message('Object not found.')
 

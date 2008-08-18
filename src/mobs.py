@@ -326,10 +326,10 @@ class Cat(Mob):
         m = msg.lower()
         if m.startswith('here kitty'):
             self.following = speaker
-            speaker.message(str(self) + ' starts following you.')
+            speaker.message(self, 'starts following you.')
         elif m.startswith('go away'):
             self.following = self
-            speaker.message(str(self) + ' stops following you.')
+            speaker.message(self, 'stops following you.')
 
 
 class Sloth(Mob):

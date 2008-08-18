@@ -153,7 +153,7 @@ def cmd_backup(s):
     fname = '%s/%s' % (conf.backupdir, backupfile)
 
     shutil.copyfile(conf.datafs, fname)
-    s.message('Backup ' + fname + ' created.')
+    s.message('Backup', fname, 'created.')
 
 
 def cmd_restart(s, r=None):
