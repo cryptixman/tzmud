@@ -177,7 +177,7 @@ else:
         dbroot['_index'] = TZDict()
 
 
-        dbroot['share'] = PersistentDict()
+        dbroot['share'] = TZDict()
         dbroot['share']['tzid'] = 0
         zodb.commit()
 
