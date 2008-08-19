@@ -35,8 +35,11 @@ dbmod = 'src/db.py'
 dbdir = 'var/db'
 datafsname = 'Data.fs'
 datafs = '%s/%s' % (dbdir, datafsname)
-backupdir = 'var/backup'
+backupdir = 'var/db/backup'
 
 port = 4444
 
 home_id = 1
+
+
+web = False

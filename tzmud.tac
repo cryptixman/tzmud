@@ -98,18 +98,17 @@ server.setServiceParent(application)
 
 
 
+if conf.web:
+    from twisted.application import internet
+    from twisted.application import service
+    from nevow import appserver
 
-from twisted.application import internet
-from twisted.application import service
-from nevow import appserver
+    etc = os.path.abspath('var/www/src')
+    sys.path.append(etc)
 
-etc = os.path.abspath('var/www/src')
-sys.path.append(etc)
+    import pages
 
-import pages
-
-app2 = service.Application('tzmudweb')
-site = appserver.NevowSite(pages.Index())
-webserver = internet.TCPServer(8080, site)
-webserver.setServiceParent(application)
-
+    app2 = service.Application('tzmudweb')
+    site = appserver.NevowSite(pages.Index())
+    webserver = internet.TCPServer(8080, site)
+    webserver.setServiceParent(application)
