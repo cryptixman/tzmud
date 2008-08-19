@@ -1,0 +1,7 @@
+.svn
+.ignore
+.tar-ignore
+twistd*
+*.pyc
+conf.py
+var/db/Data.fs*
