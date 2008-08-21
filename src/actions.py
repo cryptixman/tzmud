@@ -396,7 +396,18 @@ def cmd_lock(s, r):
 
     keyname = r.get('obj2name', '')
     keytzid = r.get('obj2tzid', 0)
-    key = s.player.itemname(keyname) or s.player.item(keytzid)
+
+    if keyname or keytzid:
+        key = s.player.itemname(keyname) or s.player.item(keytzid)
+    else:
+        key = None
+        for item in s.player.items():
+            if hasattr(item, 'name_aka'):
+                for name in item.name_aka:
+                    if name == 'key':
+                        if item.locks(x):
+                            key = item
+
     if key is None:
         if not keyname and not keytzid:
             s.message('Lock it with which key?')
@@ -406,7 +417,7 @@ def cmd_lock(s, r):
 
     if key.locks(x):
         x.lock(key)
-        s.message('You lock the door', x, '.')
+        s.message('You lock the door', x, 'with key', key, '.')
         s.room.action(dict(act='lock', actor=s.player, action='lock', door=x))
     else:
         s.message('That key does not fit.')
@@ -429,7 +440,18 @@ def cmd_unlock(s, r):
 
     keyname = r.get('obj2name', '')
     keytzid = r.get('obj2tzid', 0)
-    key = s.player.itemname(keyname) or s.player.item(keytzid)
+
+    if keyname or keytzid:
+        key = s.player.itemname(keyname) or s.player.item(keytzid)
+    else:
+        key = None
+        for item in s.player.items():
+            if hasattr(item, 'name_aka'):
+                for name in item.name_aka:
+                    if name == 'key':
+                        if item.locks(x):
+                            key = item
+
     if key is None:
         if not keyname and not keytzid:
             s.message('Unlock it with which key?')
@@ -439,7 +461,7 @@ def cmd_unlock(s, r):
 
     if key.locks(x):
         x.unlock(key)
-        s.message('You unlock the door', x, '.')
+        s.message('You unlock the door', x, 'with key', key, '.')
         s.room.action(dict(act='lock', actor=s.player, action='unlock', door=x))
     else:
         s.message('That key does not fit.')
