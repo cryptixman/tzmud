@@ -45,11 +45,16 @@ obj2tzidref = Suppress('#') + number2('obj2tzid')
 obj2ref = obj2nameref | obj2tzidref
 
 
-look_verb1 = CaselessLiteral('look')
-look_verb2 = CaselessLiteral('l')
-look_verb = (look_verb1|look_verb2)('verb')
-look_verb.setParseAction(replaceWith('look'))
-look = look_verb + Optional(CaselessLiteral('at ')) + Optional(objref) + LineEnd()
+look_verb1 = oneOf('look l', caseless=True)('verb')
+look_verb1.setParseAction(replaceWith('look'))
+look_verb2a = CaselessLiteral('look')
+look_verb2b = CaselessLiteral('l')
+look_verb2 = (look_verb2a|look_verb2b)('verb')
+look_verb2.setParseAction(replaceWith('look'))
+look1 = look_verb1 + LineEnd()
+look2 = look_verb2 + Optional(CaselessLiteral('at ')) + Optional(objref) + LineEnd()
+look = look1 | look2
+
 
 info_verb = CaselessLiteral('info')('verb')
 info = info_verb + Optional(objref) + LineEnd()
@@ -106,12 +111,14 @@ with_ = Suppress(CaselessLiteral('with '))
 lock_verb = CaselessLiteral('lock')('verb')
 lock_obj_name = Combine(OneOrMore(~with_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
-lock = lock_verb + (lock_obj_name|objtzidref) + with_ + obj2ref
+lock1 = lock_verb + (lock_obj_name|objtzidref) + with_ + obj2ref
 lock2 = lock_verb + objref + LineEnd()
+lock = lock1 | lock2
 
 unlock_verb = CaselessLiteral('unlock')('verb')
-unlock = unlock_verb + (lock_obj_name|objtzidref) + with_ + obj2ref
+unlock1 = unlock_verb + (lock_obj_name|objtzidref) + with_ + obj2ref
 unlock2 = unlock_verb + objref + LineEnd()
+unlock = unlock1 | unlock2
 
 
 follow_verb = CaselessLiteral('follow')('verb')
@@ -167,7 +174,7 @@ help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (look | info | time | take | get | drop | put | inventory | wear | remove | lock | lock2 | unlock | unlock2 | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
+actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | lock | look | unlock | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
 
 
 
