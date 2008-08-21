@@ -253,7 +253,7 @@ destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (teleport | dig_ | list_ | clone | rename | short | long_ | destroy | help)
+wizard_parser = wiz + (teleport | dig_ | lock1 | list_ | clone | rename | short | long_ | destroy | help)
 
 
 full_parser = actions_parser | wizard_parser

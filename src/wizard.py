@@ -212,15 +212,48 @@ def cmd_dig(s, r):
     exitintzid = r.get('exitintzid', 0)
 
     if exitinname or exitintzid:
-        x = destination.exitname(exitinname) or destination.exit(exitintzid)
-        if x is not None:
-            x.destination = s.room
+        bx = destination.exitname(exitinname) or destination.exit(exitintzid)
+        if bx is not None:
+            bx.destination = s.room
         elif exitinname:
-            x = rooms.Exit(exitinname, destination=s.room)
-            destination.addexit(x)
+            bx = rooms.Exit(exitinname, destination=s.room)
+            destination.addexit(bx)
         else:
             s.message('#', exitintzid, 'is not an exit.')
             raise TypeError
+
+    # If digging both directions, link the exits
+    if bx is not None:
+        x.link(bx)
+
+
+def cmd_lock(s, r):
+    '''lock <door> with <key>
+
+    Add the given key to the list of keys that will lock
+        the door, and lock the door.
+
+    '''
+
+    objname = r.get('objname', '')
+    objtzid = r.get('objtzid', 0)
+    x = s.room.exitname(objname) or s.room.exit(objtzid)
+    if x is None:
+        s.message('No such exit.')
+        return
+
+    keyname = r.get('obj2name', '')
+    keytzid = r.get('obj2tzid', 0)
+
+    key = s.player.itemname(keyname) or s.player.item(keytzid)
+    if key is None:
+        s.message('You do not have such a key.')
+        return
+
+    x.add_key(key)
+    x.lock(key)
+    s.message('You make the door', x, 'lockable with key', key, '.')
+    s.room.action(dict(act='lock', actor=s.player, action='lock', door=x))
 
 
 def cmd_list(s, r):
