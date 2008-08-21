@@ -381,9 +381,12 @@ def cmd_go(s, r):
 
 
 def cmd_lock(s, r):
-    '''lock <door> with <key>
+    '''lock <door> [with <key>]
 
-    Lock the door, if the key is correct.
+    Lock the door, if you have the correct key.
+
+    If <key> is not specified, will try all of the keys to
+        see if one will lock the door.
 
     '''
 
@@ -425,9 +428,12 @@ def cmd_lock(s, r):
 
 
 def cmd_unlock(s, r):
-    '''unlock <door> with <key>
+    '''unlock <door> [with <key>]
 
-    Unlock the door, if the key is correct.
+    Unlock the door, if you have the correct key.
+
+    If <key> is not specified, will try all of the keys to
+        see if one will unlock the door.
 
     '''
 
