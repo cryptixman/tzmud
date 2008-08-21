@@ -243,6 +243,7 @@ class Key(Item):
 
     name = 'key'
     short = 'A large steel key.'
+    name_aka = ['key']
 
     def __init__(self, name='', short='', long=''):
         Item.__init__(self, name, short, long)
