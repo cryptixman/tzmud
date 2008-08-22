@@ -16,6 +16,11 @@ First install the requirements:
     Pyparsing (http://pyparsing.wikispaces.com/)
         [tested with Pyparsing-1.4.7]
 
+    If you want to run the (optional) web server,
+        you will also need:
+        Nevow (http://divmod.org/trac/wiki/DivmodNevow)
+            [tested with Nevow-0.9.31]
+
 Unpack the TZMud distribution and run the
 TZMud control program tzcontrol.py with:
     python tzcontrol.py -s
@@ -54,10 +59,8 @@ DEVELOPING
 
 TZMud is Free Software, released under the GPL.
 
-If you are considering making any changes, please
-consider checking the source code out from the source
-code repository, and sharing your changes with the
-project.
+If you make any changes or improvements, please
+consider sharing your changes with the project.
 
-See the instructions here:
+For instructions on checking out the latest code see:
     http://code.google.com/p/tzmud/source/checkout
