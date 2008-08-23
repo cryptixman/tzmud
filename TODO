@@ -7,7 +7,6 @@
 - think about having .room only on player, not on protocol.
 - look for any other attrs that might get corrupted by someone
     manually setting something. (like character.home)
-- aka names for players, rooms, mobs, etc.
 - remember most recently used item, so that a pronoun will work.
     for example ...
     get rose
