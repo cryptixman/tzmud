@@ -16,9 +16,8 @@
 # along with TZMud.  If not, see <http://www.gnu.org/licenses/>.
 
 
-python_location = '/usr/bin/python'
+python = '/usr/bin/python2.5'
 python_version = '2.5'
-python = python_location + python_version
 
 twistd = '/usr/bin/twistd'
 twistdlog = 'var/log/twistd.log'
