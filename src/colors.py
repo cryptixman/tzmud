@@ -58,6 +58,9 @@ def yellow(txt):
 def magenta(txt):
     return bold('%(magenta)s' + txt + '%(reset)s')
 
+def white(txt):
+    return bold('%(white)s' + txt + '%(reset)s')
+
 def bold(txt):
     return '%(bold)s' + txt + '%(reset)s'
 

@@ -14,7 +14,6 @@
     drop it
 - minotaur mob digs a maze and patrols it
 - combat system
-- show possible Rooms, Items, and Mobs in @list commands
 
 # Web Server
 - Build MUD areas by web.

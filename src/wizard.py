@@ -38,6 +38,7 @@ import players
 import rooms
 import items
 import mobs
+import colors
 
 from share import find, class_as_string
 
@@ -268,20 +269,31 @@ def cmd_list(s, r):
 
     if listing == 'players':
         objs = players.ls()
+        classes = []
     elif listing == 'items':
         objs = items.ls()
+        classes = items.classes()
     elif listing == 'rooms':
         objs = rooms.ls()
+        classes = rooms.classes()
     elif listing == 'mobs':
         objs = mobs.ls()
+        classes = mobs.classes()
 
     if objs:
+        s.message('Existing objects:')
         objs.sort(key=operator.attrgetter('tzid'))
         msgs = ['(%s) %s' % (obj.tzid, obj.name) for obj in objs]
-        s.mlmessage(msgs)
+        s.mlmessage(msgs, indent=4)
     else:
         s.message('No', listing, 'yet.')
 
+    if classes:
+        if objs:
+            s.message()
+        s.message('Cloneable:')
+        for name in classes:
+            s.message(colors.white(name), indent=4)
 
 def cmd_clone(s, r):
     '''clone <object> [as <name for new clone>]
