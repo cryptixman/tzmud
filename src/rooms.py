@@ -672,7 +672,7 @@ class Zoo(Room):
         '''
 
         for x in self.exits():
-            if x.name.startswith('to the'):
+            if x.name.startswith('see the'):
                 outside = x.destination
                 for ox in outside.exits():
                     if ox.destination != self:
@@ -714,7 +714,7 @@ class Zoo(Room):
         for mobclass in mobs.classes():
             exists = False
             for x in self.exits():
-                if x.name == 'to the %s' % mobclass.lower():
+                if x.name == 'see the %s' % mobclass.lower():
                     exists = True
                     self.respawn(x.destination, mobclass)
 
