@@ -24,6 +24,7 @@ Wizards are able to create new objects, destroy objects, change existing
 '''
 
 import copy
+import operator
 
 from twisted.internet import reactor
 
@@ -275,6 +276,7 @@ def cmd_list(s, r):
         objs = mobs.ls()
 
     if objs:
+        objs.sort(key=operator.attrgetter('tzid'))
         msgs = ['(%s) %s' % (obj.tzid, obj.name) for obj in objs]
         s.mlmessage(msgs)
     else:
