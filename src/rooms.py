@@ -567,7 +567,10 @@ class Exit(TZObj):
             if self._destid is None or self.destination is None:
                 msgs.append('Broken exit.')
             else:
-                msgs.append('Exit %s to %s.' % (str(self), str(self.destination)))
+                if not self.locked:
+                    msgs.append('Exit %s to %s.' % (str(self), self.destination))
+                else:
+                    msgs.append('The exit %s is locked.' % self)
 
         return msgs
 
