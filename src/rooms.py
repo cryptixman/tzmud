@@ -26,6 +26,7 @@ for mobs. It works out best to keep these object types separated.
 '''
 
 import time
+import random
 
 from twisted.internet import reactor
 
@@ -609,13 +610,13 @@ class Exit(TZObj):
 def classes():
     'Return a list of the names of the clonable rooms.'
 
-    return 'Trap', 'TimedTrap', 'Zoo',
+    return 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap'
 
 
 class Trap(Room):
     'A room that has no exits.'
 
-    name = "a trap"
+    name = 'a trap'
     short = "There's no way out...."
 
     def addexit(self, x):
@@ -639,9 +640,41 @@ class TimedTrap(Room):
             reactor.callLater(self._timer, self.spring_trap)
 
     def spring_trap(self):
-        for player in self.players():
-            player.message('Gotcha!')
         self._springing = False
+
+
+class TeleTrap(TimedTrap):
+    '''A trap that teleports characters to different rooms.
+
+    If _targets is empty, will select from all rooms randomly.
+
+    '''
+
+    name = 'room'
+
+    def __init__(self, name=''):
+        TimedTrap.__init__(self)
+        self._targets = PersistentList()
+
+    def addtarget(self, name):
+        if name not in self._targets:
+            self._targets.append(name)
+
+    def spring_trap(self):
+        TimedTrap.spring_trap(self)
+
+        if not self._targets:
+            rms = rooms.ls()
+        else:
+            rms = [getattr(rooms, name) for name in self._targets]
+
+        p = self.players()
+        m = self.mobs()
+        characters = p + m
+        for c in characters:
+            c.message('Click.')
+            room = random.choice(rms)
+            c.move(room)
 
 
 class Zoo(Room):

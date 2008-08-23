@@ -189,6 +189,22 @@ Mob: %s (%s) [in room %s]: %s
         destination.addmob(self)
         self._rid = destination.tzid
 
+    def message(self, *args):
+        '''Dummy method, to make it easier to share methods
+        between characters and players.
+
+        '''
+
+        pass
+
+    def mlmessage(self, msgs):
+        '''Dummy method, to make it easier to share methods
+        between characters and players.
+
+        '''
+
+        pass
+
     def actions(self):
         "return a list of this mob's possible actions"
 
