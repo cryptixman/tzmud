@@ -229,6 +229,10 @@ clone_obj = clone_name|objtzidref
 clone = clone_verb + clone_obj + Optional(as_ + new_name)
 
 
+study_verb = CaselessLiteral('study')('verb')
+study = study_verb + objnameref + LineEnd()
+
+
 rename_verb = CaselessLiteral('rename')('verb')
 rename_obj_name = Combine(OneOrMore(~to_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
@@ -253,7 +257,7 @@ destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (teleport | dig_ | lock1 | list_ | clone | rename | short | long_ | destroy | help)
+wizard_parser = wiz + (teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | help)
 
 
 full_parser = actions_parser | wizard_parser

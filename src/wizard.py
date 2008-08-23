@@ -297,6 +297,7 @@ def cmd_list(s, r):
         s.message('Cloneable:')
         s.columns(classes, color=colors.white)
 
+
 def cmd_clone(s, r):
     '''clone <object> [as <name for new clone>]
 
@@ -381,6 +382,41 @@ def cmd_clone(s, r):
         name = objname or '#%s' % objtzid
         s.message('No', name, 'to clone.')
         return
+
+
+def cmd_study(s, r):
+    '''study <object>|<object type>
+
+    Learn more information about an object, or one of
+        the different types of clonable objects that
+        are available.
+
+    See the lists of cloneables using the @list command.
+
+    '''
+
+    objname = r.get('objname', '')
+    objtzid = r.get('objtzid', 0)
+
+    obj = find(r, s.room, s.player, s.room)
+    if obj is not None:
+        doc = obj.__doc__
+        name = class_as_string(obj)
+    else:
+        for mod in items, mobs, rooms:
+            for name in mod.classes():
+                if objname == name:
+                    cls = getattr(mod, name)
+                    doc = cls.__doc__
+                    break
+
+    if doc is None:
+        doc = '... but it is still a mystery'
+
+    name = colors.white(name)
+    s.message('You study the', name)
+    msgs = doc.split('\n')
+    s.mlmessage(msgs, indent=4)
 
 
 def cmd_rename(s, r):
