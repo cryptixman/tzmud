@@ -392,7 +392,7 @@ class TZ(basic.LineReceiver):
                 continue
             client.message(msg, indent=indent, color=color)
 
-    def columns(self, items):
+    def columns(self, items, color=None):
         'Send list of strings out as a multi-column list.'
 
         # determine the longest word in the given list
@@ -406,6 +406,8 @@ class TZ(basic.LineReceiver):
         cols = (70 / width) - 1
 
         filled_items = [item.ljust(width, ' ') for item in items]
+        if color is not None:
+            filled_items = [color(item) for item in filled_items]
         from itertools import izip, chain, repeat
         for row in izip(*[chain(filled_items, repeat('', cols-1))]*cols):
             self.message('  '.join(row), indent=4)

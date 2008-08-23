@@ -283,7 +283,10 @@ def cmd_list(s, r):
     if objs:
         s.message('Existing objects:')
         objs.sort(key=operator.attrgetter('tzid'))
-        msgs = ['(%s) %s' % (obj.tzid, obj.name) for obj in objs]
+        msgs = []
+        for obj in objs:
+            tzid = '(%s)' % obj.tzid
+            msgs.append('%s %s' % (tzid.rjust(4, ' '), obj))
         s.mlmessage(msgs, indent=4)
     else:
         s.message('No', listing, 'yet.')
@@ -292,8 +295,7 @@ def cmd_list(s, r):
         if objs:
             s.message()
         s.message('Cloneable:')
-        for name in classes:
-            s.message(colors.white(name), indent=4)
+        s.columns(classes, color=colors.white)
 
 def cmd_clone(s, r):
     '''clone <object> [as <name for new clone>]
