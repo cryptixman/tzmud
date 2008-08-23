@@ -319,6 +319,15 @@ class Room(TZContainer):
                 else:
                     result.append(mob)
 
+        for mob in self.mobs():
+            if hasattr(mob, 'name_aka'):
+                for aka in mob.name_aka:
+                    if aka == name:
+                        if not all:
+                            return mob
+                        else:
+                            result.append(mob)
+
         if result:
             return result
         else:

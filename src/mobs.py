@@ -350,6 +350,7 @@ class PackRat(Mob):
     'Collects things and brings them back to its nest.'
 
     actionperiod = 5 # seconds
+    name_aka = ['rat']
 
     name = 'packrat'
     short = 'A large scruffy rat. Is it carrying something?'

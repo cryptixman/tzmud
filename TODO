@@ -14,6 +14,7 @@
     drop it
 - minotaur mob digs a maze and patrols it
 - combat system
+- include initial world in download / repo
 
 # Web Server
 - Build MUD areas by web.
