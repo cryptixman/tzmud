@@ -44,11 +44,11 @@ class TZODB(object):
         self.__dict__ = cls._state
         return self
 
-    def __init__(self, fdt=None):
-        if fdt is None:
+    def __init__(self, fname=None):
+        if fname is None:
             fname = datafs
         else:
-            fname = '%s/%s.%s' % (backupdir, fdt, datafsname)
+            fname = '%s/%s' % (backupdir, fname)
 
         if not hasattr(self, 'storage'):
             self.open(fname)
@@ -86,6 +86,10 @@ class TZODB(object):
         'Abort the current database transaction, discarding all changes.'
 
         transaction.abort()
+
+    def pack(self):
+        import time
+        self.storage.pack(time.time(), None)
 
 
 class TZDict(PersistentDict):
@@ -152,9 +156,15 @@ class TZIndex(object):
 
 
 if __name__ != '__main__':
-    zodb = TZODB()
-    dbroot = zodb.root
-    commit = zodb.commit
+    try:
+        zodb = TZODB()
+        dbroot = zodb.root
+        commit = zodb.commit
+    except:
+        # If the main database is in use, this will fail,
+        # In that case, reinitializing with a different name
+        # should allow access to the other database.
+        pass
 
 
 else:
@@ -222,11 +232,64 @@ else:
         zodb = TZODB()
         dbroot = zodb.root
 
-    elif len(sys.argv) > 1:
-        fdt = sys.argv[1]
-        print 'reading backup ZODB', fdt
+    elif len(sys.argv) > 1 and sys.argv[1] == 'pack':
+        if len(sys.argv) == 2:
+            fname = None
+        elif len(sys.argv) == 3:
+            fname = sys.argv[2]
+        else:
+            print 'Usage: db.py pack [filename]'
+            sys.exit(1)
 
-        zodb = TZODB(fdt)
+        print 'Packing DB'
+        zodb = TZODB(fname)
+        dbroot = zodb.root
+
+        zodb.pack()
+
+        zodb.commit()
+
+        import conf
+        os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
+
+    elif len(sys.argv) > 1 and sys.argv[1] == 'depopulate':
+        if len(sys.argv) == 2:
+            fname = None
+        elif len(sys.argv) == 3:
+            fname = sys.argv[2]
+        else:
+            print 'Usage: db.py depopulate [filename]'
+            sys.exit(1)
+
+        print 'removing players from DB'
+        zodb = TZODB(fname)
+        dbroot = zodb.root
+
+        names = dbroot['players'].keys()
+        for name in names:
+            if name == '_index':
+                continue
+            player = dbroot['players'][name]
+            room = player.room
+            room.rmplayer(player)
+            del dbroot['players'][name]
+            del dbroot['players']['_index'][player.tzid]
+            del dbroot['_index'][player.tzid]
+            if name in dbroot['admin']:
+                dbroot['admin'].remove(name)
+            if name in dbroot['wizard']:
+                dbroot['wizard'].remove(name)
+
+        zodb.commit()
+
+        import conf
+        os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
+
+    elif len(sys.argv) > 1:
+        fname = sys.argv[1]
+        print 'reading backup ZODB', fname
+
+        zodb = TZODB(fname)
         dbroot = zodb.root
 
     else:

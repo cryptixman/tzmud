@@ -129,6 +129,18 @@ def cmd_db(s, r=None):
         s.message('')
 
 
+def cmd_pack(s):
+    '''pack
+
+    Pack the DB.
+
+    '''
+
+    s.message('Packing database.')
+    TZODB().pack()
+    s.message('Database Packed.')
+
+
 def cmd_backup(s):
     '''backup
 
@@ -264,9 +276,13 @@ def cmd_list(s, r):
     '''
 
     if r=='backups':
-        s.message('Available backups:')
         backups = os.listdir(conf.backupdir)
-        s.mlmessage(backups, indent=4)
+        if backups:
+            backups.sort()
+            s.message('Available backups:')
+            s.mlmessage(backups, indent=4)
+        else:
+            s.message('No backups yet.')
     else:
         s.message('Not implemented.')
 

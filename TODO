@@ -13,6 +13,8 @@
 - minotaur mob digs a maze and patrols it
 - combat system
 - include initial world in download / repo
+- regular automatic pack db
+- check that packrat only digs in when it finds something
 
 # Web Server
 - Build MUD areas by web.

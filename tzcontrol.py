@@ -165,19 +165,50 @@ def fresh():
     start()
 
 def backup():
+    'Take a backup of the database.'
+
     dt = now()
     dtstr = '%04d.%02d.%02d_%02d:%02d' % (dt.year, dt.month, dt.day,
                                             dt.hour, dt.minute)
-    backupfile = '%s.%s' % (dtstr, conf.datafsname)
+    fname = '%s.%s' % (dtstr, conf.datafsname)
 
     if not os.path.exists(conf.backupdir):
         os.mkdir(conf.backupdir)
 
-    fname = '%s/%s' % (conf.backupdir, backupfile)
+    fpath = '%s/%s' % (conf.backupdir, fname)
 
-    shutil.copyfile(conf.datafs, fname)
+    shutil.copyfile(conf.datafs, fpath)
 
     print 'backup', fname, 'saved in', conf.backupdir
+
+    return fname
+
+def depopulate(fname):
+    '''Remove all players from the given database file.
+
+    This is used to make a copy of the world that can be easily
+        distributed.
+
+    '''
+
+    cmd = '%s %s depopulate %s' % (conf.python, conf.dbmod, fname)
+    os.system(cmd)
+
+def world():
+    'Save depopulated backup.'
+
+    fname = backup()
+    depopulate(fname)
+    pack(fname)
+    fpath = '%s/%s' % (conf.backupdir, fname)
+    worldname = '%s/.%s' % (conf.backupdir, conf.datafsname)
+    shutil.copyfile(fpath, worldname)
+
+def pack(fname):
+    'Pack the given backup database.'
+
+    cmd = '%s %s pack %s' % (conf.python, conf.dbmod, fname)
+    os.system(cmd)
 
 def rollbackfile(fname):
     '''Check for existence of given rollback file.
@@ -211,6 +242,7 @@ def rollback(rbf):
         shutdown()
         delay()
         dbclean()
+        print 'Restoring backup', rbf
         shutil.copyfile(rbf, conf.datafs)
         start()
         return True
@@ -280,6 +312,9 @@ def main():
         parser.add_option('-b', '--backup', dest='backup',
             action="store_true",
             help='Back up the database.')
+        parser.add_option('-W', '--world', dest='world',
+            action="store_true",
+            help='Save depopulated DB for world distribution.')
         parser.add_option('-z', '--rollback', dest='rollback',
             action="store_true",
             help='Restore a previous Data.fs. Default is most recent backup. Use -Z (--rollbackfile) to specify a different file.')
@@ -312,6 +347,8 @@ def main():
             fresh()
         elif options.backup:
             backup()
+        elif options.world:
+            world()
         elif options.rollback:
             if not rollback(options.rollbackfile):
                 parser.print_help()
