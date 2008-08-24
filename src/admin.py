@@ -25,10 +25,6 @@ Admins are able to restart, or stop the server, and to back up and
 
 import os
 import copy
-import datetime
-now = datetime.datetime.now
-import shutil
-import time
 
 from twisted.python.rebuild import rebuild
 
@@ -142,18 +138,10 @@ def cmd_backup(s):
 
     '''
 
-    dt = now()
-    dtstr = '%04d.%02d.%02d_%02d:%02d' % (dt.year, dt.month, dt.day,
-                                            dt.hour, dt.minute)
-    backupfile = '%s.%s' % (dtstr, conf.datafsname)
+    cmd = '%s %s -b' % (conf.python, conf.tzcontrol)
+    os.system(cmd)
 
-    if not os.path.exists(conf.backupdir):
-        os.mkdir(conf.backupdir)
-
-    fname = '%s/%s' % (conf.backupdir, backupfile)
-
-    shutil.copyfile(conf.datafs, fname)
-    s.message('Backup', fname, 'created.')
+    s.message('Backup saved.')
 
 
 def cmd_restart(s, r=None):
@@ -238,8 +226,6 @@ def cmd_fresh(s):
 
     cmd_shutdown(s)
 
-    import os
-    import conf
     cmd = '%s %s -d -f &' % (conf.python, conf.tzcontrol)
     os.system(cmd)
 
@@ -268,6 +254,21 @@ def cmd_rollback(s, r=None):
 
     cmd = '%s %s -d -z %s &' % (conf.python, conf.tzcontrol, rbf)
     os.system(cmd)
+
+
+def cmd_list(s, r):
+    '''list backups
+
+    Show a listing of available backup databases.
+
+    '''
+
+    if r=='backups':
+        s.message('Available backups:')
+        backups = os.listdir(conf.backupdir)
+        s.mlmessage(backups, indent=4)
+    else:
+        s.message('Not implemented.')
 
 
 def cmd_svnup(s):

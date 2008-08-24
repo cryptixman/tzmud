@@ -26,6 +26,10 @@ import os
 import sys
 import time
 import shutil
+import datetime
+now = datetime.datetime.now
+import shutil
+
 
 etc = os.path.abspath('etc')
 sys.path.append(etc)
@@ -160,18 +164,35 @@ def fresh():
     dbinit()
     start()
 
-def rollbackfile(rbf):
+def backup():
+    dt = now()
+    dtstr = '%04d.%02d.%02d_%02d:%02d' % (dt.year, dt.month, dt.day,
+                                            dt.hour, dt.minute)
+    backupfile = '%s.%s' % (dtstr, conf.datafsname)
+
+    if not os.path.exists(conf.backupdir):
+        os.mkdir(conf.backupdir)
+
+    fname = '%s/%s' % (conf.backupdir, backupfile)
+
+    shutil.copyfile(conf.datafs, fname)
+
+    print 'backup', fname, 'saved in', conf.backupdir
+
+def rollbackfile(fname):
     '''Check for existence of given rollback file.
 
     Defaults to most recent backup file if None given.
 
     '''
 
-    if rbf is None:
+    if fname is None:
         backups = os.listdir(conf.backupdir)
-        f = backups[-1]
-        rbf = '%s/%s' % (conf.backupdir, f)
-    elif not os.path.exists(rbf):
+        fname = backups[-1]
+
+    rbf = '%s/%s' % (conf.backupdir, fname)
+
+    if not os.path.exists(rbf):
         print 'ERROR'
         print 'File not found: %s' % rbf
         return False
@@ -256,6 +277,9 @@ def main():
         parser.add_option('-d', '--delay', dest='delay',
             action="store_true",
             help='Delay 5 seconds before acting.')
+        parser.add_option('-b', '--backup', dest='backup',
+            action="store_true",
+            help='Back up the database.')
         parser.add_option('-z', '--rollback', dest='rollback',
             action="store_true",
             help='Restore a previous Data.fs. Default is most recent backup. Use -Z (--rollbackfile) to specify a different file.')
@@ -286,6 +310,8 @@ def main():
             restart()
         elif options.fresh:
             fresh()
+        elif options.backup:
+            backup()
         elif options.rollback:
             if not rollback(options.rollbackfile):
                 parser.print_help()
