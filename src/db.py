@@ -190,8 +190,8 @@ else:
         void = rooms.Room('void', 'A very dark darkness')
         house = rooms.Room('house', 'A nice little house.')
 
-        north = rooms.Exit('north', room=void,
-                            destination=house, return_name='south')
+        north = rooms.Exit('the light', room=void,
+                            destination=house)
 
 
         dbroot['players'] = TZDict()
@@ -201,8 +201,6 @@ else:
         dbroot['items'] = TZDict()
         import items
         rose = items.Rose()
-        items.add(rose)
-        house = rooms.getname('house')
         house.add(rose)
 
 
