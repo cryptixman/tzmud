@@ -201,7 +201,7 @@ def world():
     depopulate(fname)
     pack(fname)
     fpath = '%s/%s' % (conf.backupdir, fname)
-    worldname = '%s/.%s' % (conf.backupdir, conf.datafsname)
+    worldname = '%s/0.%s' % (conf.backupdir, conf.datafsname)
     shutil.copyfile(fpath, worldname)
 
 def pack(fname):
