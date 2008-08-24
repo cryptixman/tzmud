@@ -104,6 +104,18 @@ class TZ(basic.LineReceiver):
     def __init__(self):
         zodb = TZODB()
         self.dbroot = zodb.root
+        self.purge_all()
+
+    def purge_all(self):
+        for player in players.ls():
+            self._purge(player)
+
+    def _purge(self, player):
+        if player.logged_in:
+            client = self.playerclient(player)
+            if client is not None:
+                client.transport.loseConnection()
+            player.logged_in = False
 
     def connectionMade(self):
         'A new connection. Send out the MOTD.'
@@ -181,10 +193,7 @@ class TZ(basic.LineReceiver):
             player = players.getname(player_name)
             if player.check_password(pwtext):
                 if player.logged_in:
-                    client = self.playerclient(player)
-                    if client is not None:
-                        client.transport.loseConnection()
-                    player.logged_in = False
+                    self._purge(player)
                     self.simessage('Connection purged.')
                     self.simessage('Log in with "login <name> <password>"')
                 else:
