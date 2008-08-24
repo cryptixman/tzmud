@@ -61,6 +61,7 @@ class TZMUD(internet.TCPServer):
 
         print 'closing ZODB'
         zodb = TZODB()
+        zodb.pack()
         zodb.close()
 
     def maybe_restart(self):
