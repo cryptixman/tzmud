@@ -178,6 +178,7 @@ def backup():
     fpath = '%s/%s' % (conf.backupdir, fname)
 
     shutil.copyfile(conf.datafs, fpath)
+    pack(fname)
 
     print 'backup', fname, 'saved in', conf.backupdir
 
