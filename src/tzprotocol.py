@@ -182,7 +182,8 @@ class TZ(basic.LineReceiver):
             if player.check_password(pwtext):
                 if player.logged_in:
                     client = self.playerclient(player)
-                    client.transport.loseConnection()
+                    if client is not None:
+                        client.transport.loseConnection()
                     player.logged_in = False
                     self.simessage('Connection purged.')
                     self.simessage('Log in with "login <name> <password>"')
