@@ -28,6 +28,8 @@ import transaction
 from persistent.dict import PersistentDict
 from persistent.list import PersistentList
 
+from twisted.internet import reactor
+
 if __name__ == '__main__':
     import os
     import sys
@@ -54,6 +56,7 @@ class TZODB(object):
 
         if not hasattr(self, 'storage'):
             self.open(fname)
+            reactor.callLater(30, self.pack_regularly)
 
     def open(self, fname):
         'Open connection to the database.'
@@ -90,8 +93,18 @@ class TZODB(object):
         transaction.abort()
 
     def pack(self):
+        'Pack the DB to remove old versions, like vacuum.'
+
         import time
         self.storage.pack(time.time(), None)
+        print 'DB Packed'
+
+    def pack_regularly(self):
+        'Pack the DB every pack_interval seconds.'
+
+        self.pack()
+        pack_interval = 600 #seconds (10 minutes)
+        reactor.callLater(pack_interval, self.pack_regularly)
 
 
 class TZDict(PersistentDict):
