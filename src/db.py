@@ -29,7 +29,9 @@ from persistent.dict import PersistentDict
 from persistent.list import PersistentList
 
 if __name__ == '__main__':
-    import os, sys
+    import os
+    import sys
+
     etc = os.path.abspath('etc')
     sys.path.append(etc)
 
@@ -153,6 +155,118 @@ class TZIndex(object):
         return self.index().values()
 
 
+def db_init():
+    print 'initializing ZODB'
+
+    zodb = TZODB()
+    dbroot = zodb.root
+
+
+    dbroot['_index'] = TZDict()
+
+
+    dbroot['share'] = TZDict()
+    dbroot['share']['tzid'] = 0
+    zodb.commit()
+
+
+    dbroot['rooms'] = TZDict()
+    zodb.commit()
+
+
+    import rooms
+    void = rooms.Room('void', 'A very dark darkness')
+    house = rooms.Room('house', 'A nice little house.')
+
+    north = rooms.Exit('the light', room=void,
+                        destination=house)
+
+
+    dbroot['players'] = TZDict()
+    dbroot['players']['_index'] = TZDict()
+
+
+    dbroot['items'] = TZDict()
+    import items
+    rose = items.Rose()
+    house.add(rose)
+
+
+    dbroot['admin'] = PersistentList()
+    dbroot['wizard'] = PersistentList()
+
+    dbroot['mobs'] = TZDict()
+
+    zodb.commit()
+
+def db_upgrade():
+    print 'upgrading ZODB'
+
+    for mod in 'players', 'mobs', 'items', 'rooms':
+        module = __import__(mod)
+        if hasattr(module, 'upgrade'):
+            module.upgrade()
+
+    zodb = TZODB()
+    dbroot = zodb.root
+
+def db_pack():
+    if len(sys.argv) == 2:
+        fname = None
+    elif len(sys.argv) == 3:
+        fname = sys.argv[2]
+    else:
+        print 'Usage: db.py pack [filename]'
+        sys.exit(1)
+
+    print 'Packing DB'
+    zodb = TZODB(fname)
+    dbroot = zodb.root
+
+    zodb.pack()
+
+    zodb.commit()
+
+    import conf
+    os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
+
+def db_depopulate():
+    if len(sys.argv) == 2:
+        fname = None
+    elif len(sys.argv) == 3:
+        fname = sys.argv[2]
+    else:
+        print 'Usage: db.py depopulate [filename]'
+        sys.exit(1)
+
+    print 'removing players from DB'
+    zodb = TZODB(fname)
+    dbroot = zodb.root
+
+    names = dbroot['players'].keys()
+    for name in names:
+        if name == '_index':
+            continue
+        player = dbroot['players'][name]
+        room = player.room
+        room.rmplayer(player)
+        del dbroot['players'][name]
+        del dbroot['players']['_index'][player.tzid]
+        del dbroot['_index'][player.tzid]
+        if name in dbroot['admin']:
+            dbroot['admin'].remove(name)
+        if name in dbroot['wizard']:
+            dbroot['wizard'].remove(name)
+
+    zodb.commit()
+
+    import conf
+    os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
+
+def db_display(fname=None):
+    zodb = TZODB(fname)
+    dbroot = zodb.root
+    print dbroot
 
 
 if __name__ != '__main__':
@@ -166,135 +280,22 @@ if __name__ != '__main__':
         # should allow access to the other database.
         pass
 
-
 else:
-    import os
-    import sys
-
-    etc = os.path.abspath('etc')
-    sys.path.append(etc)
-
     from db import TZODB
     from db import TZDict
 
     if len(sys.argv) > 1 and sys.argv[1] == 'init':
-        print 'initializing ZODB'
-
-        zodb = TZODB()
-        dbroot = zodb.root
-
-
-        dbroot['_index'] = TZDict()
-
-
-        dbroot['share'] = TZDict()
-        dbroot['share']['tzid'] = 0
-        zodb.commit()
-
-
-        dbroot['rooms'] = TZDict()
-        zodb.commit()
-
-
-        import rooms
-        void = rooms.Room('void', 'A very dark darkness')
-        house = rooms.Room('house', 'A nice little house.')
-
-        north = rooms.Exit('the light', room=void,
-                            destination=house)
-
-
-        dbroot['players'] = TZDict()
-        dbroot['players']['_index'] = TZDict()
-
-
-        dbroot['items'] = TZDict()
-        import items
-        rose = items.Rose()
-        house.add(rose)
-
-
-        dbroot['admin'] = PersistentList()
-        dbroot['wizard'] = PersistentList()
-
-        dbroot['mobs'] = TZDict()
-
-        zodb.commit()
-
+        db_init()
     elif len(sys.argv) > 1 and sys.argv[1] == 'upgrade':
-        print 'upgrading ZODB'
-
-        for mod in 'players', 'mobs', 'items', 'rooms':
-            module = __import__(mod)
-            if hasattr(module, 'upgrade'):
-                module.upgrade()
-
-        zodb = TZODB()
-        dbroot = zodb.root
-
+        db_upgrade()
     elif len(sys.argv) > 1 and sys.argv[1] == 'pack':
-        if len(sys.argv) == 2:
-            fname = None
-        elif len(sys.argv) == 3:
-            fname = sys.argv[2]
-        else:
-            print 'Usage: db.py pack [filename]'
-            sys.exit(1)
-
-        print 'Packing DB'
-        zodb = TZODB(fname)
-        dbroot = zodb.root
-
-        zodb.pack()
-
-        zodb.commit()
-
-        import conf
-        os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
-
+        db_pack()
     elif len(sys.argv) > 1 and sys.argv[1] == 'depopulate':
-        if len(sys.argv) == 2:
-            fname = None
-        elif len(sys.argv) == 3:
-            fname = sys.argv[2]
-        else:
-            print 'Usage: db.py depopulate [filename]'
-            sys.exit(1)
-
-        print 'removing players from DB'
-        zodb = TZODB(fname)
-        dbroot = zodb.root
-
-        names = dbroot['players'].keys()
-        for name in names:
-            if name == '_index':
-                continue
-            player = dbroot['players'][name]
-            room = player.room
-            room.rmplayer(player)
-            del dbroot['players'][name]
-            del dbroot['players']['_index'][player.tzid]
-            del dbroot['_index'][player.tzid]
-            if name in dbroot['admin']:
-                dbroot['admin'].remove(name)
-            if name in dbroot['wizard']:
-                dbroot['wizard'].remove(name)
-
-        zodb.commit()
-
-        import conf
-        os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
-
+        db_depopulate()
     elif len(sys.argv) > 1:
         fname = sys.argv[1]
-        print 'reading backup ZODB', fname
-
-        zodb = TZODB(fname)
-        dbroot = zodb.root
-
+        print 'Reading backup ZODB', fname
+        db_display(fname)
     else:
-        zodb = TZODB()
-        dbroot = zodb.root
-
-
-    print dbroot
+        print 'Reading main ZODB'
+        db_display()

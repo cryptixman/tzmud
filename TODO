@@ -14,6 +14,8 @@
 - combat system
 - include initial world in download / repo
 - regular automatic pack db
+- pack db when shutting down
+- pack db when backing up
 - check that packrat only digs in when it finds something
 
 # Web Server
