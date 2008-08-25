@@ -33,7 +33,9 @@ from twisted.internet import reactor
 from persistent.list import PersistentList
 
 from db import TZODB, TZIndex
-dbroot = TZODB().root
+zodb = TZODB()
+dbroot = zodb.root
+commit = zodb.commit
 
 import conf
 import players
@@ -200,36 +202,46 @@ class Room(TZContainer):
     def _action(self, info):
         'Actual action work is done here.'
 
-        act = info['act']
-        actor = info['actor']
-        for player in self.players():
-            if player != actor:
-                player.act_near(info)
-            for item in player.items():
+        try:
+            act = info['act']
+            actor = info['actor']
+            for player in self.players():
+                if player != actor:
+                    player.act_near(info)
+                for item in player.items():
+                    item.act_near(info)
+            for mob in self.mobs():
+                if mob != actor:
+                    mob.act_near(info)
+            for item in self.items():
                 item.act_near(info)
-        for mob in self.mobs():
-            if mob != actor:
-                mob.act_near(info)
-        for item in self.items():
-            item.act_near(info)
-        self.act_near(info)
+            self.act_near(info)
 
-        # Some actions can affect nearby rooms. If that is the case for
-        # this action, find the rooms from the exits and pass it on.
-        spread = info.get('spread', None)
-        if spread is not None and spread > 0:
-            fromroom = info.get('fromroom', None)
-            info['fromroom'] = self
-            info['spread'] -= 1
-            for x in self.exits():
-                room = x.destination
-                if room == fromroom:
-                    continue
-                for bx in room.exits():
-                    if bx.destination == self:
-                        info['fromx'] = bx
-                        break
-                room.action(info)
+            # Some actions can affect nearby rooms. If that is the case for
+            # this action, find the rooms from the exits and pass it on.
+            spread = info.get('spread', None)
+            if spread is not None and spread > 0:
+                fromroom = info.get('fromroom', None)
+                info['fromroom'] = self
+                info['spread'] -= 1
+                for x in self.exits():
+                    room = x.destination
+                    if room == fromroom:
+                        continue
+                    for bx in room.exits():
+                        if bx.destination == self:
+                            info['fromx'] = bx
+                            break
+                    room.action(info)
+
+        except:
+            #print 'room._action ABORT'
+            abort()
+            #raise
+
+        else:
+            #print 'room._action COMMIT'
+            commit()
 
     def players(self):
         'Return a list of all the players in this room'
