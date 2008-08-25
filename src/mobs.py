@@ -380,69 +380,91 @@ class PackRat(Mob):
     def near_drop(self, info):
         if self._searching and self.room!=self.home and not self.items():
             item = info['item']
-            self.get_item(item, self.room)
-            self._searching = False
+            if item in self.room:
+                self.get_item(item, self.room)
+                self._searching = False
+
+                if not self._has_dug_home:
+                    self._dig_home()
 
     @weight(100)
     def action_move(self):
+        x = self._choose_exit()
+        if x is not None:
+            self._move(x)
+            if self._searching and x.destination!=self.home and not self.items():
+                item = self._search()
+                if item and not self._has_dug_home:
+                    self._dig_home()
+            if not self._searching and x.destination==self.home:
+                self._store_item()
+
+    def _choose_exit(self):
         origin = self.room
         exits = origin.exits()
+        x = None
         if exits:
             if self._searching:
                 x = random.choice(exits)
                 if x.locked:
-                    return
-                destination = x.destination
+                    x = None
             else:
-                destination = None
                 for x in exits:
                     try:
                         if x.destination == self._path_home[-2]:
-                            destination = x.destination
+                            break
                     except KeyError:
                         print 'No -2'
+        return x
 
-            if destination is not None:
-                origin.action(dict(act='leave', actor=self, tox=x))
+    def _move(self, x):
+        origin = self.room
+        destination = x.destination
+        if destination is not None:
+            origin.action(dict(act='leave', actor=self, tox=x))
 
-                self.move(destination)
+            self.move(destination)
 
-                if destination not in self._path_home:
-                    self._path_home.append(destination)
-                else:
-                    i = self._path_home.index(destination)
-                    l = len(self._path_home)
-                    if i+1 < l:
-                        for d in range(i+1, l):
-                            del self._path_home[d]
+            if destination not in self._path_home:
+                self._path_home.append(destination)
+            else:
+                i = self._path_home.index(destination)
+                l = len(self._path_home)
+                if i+1 < l:
+                    for d in range(i+1, l):
+                        del self._path_home[d]
 
-                backx = None
-                for backx in destination.exits():
-                    if backx.destination == origin:
-                        break
+            backx = None
+            for backx in destination.exits():
+                if backx.destination == origin:
+                    break
 
-                destination.action(dict(act='arrive', actor=self, fromx=backx))
+            destination.action(dict(act='arrive', actor=self, fromx=backx))
 
-            if self._searching and destination!=self.home and not self.items():
-                items = destination.items()
-                if items:
-                    item = items[0]
-                    self.get_item(item, destination)
-                    self._searching = False
-                if items and not self._has_dug_home:
-                    home = rooms.Room('rat nest', "The rat's nest.")
-                    x = rooms.Exit('hole', 'A roughly dug hole.',
-                                    room=destination,
-                                    destination=home, return_name='exit')
-                    self.home = home
-                    for i in range(len(self._path_home)):
-                        self._path_home.pop()
-                    self._path_home.append(home)
-                    self._path_home.append(destination)
-                    destination.action(dict(act='dig', actor=self, exit=x))
-                    self._has_dug_home = True
+    def _search(self):
+        items = self.room.items()
+        if items:
+            item = items[0]
+            self.get_item(item, self.room)
+            self._searching = False
+            return item
+        else:
+            return None
 
-            if not self._searching and destination==self.home:
-                item = self.items()[0]
-                self.drop_item(item, destination)
-                self._searching = True
+    def _dig_home(self):
+        home = rooms.Room('rat nest', "The rat's nest.")
+        x = rooms.Exit('hole', 'A roughly dug hole.',
+                        room=self.room,
+                        destination=home, return_name='exit')
+        self.home = home
+        for i in range(len(self._path_home)):
+            self._path_home.pop()
+        self._path_home.append(home)
+        self._path_home.append(self.room)
+        self.room.action(dict(act='dig', actor=self, exit=x))
+        self._has_dug_home = True
+
+    def _store_item(self):
+        item = self.items()[0]
+        self.drop_item(item, self.room)
+        self._searching = True
