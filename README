@@ -32,13 +32,24 @@ the settings from etc/defaults.py
 
 RUNNING
 
-The first time you run the server, run the TZMud
+If you want to start with a minimal world, then
+the first time you run the server, run the TZMud
 control program as:
-    python tzcontrol -f
+    python tzcontrol.py -f
 
 That command will generate a "fresh" database with
 a couple of simple rooms. The first character you
 create will be an administrator.
+
+If you would like to use the more built up world
+that is included with the distribution, then run
+the TZMud control program as:
+    python tzcontrol.py -z
+
+That command will restore the database 0.Data.fs
+from the var/db/backup directory. All players
+have been removed from the database, so you will
+still be able to create the first admin character.
 
 
 CONNECTING

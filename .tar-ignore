@@ -5,3 +5,4 @@ twistd*
 *.pyc
 conf.py
 var/db/Data.fs*
+var/db/backup/*.*.Data.fs*
