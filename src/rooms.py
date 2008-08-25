@@ -36,6 +36,7 @@ from db import TZODB, TZIndex
 zodb = TZODB()
 dbroot = zodb.root
 commit = zodb.commit
+abort = zodb.abort
 
 import conf
 import players
@@ -673,20 +674,27 @@ class TeleTrap(TimedTrap):
             self._targets.append(name)
 
     def spring_trap(self):
-        TimedTrap.spring_trap(self)
+        try:
+            TimedTrap.spring_trap(self)
 
-        if not self._targets:
-            rms = rooms.ls()
+            if not self._targets:
+                rms = rooms.ls()
+            else:
+                rms = [getattr(rooms, name) for name in self._targets]
+
+            p = self.players()
+            m = self.mobs()
+            characters = p + m
+            for c in characters:
+                c.message('Click.')
+                room = random.choice(rms)
+                c.move(room)
+
+        except:
+            abort()
+
         else:
-            rms = [getattr(rooms, name) for name in self._targets]
-
-        p = self.players()
-        m = self.mobs()
-        characters = p + m
-        for c in characters:
-            c.message('Click.')
-            room = random.choice(rms)
-            c.move(room)
+            commit()
 
 
 class Zoo(Room):
