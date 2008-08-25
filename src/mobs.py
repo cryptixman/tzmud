@@ -429,7 +429,7 @@ class PackRat(Mob):
                     item = items[0]
                     self.get_item(item, destination)
                     self._searching = False
-                if not self._has_dug_home:
+                if items and not self._has_dug_home:
                     home = rooms.Room('rat nest', "The rat's nest.")
                     x = rooms.Exit('hole', 'A roughly dug hole.',
                                     room=destination,
@@ -441,7 +441,8 @@ class PackRat(Mob):
                     self._path_home.append(destination)
                     destination.action(dict(act='dig', actor=self, exit=x))
                     self._has_dug_home = True
-            elif not self._searching and destination==self.home:
+
+            if not self._searching and destination==self.home:
                 item = self.items()[0]
                 self.drop_item(item, destination)
                 self._searching = True
