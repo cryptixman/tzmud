@@ -48,6 +48,7 @@ TZ.clients = factory.clients
 factory._player_protocols = {}
 TZ._player_protocols = factory._player_protocols
 factory._restart = True
+TZ.purge_all()
 
 
 from twisted.application import service, internet

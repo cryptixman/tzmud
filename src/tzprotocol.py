@@ -104,18 +104,6 @@ class TZ(basic.LineReceiver):
     def __init__(self):
         zodb = TZODB()
         self.dbroot = zodb.root
-        # self.purge_all()
-
-    def purge_all(self):
-        for player in players.ls():
-            self._purge(player)
-
-    def _purge(self, player):
-        if player.logged_in:
-            client = self.playerclient(player)
-            if client is not None:
-                client.transport.loseConnection()
-            player.logged_in = False
 
     def connectionMade(self):
         'A new connection. Send out the MOTD.'
@@ -446,3 +434,20 @@ class TZ(basic.LineReceiver):
         'Return the protocol of the given player.'
 
         return cls.factory._player_protocols.get(player.name, None)
+
+    @classmethod
+    def purge_all(cls):
+        'Disconnect all players.'
+
+        for player in players.ls():
+            cls._purge(player)
+
+    @classmethod
+    def _purge(cls, player):
+        'Disconnect given player.'
+
+        if player.logged_in:
+            client = cls.playerclient(player)
+            if client is not None:
+                client.transport.loseConnection()
+            player.logged_in = False
