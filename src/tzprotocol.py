@@ -104,7 +104,7 @@ class TZ(basic.LineReceiver):
     def __init__(self):
         zodb = TZODB()
         self.dbroot = zodb.root
-        self.purge_all()
+        # self.purge_all()
 
     def purge_all(self):
         for player in players.ls():
