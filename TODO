@@ -12,8 +12,9 @@
     drop it
 - minotaur mob digs a maze and patrols it
 - combat system
-- include initial world in download / repo
-- check that packrat only digs in when it finds something
+- expand the initial world
+- camera item
+- check for a better place to purge players at startup
 
 # Web Server
 - Build MUD areas by web.
