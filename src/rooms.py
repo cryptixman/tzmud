@@ -623,7 +623,28 @@ class Exit(TZObj):
 def classes():
     'Return a list of the names of the clonable rooms.'
 
-    return 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap'
+    return 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap'
+
+
+class SmallRoom(Room):
+    'A room that can only hold so many characters.'
+
+    name = 'small room'
+    short = 'Seems kind of crowded in here.'
+    max_characters = 1
+
+    def near_arrive(self, info):
+        'A character has just arrived here. If the room is full, send back!'
+
+        arriver = info['actor']
+        characters = self.players() + self.mobs()
+        if len(characters) > self.max_characters:
+            x = info['fromx']
+            from_room = x.destination
+            arriver.message('The room is too full to enter.')
+            arriver.move(from_room)
+            arriver.message(from_room)
+            self.action(dict(act='leave', actor=arriver, tox=x))
 
 
 class Trap(Room):
