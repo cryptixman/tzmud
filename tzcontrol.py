@@ -220,7 +220,13 @@ def rollbackfile(fname):
 
     if fname is None:
         backups = os.listdir(conf.backupdir)
-        fname = backups[-1]
+        backups = [f for f in backups if not f.startswith('.')]
+        if backups:
+            fname = backups[-1]
+        else:
+            print 'ERROR'
+            print 'No backup files exist.'
+            return False
 
     rbf = '%s/%s' % (conf.backupdir, fname)
 

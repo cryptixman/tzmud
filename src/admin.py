@@ -277,6 +277,7 @@ def cmd_list(s, r):
 
     if r=='backups':
         backups = os.listdir(conf.backupdir)
+        backups = [f for f in backups if not f.startswith('.')]
         if backups:
             backups.sort()
             s.message('Available backups:')
