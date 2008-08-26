@@ -1,0 +1,24 @@
+TZMud is a Python MUD server.
+http://tzmud.googlecode.com/
+
+A MUD is a text-based virtual environment
+accessed via telnet, or with a specialised
+MUD client.
+
+TZMud development is still in early stages,
+focusing on API and server stability.
+
+TZMud uses several high-quality Python
+libraries to facilitate rapid development:
+    Twisted, ZODB, and Pyparsing.
+
+TZMud is released under GPLv3.
+
+Changes in TZMud-0.5:
+    - improved database backup and restore
+    - automatic database packing
+    - added function to purge all players from a db
+    - added wizard @study command
+    - added teleporter trap
+    - fixed the PackRat digging its home
+    - started building a world for distribution
