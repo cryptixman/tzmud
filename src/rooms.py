@@ -646,6 +646,12 @@ class SmallRoom(Room):
             arriver.message(from_room)
             self.action(dict(act='leave', actor=arriver, tox=x))
 
+            backx = None
+            for backx in from_room.exits():
+                if backx.destination == self:
+                    break
+            from_room.action(dict(act='arrive', actor=arriver, fromx=backx))
+
 
 class Trap(Room):
     'A room that has no exits.'
