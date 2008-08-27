@@ -14,11 +14,6 @@ libraries to facilitate rapid development:
 
 TZMud is released under GPLv3.
 
-Changes in TZMud-0.5:
-    - improved database backup and restore
-    - automatic database packing
-    - added function to purge all players from a db
-    - added wizard @study command
-    - added teleporter trap
-    - fixed the PackRat digging its home
-    - started building a world for distribution
+Changes in TZMud-0.6:
+    - fix for server only accepting 1 connection
+    - added SmallRoom
