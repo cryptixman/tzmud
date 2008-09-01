@@ -107,6 +107,13 @@ go = go_verb + objref + LineEnd()
 direction = objref
 
 
+on_ = Suppress(CaselessLiteral('on '))
+use_verb = CaselessLiteral('use')('verb')
+use_thing = Combine(OneOrMore(~on_ + Word(alphanums)),
+                             joinString=' ', adjacent=False)('objname')
+use = use_verb + (use_thing|objtzidref) + Optional(on_ + obj2ref)
+
+
 with_ = Suppress(CaselessLiteral('with '))
 lock_verb = CaselessLiteral('lock')('verb')
 lock_obj_name = Combine(OneOrMore(~with_ + Word(alphanums)),
@@ -174,7 +181,7 @@ help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | lock | look | unlock | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
+actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | look | unlock | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
 
 
 

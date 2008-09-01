@@ -186,7 +186,7 @@ Item (%s): %s
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coins', 'Hat'
+    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coins', 'Hat', 'Camera', 'Photograph'
 
 
 class Rose(Item):
@@ -333,3 +333,38 @@ class Hat(Item):
     name = 'hat'
     short = 'An old top hat.'
     wearable = True
+
+
+class Camera(Item):
+    'Take snapshots of items, rooms, characters.'
+
+    name = 'camera'
+    short = 'A small black box with a silver button on top.'
+
+    def use(self, actor, obj):
+        'actor uses the camera to take picture of obj.'
+
+        if obj is None:
+            obj = actor.room
+
+        msgs = obj.look(actor)
+        msgs = ['    '+line for line in msgs]
+        msgs.insert(0, 'The picture is of ' + obj.name + '.')
+        picture = '\n'.join(msgs)
+
+        photo = Photograph()
+        photo.name = 'photo of %s' % obj.name
+        photo.long = picture
+
+        actor.message('That looks like a good one...')
+        actor.message('You have a photo of', obj.name, '.')
+        actor.add(photo)
+
+
+class Photograph(Item):
+    'A snapshot of some object.'
+
+    name = 'photo'
+    name_aka = ['photo', 'photograph', 'picture']
+    short = 'A glossy piece of paper with a realistic picture on it.'
+    long = "It's blank."

@@ -264,6 +264,41 @@ def cmd_take(s, r):
         s.message('That is not a container.')
 
 
+def cmd_use(s, r):
+    '''use <item> [on <object>]
+
+    Use the given item, if that makes sense. Use it on the
+        given object, if given.
+
+    '''
+
+    objname = r.get('objname', '')
+    objtzid = r.get('objtzid', 0)
+
+    obj2name = r.get('obj2name', '')
+    obj2tzid = r.get('obj2tzid', 0)
+
+    player = s.player
+
+    item = player.itemname(objname) or player.item(objtzid)
+    if item is None:
+        s.message('You do not have that.')
+        return
+    else:
+        use = getattr(item, 'use', None)
+        if use is None:
+            s.message('You cannot use that.')
+            return
+        else:
+            findr = dict(objname=obj2name, objtzid=obj2tzid)
+            obj = find(findr, s.room, player)
+            if (obj2name or obj2tzid) and obj is None:
+                s.message("You cannot use it on that. It's not here.")
+                return
+            else:
+                use(player, obj)
+
+
 def cmd_inventory(s, r=None):
     '''inventory
 

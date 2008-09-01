@@ -13,8 +13,8 @@
 - minotaur mob digs a maze and patrols it
 - combat system
 - expand the initial world
-- camera item
 - listen to exits to see if anyone is there
+- photographer mob, takes pictures and drops them around
 
 # Web Server
 - Build MUD areas by web.
