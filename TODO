@@ -14,7 +14,7 @@
 - combat system
 - expand the initial world
 - camera item
-- check for a better place to purge players at startup
+- listen to exits to see if anyone is there
 
 # Web Server
 - Build MUD areas by web.
