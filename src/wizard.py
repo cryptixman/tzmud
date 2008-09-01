@@ -504,7 +504,10 @@ def cmd_destroy(s, r):
             s.room.action(dict(act='destroy_mob', actor=s.player, mob=obj))
 
         obj.destroy()
-        s.message(class_as_string(obj), obj, 'destroyed.')
+        try:
+            s.message(class_as_string(obj), obj, 'destroyed.')
+        except TypeError:
+            s.message('Destroyed.')
     else:
         s.message('Object not found.')
 
