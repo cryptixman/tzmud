@@ -279,28 +279,7 @@ Mob: %s (%s) [in room %s]: %s
             self.awake = True
             self.room.action(dict(act='awake', actor=self))
 
-
-def classes():
-    'Return a list of the names of the clonable mobs'
-
-    return 'Cat', 'Sloth', 'Snake', 'PackRat'
-
-
-class Cat(Mob):
-    'Miaw!'
-
-    name = 'cat'
-    short = 'A frisky little kitty cat.'
-
-    def look(self, looker):
-        'Return a string to send to the player looking at this cat.'
-
-        msgs = Mob.look(self, looker)
-        if not self.awake:
-            msgs.append('    ' + str(self) + ' is sleeping... shhhh.')
-        return msgs
-
-    @weight(50)
+    @weight(0)
     def action_move(self):
         'Select an exit at random and go there.'
 
@@ -331,6 +310,31 @@ class Cat(Mob):
 
                 #print self, 'moved from', room, 'to', destination
 
+
+def classes():
+    'Return a list of the names of the clonable mobs'
+
+    return 'Cat', 'Sloth', 'Snake', 'PackRat'
+
+
+class Cat(Mob):
+    'Miaw!'
+
+    name = 'cat'
+    short = 'A frisky little kitty cat.'
+
+    def look(self, looker):
+        'Return a string to send to the player looking at this cat.'
+
+        msgs = Mob.look(self, looker)
+        if not self.awake:
+            msgs.append('    ' + str(self) + ' is sleeping... shhhh.')
+        return msgs
+
+    @weight(50)
+    def action_move(self):
+        Mob.action_move(self)
+
     def near_say(self, info):
         '''Players can cause the cat to follow by saying "here kitty" or
             stop the cat from following by saying "go away".
@@ -360,6 +364,11 @@ class Snake(Mob):
 
     name = 'snake'
     short = 'A green garter snake.'
+    actionperiod = 1 # seconds
+
+    @weight(100)
+    def action_move(self):
+        Mob.action_move(self)
 
 
 class PackRat(Mob):
