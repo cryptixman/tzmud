@@ -142,6 +142,11 @@ words = Combine(OneOrMore(Word(printables)),
 say = say_verb + words
 
 
+to_ = Suppress(CaselessLiteral('to '))
+listen_verb = CaselessLiteral('listen')('verb')
+listen = listen_verb + Optional(to_) + objref
+
+
 shout_verb = CaselessLiteral('shout')('verb')
 shout = shout_verb + words
 
@@ -181,7 +186,7 @@ help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | look | unlock | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
+actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
 
 
 
@@ -189,7 +194,6 @@ wiz = CaselessLiteral('@')('section')
 wiz.setParseAction(replaceWith('wizard'))
 
 
-to_ = Suppress(CaselessLiteral('to '))
 teleport_verb = CaselessLiteral('teleport')('verb')
 teleport_to = objref
 teleport1 = teleport_verb + Optional(teleport_to) + LineEnd()

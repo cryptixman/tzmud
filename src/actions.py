@@ -580,6 +580,30 @@ def cmd_say(s, r):
     s.room.action(dict(act='say', actor=s.player, verb=verb, raw=words))
 
 
+def cmd_listen(s, r):
+    '''listen [to] <object>
+
+    Put your ear up to some object to see if you can hear something.
+
+    '''
+
+    objname = r.get('objname', '')
+    objtzid = r.get('objtzid', '')
+
+    player = s.player
+    room = s.room
+
+    obj = player.itemname(objname) or player.item(objtzid) or \
+            room.itemname(objname) or room.item(objtzid) or \
+            room.exitname(objname) or room.exit(objname)
+
+    if obj is not None:
+        s.message('You listen to', obj)
+        s.room.action(dict(act='listen', actor=player, obj=obj))
+    else:
+        s.message('That is not here.')
+
+
 def cmd_shout(s, r):
     '''shout <text>
 

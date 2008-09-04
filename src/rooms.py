@@ -216,6 +216,8 @@ class Room(TZContainer):
                     mob.act_near(info)
             for item in self.items():
                 item.act_near(info)
+            for x in self.exits():
+                x.act_near(info)
             self.act_near(info)
 
             # Some actions can affect nearby rooms. If that is the case for
@@ -587,6 +589,16 @@ class Exit(TZObj):
                     msgs.append('The exit %s is locked.' % self)
 
         return msgs
+
+    def near_listen(self, info):
+        obj = info['obj']
+        if obj==self:
+            listener = info['actor']
+            d = self.destination
+            if d.mobs() or d.players():
+                listener.message('You hear someone there.')
+            else:
+                listener.message('It sounds quiet there.')
 
 
     def __str__(self):
