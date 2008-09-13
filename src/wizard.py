@@ -292,6 +292,8 @@ def cmd_list(s, r):
         s.message('No', listing, 'yet.')
 
     if classes:
+        classes = list(classes)
+        classes.sort()
         if objs:
             s.message()
         s.message('Cloneable:')
