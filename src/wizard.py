@@ -297,7 +297,7 @@ def cmd_list(s, r):
         if objs:
             s.message()
         s.message('Cloneable:')
-        s.columns(classes, color=colors.white)
+        s.columns_v(classes, color=colors.white)
 
 
 def cmd_clone(s, r):
@@ -531,7 +531,8 @@ def cmd_help(s, r=None):
             if func.startswith('cmd_'):
                 #s.message(func[4:], indent=4)
                 commands.append(func[4:])
-        s.columns(commands)
+        commands.sort()
+        s.columns_v(commands)
     else:
         func_name = 'cmd_%s' % topic
         func = getattr(wizard, func_name, None)

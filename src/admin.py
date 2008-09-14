@@ -399,7 +399,8 @@ def cmd_help(s, r=None):
             if func.startswith('cmd_'):
                 #s.message(func[4:], indent=4)
                 commands.append(func[4:])
-        s.columns(commands)
+        commands.sort()
+        s.columns_v(commands)
 
     else:
         func_name = 'cmd_%s' % r

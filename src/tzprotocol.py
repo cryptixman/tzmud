@@ -410,6 +410,62 @@ class TZ(basic.LineReceiver):
         for row in izip(*[chain(filled_items, repeat('', cols-1))]*cols):
             self.message('  '.join(row), indent=4)
 
+    def columns_v(self, items, color=None):
+        '''Send list of strings out as a multi-column list.
+
+        The columns are printed vertically, such that an
+            alphabetized list would be read top-to-bottom,
+            then left to right.
+
+        '''
+
+        # determine the longest word in the given list
+        maxlen = 0
+        for i in items:
+            l = len(i)
+            if l > maxlen:
+                maxlen = l
+
+        li = len(items)
+        width = maxlen + 2
+        cols = (70 / width) - 1
+        rows = li / cols
+        if li % cols:
+            rows += 1
+
+        columns = []
+        n = 0
+        for i in range(li % cols):
+            columns.append(items[n:n+rows])
+            n += rows
+        for i in range(li % cols, cols):
+            if not li % cols:
+                end = n + rows
+            else:
+                end = n + rows - 1
+            columns.append(items[n:end])
+            if not li % cols:
+                n += rows
+            else:
+                n += rows - 1
+
+        reordered = []
+        for r in range(rows):
+            for column in columns:
+                try:
+                    reordered.append(column[r])
+                except IndexError:
+                    pass
+
+        items = reordered
+
+        filled_items = [item.ljust(width, ' ') for item in items]
+        if color is not None:
+            filled_items = [color(item) for item in filled_items]
+        from itertools import izip, chain, repeat
+        for row in izip(*[chain(filled_items, repeat('', cols-1))]*cols):
+            self.message('  '.join(row), indent=4)
+
     @classmethod
     def who(cls):
         'Return list of names of players connected right now.'
