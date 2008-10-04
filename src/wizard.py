@@ -405,18 +405,23 @@ def cmd_study(s, r):
         doc = obj.__doc__
         name = class_as_string(obj)
     else:
+        found = False
         for mod in items, mobs, rooms:
             for name in mod.classes():
                 if objname == name:
+                    found = name
                     cls = getattr(mod, name)
                     doc = cls.__doc__
-                    break
+
+        if not found:
+            s.message('No such thing to study.')
+            return
 
     if doc is None:
         doc = '... but it is still a mystery'
 
     name = colors.white(name)
-    s.message('You study the', name)
+    s.message('You study the', found)
     msgs = doc.split('\n')
     s.mlmessage(msgs, indent=4)
 
