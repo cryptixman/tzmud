@@ -24,10 +24,12 @@ Mobs are generally not gettable, and subclass the Character class.
 
 import random
 import time
+from bisect import bisect
 
 from twisted.internet import reactor
 
 from persistent.list import PersistentList
+from persistent.dict import PersistentDict
 
 from db import TZODB, TZIndex
 zodb = TZODB()
@@ -105,33 +107,6 @@ def nudge_all():
         mob.nudge(0)
 
 
-
-
-def weight(value):
-    '''Decorator function to set the relative weighting of a function.
-
-    Use this to make some mob actions more frequent or less frequent.
-
-    For instance, in the base Mob class, these method defintions ...
-
-    @weight(5)
-    def action_sleep(self):
-        [...]
-
-    @weight(25)
-    def action_awake(self):
-        [...]
-
-    Will cause awake to be called about 5 times more often than sleep.
-
-    '''
-
-    def set_weight(method):
-        method.weight = value
-        return method
-    return set_weight
-
-
 class Mob(Character):
     'Base class for all mob (mobile) objects in the MUD.'
 
@@ -144,6 +119,11 @@ class Mob(Character):
         self.nudge()
 
         add(self)
+
+        self._action_weights = PersistentDict()
+        self.set_default_action_weights()
+        self.set_action_weights(action_awake=500,
+                                action_move=0)
 
     def destroy(self):
         'Get rid of this mob and remove it from the mob index.'
@@ -205,26 +185,45 @@ Mob: %s (%s) [in room %s]: %s
 
         pass
 
-    def actions(self):
-        "return a list of this mob's possible actions"
+    def set_action_weights(self, **kw):
+        '''set the weight of the given methods by name.
 
-        return [getattr(self, method) for method in dir(self) if method.startswith('action_')]
+        >>> mob.set_action_weights(action_sleep=50,
+                                    action_move=200)
+
+        '''
+
+        for meth_name, weight in kw.items():
+            self._action_weights[meth_name] = weight
+
+    def set_default_action_weights(self):
+        '''set all action_* methods to weight 100.'''
+
+        for meth_name in self.actions():
+            self._action_weights[meth_name] = 100
+
+    def actions(self):
+        """return a list of this mob's possible actions.
+
+        Names of actions should begin with action_
+
+        """
+
+        acts = [meth_name for meth_name in dir(self)
+                    if meth_name.startswith('action_')]
+        return acts
 
     def action(self):
         'Select a possible action using weighted choice'
 
-        actions = self.actions()
-        weights = [method.weight for method in actions]
-        total = sum(weights)
-
-        choice = random.randrange(total)
-
-        while choice > weights[0]:
-            choice -= weights[0]
-            weights.pop(0)
-            actions.pop(0)
-
-        return actions[0]
+        action_names = self.actions()
+        weights = [self._action_weights[meth_name] for meth_name in action_names]
+        total = float(sum(weights))
+        cum_norm_weights = [0.0]*len(weights)
+        for i in xrange(len(weights)):
+            cum_norm_weights[i] = cum_norm_weights[i-1] + weights[i]/total
+        meth_name = action_names[bisect(cum_norm_weights, random.random())]
+        return getattr(self, meth_name)
 
     def act(self):
         'Choose an action and call it.'
@@ -262,7 +261,6 @@ Mob: %s (%s) [in room %s]: %s
             print 'Mob acted too recently to nudge.'
 
 
-    @weight(5)
     def action_sleep(self):
         'Go to sleep.'
 
@@ -270,8 +268,6 @@ Mob: %s (%s) [in room %s]: %s
             self.awake = False
             self.room.action(dict(act='sleep', actor=self))
 
-
-    @weight(25)
     def action_awake(self):
         'Wake up.'
 
@@ -279,7 +275,6 @@ Mob: %s (%s) [in room %s]: %s
             self.awake = True
             self.room.action(dict(act='awake', actor=self))
 
-    @weight(0)
     def action_move(self):
         'Select an exit at random and go there.'
 
@@ -323,17 +318,17 @@ class Cat(Mob):
     name = 'cat'
     short = 'A frisky little kitty cat.'
 
+    def __init__(self, name='', short='', long=''):
+        Mob.__init__(self, name, short, long)
+        self.set_action_weights(action_move=1000)
+
     def look(self, looker):
         'Return a string to send to the player looking at this cat.'
 
         msgs = Mob.look(self, looker)
         if not self.awake:
-            msgs.append('    ' + str(self) + ' is sleeping... shhhh.')
+            msgs.append('    ' + str(self) + ' is sleeping.... Aww. So cute.')
         return msgs
-
-    @weight(50)
-    def action_move(self):
-        Mob.action_move(self)
 
     def near_say(self, info):
         '''Players can cause the cat to follow by saying "here kitty" or
@@ -366,10 +361,13 @@ class Snake(Mob):
     short = 'A green garter snake.'
     actionperiod = 1 # seconds
 
-    @weight(100)
-    def action_move(self):
-        Mob.action_move(self)
 
+    def __init__(self, name='', short='', long=''):
+        Mob.__init__(self, name, short, long)
+        self.set_action_weights(action_move=2000)
+
+    def action_reweight(self):
+        pass
 
 class PackRat(Mob):
     'Collects things and brings them back to its nest.'
@@ -385,6 +383,7 @@ class PackRat(Mob):
         self._path_home = PersistentList()
         self._searching = True
         self._has_dug_home = False
+        self.set_action_weights(action_move=2000)
 
     def near_drop(self, info):
         if self._searching and self.room!=self.home and not self.items():
@@ -396,7 +395,6 @@ class PackRat(Mob):
                 if not self._has_dug_home:
                     self._dig_home()
 
-    @weight(100)
     def action_move(self):
         x = self._choose_exit()
         if x is not None:
@@ -441,7 +439,7 @@ class PackRat(Mob):
                 l = len(self._path_home)
                 if i+1 < l:
                     for d in range(i+1, l):
-                        del self._path_home[d]
+                        del self._path_home[-1]
 
             backx = None
             for backx in destination.exits():
