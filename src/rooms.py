@@ -848,7 +848,7 @@ class Zoo(Room):
         key = self.itemname('key')
 
         outside = Room('outside the %s cage' % mcl)
-        x = Exit('to the %s' % mcl)
+        x = Exit('see the %s' % mcl)
         bx = Exit('zoo')
         self.addexit(x)
         x.destination = outside
