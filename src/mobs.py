@@ -40,6 +40,7 @@ commit = zodb.commit
 import tzprotocol
 
 import rooms
+import items
 
 from share import TZContainer, Character
 from colors import magenta
@@ -309,7 +310,7 @@ Mob: %s (%s) [in room %s]: %s
 def classes():
     'Return a list of the names of the clonable mobs'
 
-    return 'Cat', 'Sloth', 'Snake', 'PackRat'
+    return 'Cat', 'Sloth', 'Snake', 'PackRat', 'Photographer'
 
 
 class Cat(Mob):
@@ -473,5 +474,48 @@ class PackRat(Mob):
 
     def _store_item(self):
         item = self.items()[0]
-        self.drop_item(item, self.room)
+        self.drop_item(item)
         self._searching = True
+
+
+class Photographer(Mob):
+    'Wanders around taking pictures'
+
+    actionperiod = 25 # seconds
+    name_aka = ['photographer']
+
+    name = 'photographer'
+    short = 'A guy with a bag and a camera.'
+
+    def __init__(self, name='', short='', long=''):
+        Mob.__init__(self, name, short, long)
+        camera = items.Camera()
+        self.add(camera)
+        self.set_action_weights(action_sleep=0,
+                                action_awake=0,
+                                action_move=400)
+
+    def action_snap(self):
+        'Take a picture.'
+
+        camera = self.itemname('camera')
+        r = self.room
+        i = r.items()
+        m = r.mobs()
+        m.remove(self)
+        p = r.players()
+        x = r.exits()
+        item = random.choice([r] + i + m + p + x)
+
+        camera.use(self, item)
+        r.action(dict(act='use', actor=self, item=camera))
+
+    def action_drop(self):
+        'Drop one of the pictures.'
+
+        picnames = self.itemnames()
+        picnames = [n for n in picnames if n.startswith('photo of')]
+        if picnames:
+            picname = random.choice(picnames)
+            pic = self.itemname(picname)
+            self.drop_item(pic)

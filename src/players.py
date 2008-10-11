@@ -418,6 +418,13 @@ Player (%s): %s  [%s]
         x = info['exit']
         self.message(digger, 'digs a new exit', x, '.')
 
+    def near_use(self, info):
+        'Someone has used something near this player.'
+
+        user = info['actor']
+        item = info['item']
+        self.message(user, 'uses the', item, '.')
+
 
 if __name__ == '__main__':
     update()

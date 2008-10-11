@@ -136,7 +136,7 @@ def cmd_drop(s, r):
 
     if objname == 'all':
         for item in s.player.items():
-            s.player.drop_item(item, s.room)
+            s.player.drop_item(item)
             s.player.message('You drop', item, '.')
         return
 
@@ -155,7 +155,7 @@ def cmd_drop(s, r):
             else:
                 s.message('You cannot split that item.')
 
-        s.player.drop_item(item, s.room)
+        s.player.drop_item(item)
         s.player.message('You drop', item, '.')
 
     else:
@@ -297,6 +297,7 @@ def cmd_use(s, r):
                 return
             else:
                 use(player, obj)
+                room.action(dict(act='use', actor=player, item=item))
 
 
 def cmd_inventory(s, r=None):

@@ -314,13 +314,14 @@ Character (%s): %s
         item.get(self)
         room.action(dict(act='get', actor=self, item=item))
 
-    def drop_item(self, item, room):
-        'Drop item from inventory in to room.'
+    def drop_item(self, item):
+        'Drop item from inventory.'
 
         if self.is_wearing(item):
             self.unwear(item)
             item.unwear(self)
         self.remove(item)
+        room = self.room
         room.add(item)
         item.drop(self)
         room.action(dict(act='drop', actor=self, item=item))
