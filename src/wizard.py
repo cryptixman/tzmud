@@ -404,6 +404,7 @@ def cmd_study(s, r):
     if obj is not None:
         doc = obj.__doc__
         name = class_as_string(obj)
+        found = obj
     else:
         found = False
         for mod in items, mobs, rooms:
