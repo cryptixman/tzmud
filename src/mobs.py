@@ -508,7 +508,6 @@ class Photographer(Mob):
         item = random.choice([r] + i + m + p + x)
 
         camera.use(self, item)
-        r.action(dict(act='use', actor=self, item=camera))
 
     def action_drop(self):
         'Drop one of the pictures.'

@@ -421,9 +421,18 @@ Player (%s): %s  [%s]
     def near_use(self, info):
         'Someone has used something near this player.'
 
-        user = info['actor']
-        item = info['item']
-        self.message(user, 'uses the', item, '.')
+        #check for a customized message first
+        custom = info.get('custom', None)
+        if custom is not None:
+            self.message(custom % info)
+        else:
+            user = info['actor']
+            item = info['item']
+            target = info.get('target', None)
+            if target is None:
+                self.message(user, 'uses the', item, '.')
+            else:
+                self.message(user, 'uses the', item, 'on', target, '.')
 
 
 if __name__ == '__main__':

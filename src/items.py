@@ -360,6 +360,10 @@ class Camera(Item):
         actor.message('You have a photo of', obj.name, '.')
         actor.add(photo)
 
+        actor.room.action(dict(act='use',
+                                custom='%(actor)s snaps a picture of %(target)s.',
+                                actor=actor, item=self, target=obj))
+
 
 class Photograph(Item):
     'A snapshot of some object.'

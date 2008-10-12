@@ -297,7 +297,6 @@ def cmd_use(s, r):
                 return
             else:
                 use(player, obj)
-                room.action(dict(act='use', actor=player, item=item))
 
 
 def cmd_inventory(s, r=None):
