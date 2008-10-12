@@ -129,7 +129,7 @@ unlock = unlock1 | unlock2
 
 
 follow_verb = CaselessLiteral('follow')('verb')
-follow = follow_verb + objref + LineEnd()
+follow = follow_verb + Optional(objref) + LineEnd()
 
 
 exits = CaselessLiteral('exits')('verb') + LineEnd()
