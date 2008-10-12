@@ -493,7 +493,8 @@ class Photographer(Mob):
         self.add(camera)
         self.set_action_weights(action_sleep=0,
                                 action_awake=0,
-                                action_move=400)
+                                action_move=400,
+                                action_snap=1000)
 
     def action_snap(self):
         'Take a picture.'
@@ -505,9 +506,13 @@ class Photographer(Mob):
         m.remove(self)
         p = r.players()
         x = r.exits()
-        item = random.choice([r] + i + m + p + x)
+        choices = i or m or p or x or [r]
+        item = random.choice(choices)
+        photoname = 'photo of %s' % item.name
+        have_one_already = self.itemname(photoname)
 
-        camera.use(self, item)
+        if have_one_already is None:
+            camera.use(self, item)
 
     def action_drop(self):
         'Drop one of the pictures.'
