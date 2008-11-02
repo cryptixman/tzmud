@@ -705,9 +705,11 @@ def cmd_stats(s, r=None):
     s.message('Character stats...')
     keys = s.player._stats0.keys()
     keys.sort()
+    maxlen = max(len(k) for k in keys)
     for k in keys:
         v = s.player.stat(k)
-        s.message('    ', k, ':', v)
+        spaces = maxlen - len(k)
+        s.message('    ', k, ' '*spaces, ':', v)
 
 
 def cmd_unset(s, r):
