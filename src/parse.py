@@ -165,6 +165,10 @@ who_verb = CaselessLiteral('who')('verb')
 who = who_verb + LineEnd()
 
 
+stats_verb = CaselessLiteral('stats')('verb')
+stats = stats_verb + LineEnd()
+
+
 set_verb = CaselessLiteral('set')('verb')
 set_var = Word(alphas)('var')
 set_val = Word(alphas)('val')
@@ -186,7 +190,7 @@ help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | set | unset | password | help | go | direction)
+actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | stats | set | unset | password | help | go | direction)
 
 
 

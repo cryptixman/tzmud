@@ -31,6 +31,7 @@ from twisted.internet import reactor
 
 from persistent import Persistent
 from persistent.list import PersistentList
+from persistent.dict import PersistentDict
 
 import conf
 from db import TZODB, TZIndex, tzid
@@ -212,6 +213,8 @@ class Character(TZContainer):
     'Base class for Player and Mob classes.'
 
     gettable = False
+    _stats0 = PersistentDict()
+    _stats = PersistentDict()
 
     def __init__(self, name='', short='', long=''):
         TZContainer.__init__(self, name, short, long)
@@ -220,6 +223,8 @@ class Character(TZContainer):
         self._hid = None
         self._follow_id = None
 
+        self._set_default_stats()
+
         self._wearing_ids = PersistentList()
 
         self.awake = True
@@ -227,10 +232,33 @@ class Character(TZContainer):
 
         self.following = None
 
+    def _set_default_stats(self):
+
+        stats_list = ['health', 'strength', ]
+
+        for name in stats_list:
+            self._stats0[name] = 0
+
     def __repr__(self):
         return '''
 Character (%s): %s
 ''' % (self.tzid, self.short)
+
+    def stat(self, name):
+        '''return the value of the named statistic.
+
+        returns None if the stat is not set either in
+        _stat or _stat0, and copies that value from _stat0
+        if there is a value in _stat0, but none yet in _stat.
+
+        '''
+
+        v = self._stats.get(name)
+        if v is None:
+            v = self._stats0.get(name)
+            if v is not None:
+                self._stats[name] = v
+        return v
 
     def look(self, looker):
         '''Return a multiline message (list of strings) for a player looking

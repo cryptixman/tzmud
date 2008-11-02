@@ -695,6 +695,21 @@ def cmd_set(s, r=None):
             s.message('You have not set anything yet.')
 
 
+def cmd_stats(s, r=None):
+    '''stats
+
+    Show the values of all character statistics.
+
+    '''
+
+    s.message('Character stats...')
+    keys = s.player._stats0.keys()
+    keys.sort()
+    for k in keys:
+        v = s.player.stat(k)
+        s.message('    ', k, ':', v)
+
+
 def cmd_unset(s, r):
     '''unset <var>
 
