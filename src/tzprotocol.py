@@ -162,13 +162,17 @@ class TZ(basic.LineReceiver):
         except ValueError:
             self.simessage('Create account with "create <name> <password>"')
         else:
-            player = players.Player(player_name)
-            player.set_password(pwtext)
-            if len(players.ls()) == 1:
-                admin.add(player)
+            existing = players.getname(player_name)
+            if existing:
+                self.simessage('Name already in use.')
+            else:
+                player = players.Player(player_name)
+                player.set_password(pwtext)
+                if len(players.ls()) == 1:
+                    admin.add(player)
 
-            self.simessage('Account created.')
-            self.simessage('Log in with "login <name> <password>"')
+                self.simessage('Account created.')
+                self.simessage('Log in with "login <name> <password>"')
 
     def purge(self, r):
         'Disconnect other session with this account logged in.'
