@@ -511,6 +511,7 @@ Room (%s): %s
 
 class Exit(TZObj):
     locked = False
+    _weight = 0
     _lock_link_id = 0
 
     def __init__(self, name, short='', long='', room=None, destination=None, return_name=''):
@@ -531,6 +532,24 @@ class Exit(TZObj):
 
         self.room.rmexit(self)
         TZObj.destroy(self)
+
+    def go(self, character):
+        '''character is trying to go through this exit.
+
+        returns (True, None) if it works.
+        returns (False, 'Some message explaining why not.') if not.
+
+        '''
+
+        if self.destination is None:
+            return (False, 'Exit %s is broken....'%self)
+        if self.locked:
+            return (False, 'The door is locked.')
+        elif self._weight:
+            if character.stat('strength') < self._weight:
+                return (False, 'The door is too heavy.')
+
+        return (True, None)
 
     def add_key(self, key):
         'Make this door lockable with the given key.'
@@ -635,7 +654,7 @@ class Exit(TZObj):
 def classes():
     'Return a list of the names of the clonable rooms.'
 
-    return 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap'
+    return 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap', 'HeavyDoorRoom'
 
 
 class SmallRoom(Room):
@@ -867,3 +886,18 @@ class Zoo(Room):
         cage.addexit(bx)
 
         self.respawn(outside, mobclass)
+
+
+
+
+class HeavyDoorRoom(Room):
+    'A room with a heavy door.'
+
+    name = 'hdr'
+    short = "Whoa that's a big door."
+
+    def __init__(self, name=''):
+        Room.__init__(self, name)
+        x = Exit('big door')
+        x._weight = 5
+        self.addexit(x)

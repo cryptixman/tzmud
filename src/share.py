@@ -247,18 +247,44 @@ Character (%s): %s
     def stat(self, name):
         '''return the value of the named statistic.
 
-        returns None if the stat is not set either in
-        _stat or _stat0, and copies that value from _stat0
-        if there is a value in _stat0, but none yet in _stat.
+        returns 0 if the stat is not set either in
+            _stats or _stats0.
+
+        Copies the value from _stats0 in to _stats
+            if there is a value in _stats0,
+            but none yet in _stats.
 
         '''
 
         v = self._stats.get(name)
         if v is None:
-            v = self._stats0.get(name)
-            if v is not None:
-                self._stats[name] = v
+            v = self._stats0.get(name, 0)
+            self._stats[name] = v
         return v
+
+    def go(self, x):
+        '''Character is trying to go through exit x.
+
+        Passes through the return value from the exit.
+
+        '''
+
+        r = x.go(self)
+        success, msg = r
+        if success:
+            room = x.room
+            dest = x.destination
+            room.action(dict(act='leave', actor=self, tox=x))
+            self.move(dest)
+
+            backx = None
+            for backx in dest.exits():
+                if backx.destination == room:
+                    break
+            dest.action(dict(act='arrive',
+                                actor=self, fromx=backx))
+
+        return r
 
     def look(self, looker):
         '''Return a multiline message (list of strings) for a player looking

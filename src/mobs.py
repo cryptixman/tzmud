@@ -279,32 +279,16 @@ Mob: %s (%s) [in room %s]: %s
     def action_move(self):
         'Select an exit at random and go there.'
 
+        room = self.room
         fol = self.following
-        if fol is not None and (fol in self.room.players() or
-                                fol in self.room.mobs()):
+        if fol is not None and (fol in room.players() or
+                                fol in room.mobs()):
             return
 
-        origin = self.room
-        exits = origin.exits()
+        exits = room.exits()
         if exits:
             x = random.choice(exits)
-            if x.locked:
-                return
-
-            destination = x.destination
-            if destination is not None:
-                origin.action(dict(act='leave', actor=self, tox=x))
-
-                self.move(destination)
-
-                backx = None
-                for backx in destination.exits():
-                    if backx.destination == origin:
-                        break
-
-                destination.action(dict(act='arrive', actor=self, fromx=backx))
-
-                #print self, 'moved from', room, 'to', destination
+            success, msg = self.go(x)
 
 
 def classes():
@@ -426,28 +410,17 @@ class PackRat(Mob):
         return x
 
     def _move(self, x):
-        origin = self.room
-        destination = x.destination
-        if destination is not None:
-            origin.action(dict(act='leave', actor=self, tox=x))
-
-            self.move(destination)
-
-            if destination not in self._path_home:
-                self._path_home.append(destination)
+        success, msg = self.go(x)
+        if success:
+            dest = x.destination
+            if dest not in self._path_home:
+                self._path_home.append(dest)
             else:
-                i = self._path_home.index(destination)
+                i = self._path_home.index(dest)
                 l = len(self._path_home)
                 if i+1 < l:
                     for d in range(i+1, l):
                         del self._path_home[-1]
-
-            backx = None
-            for backx in destination.exits():
-                if backx.destination == origin:
-                    break
-
-            destination.action(dict(act='arrive', actor=self, fromx=backx))
 
     def _search(self):
         items = self.room.items()

@@ -385,17 +385,10 @@ def cmd_go(s, r):
         s.message('Not an exit.')
         return
 
-    if x.locked:
-        s.message('Door is locked.')
-        return
+    success, msg = s.player.go(x)
 
-    destination = x.destination
-    if destination is not None:
-        s.room.action(dict(act='leave', actor=s.player, tox=x))
-
-        s.player.move(destination)
-
-        s.message(s.room)
+    if success:
+        s.message(x.destination)
 
         if len(s.room.players()) > 1:
             for player in s.room.players():
@@ -405,14 +398,8 @@ def cmd_go(s, r):
         for mob in s.room.mobs():
             s.message(mob, 'is here.')
 
-        backx = None
-        for backx in s.room.exits():
-            if backx.destination == origin:
-                break
-        s.room.action(dict(act='arrive', actor=s.player, fromx=backx))
-
     else:
-        s.message('Exit', x, 'is broken....')
+        s.message(msg)
 
 
 def cmd_lock(s, r):
