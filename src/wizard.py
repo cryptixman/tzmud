@@ -224,9 +224,9 @@ def cmd_dig(s, r):
             s.message('#', exitintzid, 'is not an exit.')
             raise TypeError
 
-    # If digging both directions, link the exits
-    if bx is not None:
-        x.link(bx)
+        # If digging both directions, link the exits
+        if bx is not None:
+            x.link(bx)
 
 
 def cmd_lock(s, r):
