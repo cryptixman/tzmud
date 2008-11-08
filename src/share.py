@@ -176,7 +176,8 @@ class TZContainer(TZObj):
                 if not all:
                     return item
                 else:
-                    result.append(item)
+                    if item not in result:
+                        result.append(item)
 
         for item in self.items():
             if hasattr(item, 'name_aka'):
@@ -185,7 +186,8 @@ class TZContainer(TZObj):
                         if not all:
                             return item
                         else:
-                            result.append(item)
+                            if item not in result:
+                                result.append(item)
 
         if result:
             return result
