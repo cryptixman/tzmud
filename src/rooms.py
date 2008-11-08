@@ -815,11 +815,18 @@ class Zoo(Room):
 
         key = self.itemname('key')
         if key is None:
-            key = items.Key()
-            self.add(key)
-            # make sure to always use the same key
+            # Check if the room has any keys. If not make one.
+            # If it does have at least one key, only make a
+            #   new one very rarely.
+            _key = None
             if hasattr(self, '_key'):
-                key._key = getattr(self, '_key')
+                _key = getattr(self, '_key')
+            if _key is None or random.choice(random.randrange(50)) == 0:
+                key = items.Key()
+                self.add(key)
+                # make sure to always use the same key
+                if hasattr(self, '_key'):
+                    key._key = getattr(self, '_key')
         self._key = key._key
 
         for mobclass in mobs.classes():
