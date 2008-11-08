@@ -19,8 +19,7 @@
 - Die item -- magical attack
 - allow wizard to change settings on objects
 - Human/Humanoid mob for subclassing
-- info command should only talk about player, other info
-    should only be available to wizards
+- Zoo makes too many keys
 
 # Web Server
 - Build MUD areas by web.

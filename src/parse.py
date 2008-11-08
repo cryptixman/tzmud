@@ -198,6 +198,10 @@ wiz = CaselessLiteral('@')('section')
 wiz.setParseAction(replaceWith('wizard'))
 
 
+info_verb = CaselessLiteral('info')('verb')
+info = info_verb + Optional(objref) + LineEnd()
+
+
 teleport_verb = CaselessLiteral('teleport')('verb')
 teleport_to = objref
 teleport1 = teleport_verb + Optional(teleport_to) + LineEnd()
@@ -272,7 +276,7 @@ destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | help)
+wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | help)
 
 
 full_parser = actions_parser | wizard_parser

@@ -73,6 +73,22 @@ def remove(player):
         dbroot['wizard'].remove(player.name)
 
 
+def cmd_info(s, r):
+    '''info [<item>|<player>|<mob>|<room>|<exit>]
+
+    Get more info about given object or about own player if none given
+
+    '''
+
+    objs = find(r, s.room, s.player, s.player, all=True)
+
+    if objs:
+        for obj in objs:
+            s.mlmessage(obj.wizinfo())
+    else:
+        s.message('You do not see that here.')
+
+
 def cmd_teleport(s, r=None):
     '''teleport [<room>|<player>] OR teleport <object> to <room>
 

@@ -114,9 +114,24 @@ class TZObj(Persistent):
         '''Return a multiline message (list of strings) with more details
             about this object.
 
+        For regular characters (not wizards) just returns the name
+            and id of the object, so that it can be selected by id
+            if there is more than one object by that name that is
+            selectable.
+
         '''
 
-        return ['%s (%s) %s' % (self.name, self.tzid, self.__class__)]
+        return ['%s (%s)' % (self.name, self.tzid)]
+
+    def wizinfo(self):
+        '''Return a multiline message (list of strings) with more details
+            about this object.
+
+        For wizards, gives the name, id and class of the object.
+
+        '''
+
+        return ['%s (%s) %s' % (self.name, self.tzid, class_as_string(self))]
 
 
 class TZContainer(TZObj):
