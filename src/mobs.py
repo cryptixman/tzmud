@@ -474,18 +474,19 @@ class Photographer(Mob):
 
         camera = self.itemname('camera')
         r = self.room
-        i = r.items()
-        m = r.mobs()
-        m.remove(self)
-        p = r.players()
-        x = r.exits()
-        choices = i or m or p or x or [r]
-        item = random.choice(choices)
-        photoname = 'photo of %s' % item.name
-        have_one_already = self.itemname(photoname)
+        if r != self.home:
+            i = r.items()
+            m = r.mobs()
+            m.remove(self)
+            p = r.players()
+            x = r.exits()
+            choices = i or m or p or x or [r]
+            item = random.choice(choices)
+            photoname = 'photo of %s' % item.name
+            have_one_already = self.itemname(photoname)
 
-        if have_one_already is None:
-            camera.use(self, item)
+            if have_one_already is None:
+                camera.use(self, item)
 
     def action_drop(self):
         'Drop one of the pictures.'
