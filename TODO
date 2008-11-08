@@ -15,7 +15,6 @@
 - combat system
 - skill system
 - expand the initial world
-- think about a better way to re-weight mob actions
 - Die item -- magical attack
 - allow wizard to change settings on objects
 - Human/Humanoid mob for subclassing
