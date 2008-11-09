@@ -18,6 +18,9 @@
 - Die item -- magical attack
 - allow wizard to change settings on objects
 - Human/Humanoid mob for subclassing
+- Fix upgrading objects that create other objects during
+    their creation to keep them from creating more and
+    more objects each time they are upgraded.
 
 # Web Server
 - Build MUD areas by web.

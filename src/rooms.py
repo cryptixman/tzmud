@@ -527,6 +527,8 @@ class Exit(TZObj):
             destination.addexit(x)
         self._keys = PersistentList()
 
+        self.settings += ['weight']
+
     def destroy(self):
         'Get rid of this exit.'
 
@@ -546,7 +548,7 @@ class Exit(TZObj):
         if self.locked:
             return (False, 'The door is locked.')
         elif self._weight:
-            if character.stat('strength') < self._weight:
+            if character.setting('strength') < self._weight:
                 return (False, 'The door is too heavy.')
 
         return (True, None)

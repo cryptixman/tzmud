@@ -223,6 +223,10 @@ def db_upgrade():
     zodb = TZODB()
     dbroot = zodb.root
 
+def db_upgradeall():
+    import share
+    share.upgradeall()
+
 def db_pack():
     if len(sys.argv) == 2:
         fname = None
@@ -301,6 +305,8 @@ else:
         db_init()
     elif len(sys.argv) > 1 and sys.argv[1] == 'upgrade':
         db_upgrade()
+    elif len(sys.argv) > 1 and sys.argv[1] == 'upgradeall':
+        db_upgradeall()
     elif len(sys.argv) > 1 and sys.argv[1] == 'pack':
         db_pack()
     elif len(sys.argv) > 1 and sys.argv[1] == 'depopulate':

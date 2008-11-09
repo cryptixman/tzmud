@@ -89,6 +89,27 @@ def cmd_info(s, r):
         s.message('You do not see that here.')
 
 
+def cmd_set(s, r):
+    '''info [<item>|<player>|<mob>|<room>|<exit>]
+
+    Get more info about given object or about own player if none given
+
+    '''
+
+    obj = find(r, s.room, s.player, s.room)
+    if obj is None:
+        s.message('You do not see that here.')
+        return
+
+    setting = r['setting']
+    value = r['value']
+
+    if obj.setting(setting, value):
+        s.message('Set', setting, 'to', value, '.')
+    else:
+        s.message('Cannot set', setting, 'on', obj, '.')
+
+
 def cmd_teleport(s, r=None):
     '''teleport [<room>|<player>] OR teleport <object> to <room>
 

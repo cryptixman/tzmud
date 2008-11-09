@@ -30,6 +30,7 @@ from pyparsing import Word, alphas, nums, alphanums, printables, oneOf, OneOrMor
 def toint(s, l, t):
     return int(t[0])
 
+space = OneOrMore(' ')
 objnameref = Combine(OneOrMore(Word(alphanums)),
                         joinString=' ', adjacent=False)('objname')
 number = Word(nums)
@@ -109,9 +110,9 @@ direction = objref
 
 on_ = Suppress(CaselessLiteral('on '))
 use_verb = CaselessLiteral('use')('verb')
-use_thing = Combine(OneOrMore(~on_ + Word(alphanums)),
+words_without_on = Combine(OneOrMore(~on_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
-use = use_verb + (use_thing|objtzidref) + Optional(on_ + obj2ref)
+use = use_verb + (words_without_on|objtzidref) + Optional(on_ + obj2ref)
 
 
 with_ = Suppress(CaselessLiteral('with '))
@@ -143,6 +144,8 @@ say = say_verb + words
 
 
 to_ = Suppress(CaselessLiteral('to '))
+words_without_to = Combine(OneOrMore(~to_ + Word(alphanums)),
+                             joinString=' ', adjacent=False)('objname')
 listen_verb = CaselessLiteral('listen')('verb')
 listen = listen_verb + Optional(to_) + objref
 
@@ -169,10 +172,14 @@ stats_verb = CaselessLiteral('stats')('verb')
 stats = stats_verb + LineEnd()
 
 
-set_verb = CaselessLiteral('set')('verb')
+set0_verb = CaselessLiteral('set')('verb')
+set1_verb = CaselessLiteral('set ')('verb')
+set1_verb.setParseAction(replaceWith('set'))
 set_var = Word(alphas)('var')
 set_val = Word(alphas)('val')
-set = set_verb + Optional(set_var + Optional(Optional('=' + set_val))) + LineEnd()
+set0 = set0_verb + LineEnd()
+set1 = set1_verb + set_var + Optional(Optional('=' + set_val)) + LineEnd()
+set = set0 | set1
 
 unset_verb = CaselessLiteral('unset')('verb')
 unset = unset_verb + set_var + LineEnd()
@@ -272,11 +279,14 @@ long_verb = CaselessLiteral('long')('verb')
 long_ = long_verb + for_ + Optional(obj_name|objtzidref) + is_ + new_desc
 
 
+wizset = set1_verb + words_without_on('setting')  + on_ + (words_without_to|objtzidref) + to_ + words('value')
+
+
 destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | help)
+wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | help)
 
 
 full_parser = actions_parser | wizard_parser

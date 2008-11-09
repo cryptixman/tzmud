@@ -62,6 +62,9 @@ class TZObj(Persistent):
         self.short = short if short else self.short
         self.long = long if long else self.long
 
+        self.settings = PersistentList()
+        self.settings += ['name', 'short', 'long']
+
         self.owner = owner
         tzindex.add(self)
 
@@ -76,6 +79,61 @@ class TZObj(Persistent):
     def __copy__(self):
         new_item = self.__class__(self.name, self.short, self.long)
         return new_item
+
+    def setting(self, var, val=None):
+        '''return the value of the given setting if val is None.
+                returns None if this object does not have that setting.
+
+            If a value is specified, changes the value of the setting.
+                returns True if successful, or False otherwise.
+
+
+            Looks for a variable called var in self.settings and
+                only acts if the name is given there.
+
+
+            Acts either the value of self._var or the value
+                of self.var in that order.
+
+        '''
+
+        uvar = '_%s' % var
+
+        if val is None:
+            # return the value of the setting.
+
+            if var not in self.settings:
+                return None
+
+            val = getattr(self, uvar, None)
+            if val is None:
+                val = getattr(self, var, None)
+
+            return val
+
+        else:
+            # change the value of the setting
+
+            if var not in self.settings:
+                return False
+
+            try:
+                val = int(val)
+            except ValueError:
+                try:
+                    val = float(val)
+                except ValueError:
+                    pass
+
+            if hasattr(self, uvar):
+                setattr(self, uvar, val)
+                return True
+            elif hasattr(self, var):
+                setattr(self, var, val)
+                return True
+            else:
+                return False
+
 
     def act_near(self, info):
         '''Something has happened near this object. Handle it if necessary.
@@ -131,7 +189,11 @@ class TZObj(Persistent):
 
         '''
 
-        return ['%s (%s) %s' % (self.name, self.tzid, class_as_string(self))]
+        lines = ['%s (%s) %s' % (self.name, self.tzid, class_as_string(self))]
+        lines.append('Settings:')
+        for var in self.settings:
+            lines.append('    %s: %s' % (var, self.setting(var)))
+        return lines
 
 
 class TZContainer(TZObj):
@@ -247,41 +309,22 @@ class Character(TZContainer):
 
         self.following = None
 
-    def _set_default_stats(self):
-        self._stats0 = PersistentDict()
-        self._stats = PersistentDict()
-
-        stats_list = ['health', 'strength', ]
-
-        for name in stats_list:
-            self._stats0[name] = 0
-
     def __repr__(self):
         return '''
 Character (%s): %s
 ''' % (self.tzid, self.short)
 
-    def stat(self, name, val=None):
-        '''return the value of the named statistic if val is None,
-            otherwise, set the stat to val.
+    def _set_default_stats(self):
+        self._stats0 = PersistentDict()
 
-        returns 0 if the stat is not set either in
-            _stats or _stats0.
+        stats_list = ['health', 'strength', ]
+        self.settings += stats_list
 
-        Copies the value from _stats0 in to _stats
-            if there is a value in _stats0,
-            but none yet in _stats.
-
-        '''
-
-        if val is None:
-            v = self._stats.get(name)
-            if v is None:
-                v = self._stats0.get(name, 0)
-                self._stats[name] = v
-            return v
-        else:
-            self._stats[name] = val
+        for name in stats_list:
+            uname = '_%s' % name
+            val = 0
+            self._stats0[name] = val
+            setattr(self, uname, val)
 
     def go(self, x):
         '''Character is trying to go through exit x.
@@ -632,13 +675,33 @@ def upgrade(obj):
             newattr = getattr(updated, attr, na)
             newattrtype = type(newattr)
 
+            listtypes = [type([]), type(PersistentList())]
+            dicttypes = [type({}), type(PersistentDict())]
+
             if newattrtype == types.MethodType:
                 pass
                 #print '    method', attr
+            elif newattrtype in listtypes and newattrtype==oldattrtype:
+                print '        extending list', attr
+                print '        oldattr', oldattr
+                print '        newattr', newattr
+                for val in oldattr:
+                    print '         checking', val
+                    if val not in newattr:
+                        print '             adding', val
+                        newattr.append(val)
+            elif newattrtype in dicttypes and newattrtype==oldattrtype:
+                print '        extending dict', attr
+                for var in oldattr:
+                    if var not in newattr:
+                        newattr[var] = val
             elif oldattr is not na:
                 if newattr is None or newattrtype==oldattrtype:
                     print '        copying', attr
-                    setattr(updated, attr, oldattr)
+                    try:
+                        setattr(updated, attr, oldattr)
+                    except AttributeError:
+                        print '        ...must be a property.'
                 else:
                     print '        ', attr, 'changed type'
             else:

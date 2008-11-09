@@ -669,14 +669,14 @@ def cmd_set(s, r=None):
             val = False
 
         if val:
-            s.player.settings[var] = val
+            s.player.user_settings[var] = val
         else:
-            del s.player.settings[var]
+            del s.player.user_settings[var]
 
     else:
-        if s.player.settings:
+        if s.player.user_settings:
             s.message('Settings:')
-            for k, v in s.player.settings.items():
+            for k, v in s.player.user_settings.items():
                 s.message('%s = %s' % (k, v), indent=4)
         else:
             s.message('You have not set anything yet.')
@@ -694,7 +694,7 @@ def cmd_stats(s, r=None):
     keys.sort()
     maxlen = max(len(k) for k in keys)
     for k in keys:
-        v = s.player.stat(k)
+        v = s.player.setting(k)
         spaces = maxlen - len(k)
         s.message('    ', k, ' '*spaces, ':', v)
 

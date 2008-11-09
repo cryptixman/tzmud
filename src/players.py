@@ -92,7 +92,7 @@ class Player(Character):
         add(self)
 
         self.pwhash = None
-        self.settings = TZDict()
+        self.user_settings = TZDict()
 
         self.logged_in = False
         self.created = time.time()
