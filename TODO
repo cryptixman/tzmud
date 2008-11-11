@@ -17,7 +17,6 @@
 - expand the initial world
 - Die item -- magical attack
 - Human/Humanoid mob for subclassing
-- return by door still not connected weightwise
 
 # Web Server
 - Build MUD areas by web.

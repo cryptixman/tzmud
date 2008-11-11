@@ -282,6 +282,7 @@ def cmd_dig(s, r):
             xi.destination = room
         else:
             xi = rooms.Exit(exitinname, room=destination, destination=room)
+            xo.link(xi)
 
     elif exitoutname:
         if exitinname or xi is None:
