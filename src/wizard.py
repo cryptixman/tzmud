@@ -90,9 +90,12 @@ def cmd_info(s, r):
 
 
 def cmd_set(s, r):
-    '''info [<item>|<player>|<mob>|<room>|<exit>]
+    '''set <setting> on <object> [to <value>]
 
-    Get more info about given object or about own player if none given
+    Change the setting on the object. Value defaults to True if
+        not specified.
+
+    For a list of available settings, use @info <object>
 
     '''
 
@@ -102,12 +105,40 @@ def cmd_set(s, r):
         return
 
     setting = r['setting']
-    value = r['value']
+    value = r.get('value', "True")
 
     if obj.setting(setting, value):
         s.message('Set', setting, 'to', value, '.')
     else:
         s.message('Cannot set', setting, 'on', obj, '.')
+
+
+def cmd_unset(s, r):
+    '''unset <setting> on <object>
+
+    Change the setting on the object to False.
+
+    For a list of available settings, use @info <object>
+
+    '''
+
+    obj = find(r, s.room, s.player, s.room)
+    if obj is None:
+        s.message('You do not see that here.')
+        return
+
+    setting = r['setting']
+
+    val = obj.setting(setting)
+    if val is True:
+        value = 'False'
+    else:
+        value = ''
+
+    if obj.setting(setting, value):
+        s.message('Unset', setting, '.')
+    else:
+        s.message('Cannot unset', setting, 'on', obj, '.')
 
 
 def cmd_teleport(s, r=None):

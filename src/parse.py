@@ -279,14 +279,16 @@ long_verb = CaselessLiteral('long')('verb')
 long_ = long_verb + for_ + Optional(obj_name|objtzidref) + is_ + new_desc
 
 
-wizset = set1_verb + words_without_on('setting')  + on_ + (words_without_to|objtzidref) + to_ + words('value')
+wizset = set1_verb + words_without_on('setting') + on_ + (words_without_to|objtzidref) + Optional(to_ + words('value'))
+
+wizunset = unset_verb + words_without_on('setting') + on_ + (words_without_to|objtzidref)
 
 
 destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | help)
+wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | wizunset | help)
 
 
 full_parser = actions_parser | wizard_parser

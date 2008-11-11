@@ -99,23 +99,33 @@ class TZObj(Persistent):
 
         uvar = '_%s' % var
 
+        currval = getattr(self, var, None)
+        if currval is None:
+            currval = getattr(self, uvar, None)
+
         if val is None:
             # return the value of the setting.
 
             if var not in self.settings:
                 return None
 
-            val = getattr(self, var, None)
-            if val is None:
-                val = getattr(self, uvar, None)
-
-            return val
+            return currval
 
         else:
             # change the value of the setting
 
             if var not in self.settings:
                 return False
+
+            if var == 'name' and not val:
+                return False
+
+            if val.lower() == 'true':
+                if currval in (True, False):
+                    val = True
+            elif val.lower() == 'false':
+                if currval in (True, False):
+                    val = False
 
             try:
                 val = int(val)

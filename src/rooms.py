@@ -510,18 +510,18 @@ Room (%s): %s
 
 
 class Exit(TZObj):
-    locked = False
     _link_exit_id = 0
 
     def __init__(self, name, short='', long='', room=None, destination=None, return_name=''):
         TZObj.__init__(self, name, short, long)
         self._rid = None
         self.room = room
+
         self.weight = 0
+        self.locked = False
 
         if room is not None:
             room.addexit(self)
-        self._destid = None
         self.destination = destination
 
         if return_name and destination is not None:
@@ -534,7 +534,7 @@ class Exit(TZObj):
 
         self._keys = PersistentList()
 
-        self.settings += ['weight']
+        self.settings += ['locked', 'weight',]
 
     def destroy(self):
         'Get rid of this exit.'
@@ -576,18 +576,12 @@ class Exit(TZObj):
 
         if key.locks(self):
             self.locked = True
-        if self._link_exit_id:
-            otherx = tzindex.get(self._link_exit_id)
-            otherx.locked = True
 
     def unlock(self, key):
         'Unlock this door if the key is correct.'
 
         if key.locks(self):
             self.locked = False
-        if self._link_exit_id:
-            otherx = tzindex.get(self._link_exit_id)
-            otherx.locked = False
 
     def link(self, otherx):
         '''Connect this door to another one, so that locking/ unlocking this
@@ -661,6 +655,16 @@ class Exit(TZObj):
         'Getter for the destination property.'
         return get(self._destid)
     destination = property(_get_destination, _set_destination)
+
+    def _set_locked(self, tf):
+        tf = bool(tf)
+        self._locked = tf
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
+            otherx._locked = tf
+    def _get_locked(self):
+        return self._locked
+    locked = property(_get_locked, _set_locked)
 
     def _set_weight(self, w):
         self._weight = w
