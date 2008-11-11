@@ -668,6 +668,21 @@ def upgrade(obj):
         pass
     tzindex.remove(updated)
 
+    # Some objects create other objects during their
+    #   creation. In order to make sure that we get rid
+    #   of the unwanted duplicates, set the _upgraded
+    #   flag on the updated version. Anything that does
+    #   not have this flag will later be deleted.
+    #
+    # This means that if a new update to an object (the
+    #   reason for running the upgrade on the database)
+    #   involves the creation of an object that was not
+    #   created before, that new addition should be
+    #   marked with "_upgraded = True" manually before
+    #   running the upgrade, or else it will be deleted.
+    updated._upgraded = True
+
+
     for attr in dir(updated):
         if attr.startswith('__'):
             pass
@@ -683,6 +698,8 @@ def upgrade(obj):
             oldattr = getattr(obj, attr, na)
             oldattrtype = type(oldattr)
             newattr = getattr(updated, attr, na)
+            if attr in ['_exit_ids', '_mob_ids', '_item_ids']:
+                newattr = None
             newattrtype = type(newattr)
 
             listtypes = [type([]), type(PersistentList())]
@@ -704,7 +721,7 @@ def upgrade(obj):
                 print '        extending dict', attr
                 for var in oldattr:
                     if var not in newattr:
-                        newattr[var] = val
+                        newattr[var] = oldattr[var]
             elif oldattr is not na:
                 if newattr is None or newattrtype==oldattrtype:
                     print '        copying', attr
@@ -741,6 +758,21 @@ def upgradeall():
 
     for obj in tzindex.ls():
         upgrade(obj)
+
+    for obj in tzindex.ls():
+        print 'checking for duplicate', obj.name,
+        upgraded = getattr(obj, '_upgraded', False)
+        if not upgraded:
+            print 'dup'
+            tzindex.remove(obj)
+            module = __import__(obj.__module__)
+            if module.get(obj.tzid):
+                module.remove(obj)
+        else:
+            print 'unique'
+            del(obj._upgraded)
+
+    commit()
 
 
 # Delay these imports due to circular dependencies
