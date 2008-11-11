@@ -511,20 +511,27 @@ Room (%s): %s
 
 class Exit(TZObj):
     locked = False
-    _weight = 0
-    _lock_link_id = 0
+    _link_exit_id = 0
 
     def __init__(self, name, short='', long='', room=None, destination=None, return_name=''):
         TZObj.__init__(self, name, short, long)
         self._rid = None
         self.room = room
+        self.weight = 0
+
         if room is not None:
             room.addexit(self)
         self._destid = None
         self.destination = destination
-        if return_name:
-            x = Exit(return_name, destination=room)
-            destination.addexit(x)
+
+        if return_name and destination is not None:
+            x = destination.exitname(return_name)
+            if x is not None:
+                x.destination = room
+            else:
+                x = Exit(return_name, room=destination, destination=room)
+            self.link(x)
+
         self._keys = PersistentList()
 
         self.settings += ['weight']
@@ -547,8 +554,8 @@ class Exit(TZObj):
             return (False, 'Exit %s is broken....'%self)
         if self.locked:
             return (False, 'The door is locked.')
-        elif self._weight:
-            if character.setting('strength') < self._weight:
+        elif self.weight:
+            if character.setting('strength') < self.weight:
                 return (False, 'The door is too heavy.')
 
         return (True, None)
@@ -559,8 +566,8 @@ class Exit(TZObj):
         _key = key._key
         if _key not in self._keys:
             self._keys.append(_key)
-        if self._lock_link_id:
-            otherx = tzindex.get(self._lock_link_id)
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
             if _key not in otherx._keys:
                 otherx._keys.append(_key)
 
@@ -569,8 +576,8 @@ class Exit(TZObj):
 
         if key.locks(self):
             self.locked = True
-        if self._lock_link_id:
-            otherx = tzindex.get(self._lock_link_id)
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
             otherx.locked = True
 
     def unlock(self, key):
@@ -578,8 +585,8 @@ class Exit(TZObj):
 
         if key.locks(self):
             self.locked = False
-        if self._lock_link_id:
-            otherx = tzindex.get(self._lock_link_id)
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
             otherx.locked = False
 
     def link(self, otherx):
@@ -588,8 +595,11 @@ class Exit(TZObj):
 
         '''
 
-        self._lock_link_id = otherx.tzid
-        otherx._lock_link_id = self.tzid
+        self._link_exit_id = otherx.tzid
+        otherx._link_exit_id = self.tzid
+
+        if self.weight:
+            otherx.weight = self.weight
 
     def look(self, s):
         '''Return a multiline message (list of strings) to a player looking
@@ -652,11 +662,19 @@ class Exit(TZObj):
         return get(self._destid)
     destination = property(_get_destination, _set_destination)
 
+    def _set_weight(self, w):
+        self._weight = w
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
+            otherx._weight = w
+    def _get_weight(self):
+        return self._weight
+    weight = property(_get_weight, _set_weight)
 
 def classes():
     'Return a list of the names of the clonable rooms.'
 
-    return 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap', 'HeavyDoorRoom'
+    return 'Room', 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap', 'HeavyDoorRoom'
 
 
 class SmallRoom(Room):

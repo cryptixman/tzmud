@@ -223,47 +223,44 @@ def cmd_dig(s, r):
 
     '''
 
+    room = s.room
+
     destname = r.get('destname', '')
     desttzid = r.get('desttzid', 0)
-
     destination = rooms.getname(destname) or rooms.get(desttzid)
+
     if destination is None and destname:
         destination = rooms.Room(destname)
     elif destination is None:
         s.message('#', desttzid, 'is not a room.')
         return
 
-
     exitoutname = r.get('exitoutname', '')
     exitouttzid = r.get('exitouttzid', 0)
-
-    x = s.room.exitname(exitoutname) or s.room.exit(exitouttzid)
-    if x is not None:
-        x.destination = destination
-    elif exitoutname:
-        x = rooms.Exit(exitoutname, destination=destination)
-        s.room.addexit(x)
-    else:
-        s.message('#', exitouttzid, 'is not an exit in this room.')
-
+    xo = room.exitname(exitoutname) or room.exit(exitouttzid)
 
     exitinname = r.get('exitinname', '')
     exitintzid = r.get('exitintzid', 0)
+    xi = destination.exitname(exitinname) or destination.exit(exitintzid)
+    if xi is not None:
+        exitinname = xi.name
 
-    if exitinname or exitintzid:
-        bx = destination.exitname(exitinname) or destination.exit(exitintzid)
-        if bx is not None:
-            bx.destination = s.room
-        elif exitinname:
-            bx = rooms.Exit(exitinname, destination=s.room)
-            destination.addexit(bx)
+    if xo is not None:
+        xo.destination = destination
+        if xi is not None:
+            xi.destination = room
         else:
-            s.message('#', exitintzid, 'is not an exit.')
+            xi = rooms.Exit(exitinname, room=destination, destination=room)
+
+    elif exitoutname:
+        if exitinname or xi is None:
+            xo = rooms.Exit(exitoutname, room=room, destination=destination, return_name=exitinname)
+        else:
+            s.message('#', exitintzid, 'is not an exit in', destination, '.')
             raise TypeError
 
-        # If digging both directions, link the exits
-        if bx is not None:
-            x.link(bx)
+    else:
+        s.message('#', exitouttzid, 'is not an exit in this room.')
 
 
 def cmd_lock(s, r):

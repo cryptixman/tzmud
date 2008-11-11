@@ -92,8 +92,8 @@ class TZObj(Persistent):
                 only acts if the name is given there.
 
 
-            Acts either the value of self._var or the value
-                of self.var in that order.
+            Acts either the value of self.var or the value
+                of self._var in that order.
 
         '''
 
@@ -105,9 +105,9 @@ class TZObj(Persistent):
             if var not in self.settings:
                 return None
 
-            val = getattr(self, uvar, None)
+            val = getattr(self, var, None)
             if val is None:
-                val = getattr(self, var, None)
+                val = getattr(self, uvar, None)
 
             return val
 
@@ -125,11 +125,11 @@ class TZObj(Persistent):
                 except ValueError:
                     pass
 
-            if hasattr(self, uvar):
-                setattr(self, uvar, val)
-                return True
-            elif hasattr(self, var):
+            if hasattr(self, var):
                 setattr(self, var, val)
+                return True
+            elif hasattr(self, uvar):
+                setattr(self, uvar, val)
                 return True
             else:
                 return False
