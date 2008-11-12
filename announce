@@ -14,6 +14,15 @@ libraries to facilitate rapid development:
 
 TZMud is released under GPLv3.
 
-Changes in TZMud-0.6:
-    - fix for server only accepting 1 connection
-    - added SmallRoom
+Changes in TZMud-0.7:
+    - new character stats framework
+    - new wizard powers including studying objects
+        and changing settings on objects like weight
+        or character stats
+    - exits can now react to characters passing through
+    - exits can also react to actions in the room
+    - objects can now be used
+    - simplified weighting of mob actions
+    - added Camera and Photograph objects
+    - added Photographer mob
+    - improved database upgrade mechanism
