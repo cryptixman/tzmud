@@ -221,6 +221,7 @@ def rollbackfile(fname):
     if fname is None:
         backups = os.listdir(conf.backupdir)
         backups = [f for f in backups if not f.startswith('.')]
+        backups.sort()
         if backups:
             fname = backups[-1]
         else:
