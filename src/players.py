@@ -23,6 +23,7 @@ Players subclass the Character class.
 '''
 
 
+import os
 import hashlib
 import time
 
@@ -130,18 +131,51 @@ class Player(Character):
 
         hasher = hashlib.md5()
         hasher.update(pwtext)
-        pwhash = hasher.digest()
+        salt = os.urandom(4)
+        hasher.update(salt)
+        pwhash = '{pw_v1}' + hasher.digest() + salt
 
         self.pwhash = pwhash
 
     def check_password(self, pwtext):
         'Return True if the hash of the given text matches the hashed password.'
 
+        if not self.pwhash.startswith('{pw_v1}'):
+            return self.check_password_v0(pwtext)
+
+        hasher = hashlib.md5()
+        hasher.update(pwtext)
+        salt = self.pwhash[-4:]
+        hasher.update(salt)
+        pwhash = hasher.digest()
+
+        if pwhash == self.pwhash[7:-4]:
+            return True
+        else:
+            return False
+
+    def check_password_v0(self, pwtext):
+        '''Old password verification, from before salted password storage.
+
+        This method will be used for passwords in the old format.
+
+        Passwords will be updated to the new format if the check
+            is successful.
+
+        returns True if the hash of the given text matches the hashed
+            password.
+
+
+        This method will go away in version 0.9
+
+        '''
+
         hasher = hashlib.md5()
         hasher.update(pwtext)
         pwhash = hasher.digest()
 
         if pwhash == self.pwhash:
+            self.set_password(pwtext)
             return True
         else:
             return False

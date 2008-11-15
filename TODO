@@ -16,6 +16,7 @@
 - expand the initial world
 - Die item -- magical attack
 - Human/Humanoid mob for subclassing
+- remove old-style password verification in v0.9
 
 # Web Server
 - Build MUD areas by web.
