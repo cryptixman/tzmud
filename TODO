@@ -17,6 +17,10 @@
 - Die item -- magical attack
 - Human/Humanoid mob for subclassing
 - remove old-style password verification in v0.9
+- use hexdigest to store password hash?
+- allow cloning special Exit types
+- allow objects to be invisible
+- SpawnPoint object to create mobs periodically
 
 # Web Server
 - Build MUD areas by web.
