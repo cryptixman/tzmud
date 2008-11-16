@@ -133,13 +133,14 @@ class TZ(basic.LineReceiver):
             self.simessage('Must log in with "login <name> <password>"')
         else:
             player = players.getname(player_name)
-            print 'player', player
             if player is None:
                 self.simessage('Incorrect user name or password.')
+                print 'player', player_name, 'does not exist'
             elif player.logged_in:
                 if player.check_password(pwtext):
                     self.simessage('Player already logged in.')
                     self.simessage('Use "purge <name> <password>" to disconnect other session.')
+                    print 'player', player.name, 'already logged in'
             else:
                 if player.check_password(pwtext):
                 #if True:
@@ -153,8 +154,10 @@ class TZ(basic.LineReceiver):
                     wizard.cmd_teleport(self, {})
                     reactor.callLater(0.2, actions.cmd_look, self,
                                         dict(verb='look'))
+                    print 'player', player.name, 'logged in'
                 else:
                     self.simessage('Incorrect user name or password.')
+                    print 'player', player.name, 'wrong password'
 
     def create(self, r):
         'Create a new account.'
