@@ -165,7 +165,9 @@ def cmd_teleport(s, r=None):
 
         objname = r.get('objname', '')
         objtzid = r.get('objtzid', 0)
-        obj = find(r, s.room, s.player, s.room)
+        obj = find(r, s.room, s.player, s.room) or \
+                players.getname(objname) or players.get(objtzid) or \
+                mobs.getname(objname) or mobs.get(objtzid)
         if obj is None:
             s.message('No such object.')
             return
@@ -173,40 +175,66 @@ def cmd_teleport(s, r=None):
             item = s.room.itemname(objname) or s.room.item(objtzid)
             s.room.remove(item)
             destination.add(item)
-            s.room.action(dict(act='teleport_item_away', actor=s.player,
+            s.room.action(dict(act='teleport_item_away', actor=None,
                                 item=item))
+            destination.action(dict(act='teleport_item_in',
+                                        actor=None,
+                                        item=item))
         elif s.player.itemname(objname) or s.player.item(objtzid):
             item = s.player.itemname(objname) or s.player.item(objtzid)
             s.player.remove(item)
             destination.add(item)
-            destination.action(dict(act='teleport_item_in', actor=s.player,
+            s.room.action(dict(act='teleport_item_away',
+                                    actor=None,
+                                    item=item))
+            destination.action(dict(act='teleport_item_in', actor=None,
                                 item=item))
         elif s.room.playername(objname) or s.room.player(objtzid):
             player = s.room.playername(objname) or s.room.player(objtzid)
-            def notify_later():
-                s.room.action(dict(act='teleport_character_away', actor=s.player,
+            s.room.action(dict(act='teleport_character_away',
+                                delay=0.2,
+                                actor=None,
+                                character=player))
+            reactor.callLater(0.4, player.move, destination)
+            destination.action(dict(act='teleport_character_in',
+                                        delay=0.4,
+                                        actor=None,
                                         character=player))
-            def teleport_later(player, destination):
-                player.move(destination)
-                destination.action(dict(act='teleport_character_in',
-                                        actor=s.player,
-                                        character=player))
-            reactor.callLater(0.2, notify_later)
-            reactor.callLater(0.4, teleport_later, player, destination)
         elif s.room.mobname(objname) or s.room.mob(objtzid):
             mob = s.room.mobname(objname) or s.room.mob(objtzid)
             mob.move(destination)
-            s.room.action(dict(act='teleport_character_away', actor=s.player,
+            s.room.action(dict(act='teleport_character_away', actor=None,
                                 character=mob))
-            destination.action(dict(act='teleport_character_in', actor=s.player,
+            destination.action(dict(act='teleport_character_in', actor=None,
                                 character=mob))
         elif s.room.exit(objtzid) or s.room.exitname(objname):
             x = s.room.exit(objtzid) or s.room.exitname(objname)
             s.room.rmexit(x)
             destination.addexit(x)
             s.message('Exit', x, 'moved.')
+        elif mobs.getname(objname) or mobs.get(objtzid):
+            mob = obj
+            mob.move(destination)
+            mob.room.action(dict(act='teleport_character_away', actor=None,
+                                character=mob))
+            destination.action(dict(act='teleport_character_in', actor=None,
+                                character=mob))
+        elif players.getname(objname) or players.get(objtzid):
+            player = obj
+            player.room.action(dict(act='teleport_character_away',
+                                    delay=0.2,
+                                    actor=None,
+                                    character=player))
+            reactor.callLater(0.4, player.move, destination)
+            destination.action(dict(act='teleport_character_in',
+                                        delay=0.4,
+                                        actor=None,
+                                        character=player))
         else:
             s.message('Cannot teleport the', obj, '.')
+            return
+
+        s.message('You teleport', obj, '.')
 
     else:
         obj = s.player
@@ -234,13 +262,13 @@ def cmd_teleport(s, r=None):
                     return
 
         if origin is not None:
-            origin.action(dict(act='teleport_character_away', actor=s.player,
+            origin.action(dict(act='teleport_character_away', actor=None,
                                     character=s.player))
 
         s.player.move(destination)
 
         s.message(s.room.name)
-        destination.action(dict(act='teleport_character_in', actor=s.player,
+        destination.action(dict(act='teleport_character_in', actor=None,
                                     character=s.player))
 
 

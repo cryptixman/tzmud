@@ -73,6 +73,7 @@ import hashlib
 import time
 
 from twisted.protocols import basic
+from twisted.internet import reactor
 
 import conf
 
@@ -150,7 +151,8 @@ class TZ(basic.LineReceiver):
                     self.factory._player_protocols[player_name] = self
 
                     wizard.cmd_teleport(self, {})
-                    actions.cmd_look(self, dict(verb='look'))
+                    reactor.callLater(0.2, actions.cmd_look, self,
+                                        dict(verb='look'))
                 else:
                     self.simessage('Incorrect user name or password.')
 
