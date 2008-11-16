@@ -267,7 +267,6 @@ def cmd_teleport(s, r=None):
 
         s.player.move(destination)
 
-        s.message(s.room.name)
         destination.action(dict(act='teleport_character_in', actor=None,
                                     character=s.player))
 

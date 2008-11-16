@@ -374,6 +374,7 @@ Player (%s): %s  [%s]
             self.message(teleporter, 'appears.')
         else:
             self.message('You have been teleported.')
+            self.message(self.room.name)
 
     def near_teleport_item_away(self, info):
         'Something has been "teleport"ed away from near this player.'
