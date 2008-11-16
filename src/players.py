@@ -131,7 +131,7 @@ class Player(Character):
 
         hasher = hashlib.md5()
         hasher.update(pwtext)
-        salt = os.urandom(4)
+        salt = hashlib.md5(os.urandom(4)).hexdigest()[:8]
         hasher.update(salt)
         pwhash = '{pw_v1}' + hasher.hexdigest() + salt
 
@@ -145,11 +145,11 @@ class Player(Character):
 
         hasher = hashlib.md5()
         hasher.update(pwtext)
-        salt = self.pwhash[-4:]
+        salt = self.pwhash[-8:]
         hasher.update(salt)
         pwhash = hasher.hexdigest()
 
-        if pwhash == self.pwhash[7:-4]:
+        if pwhash == self.pwhash[7:-8]:
             return True
         else:
             return False
