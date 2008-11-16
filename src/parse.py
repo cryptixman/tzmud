@@ -210,12 +210,12 @@ info = info_verb + Optional(objref) + LineEnd()
 
 
 teleport_verb = CaselessLiteral('teleport')('verb')
-teleport_to = objref
+teleport_to = obj2ref
 teleport1 = teleport_verb + Optional(teleport_to) + LineEnd()
 
 thingname = Combine(OneOrMore(~to_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
-teleport2 = teleport_verb + (thingname|objtzidref) + to_ + obj2ref
+teleport2 = teleport_verb + Optional(thingname|objtzidref) + to_ + obj2ref
 teleport = teleport2 | teleport1
 
 dig_verb = CaselessLiteral('dig')('verb')

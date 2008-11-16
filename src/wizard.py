@@ -142,7 +142,7 @@ def cmd_unset(s, r):
 
 
 def cmd_teleport(s, r=None):
-    '''teleport [<room>|<player>] OR teleport <object> to <room>
+    '''teleport [to [<room>|<player>]] OR teleport <object> to <room>
 
     Teleport self to the named room or player, or if no name is given
         teleport self to home, OR
@@ -154,17 +154,18 @@ def cmd_teleport(s, r=None):
     if s.room is not None:
         s.room.action(dict(act='teleport', actor=s.player))
 
+    objname = r.get('objname', '')
+    objtzid = r.get('objtzid', 0)
+
     destname = r.get('obj2name', '')
     desttzid = r.get('obj2tzid', 0)
 
-    if destname or desttzid:
+    if (objname or objtzid) and (destname or desttzid):
         destination = rooms.getname(destname) or rooms.get(desttzid)
         if destination is None:
             s.message('No such place.')
             return
 
-        objname = r.get('objname', '')
-        objtzid = r.get('objtzid', 0)
         obj = find(r, s.room, s.player, s.room) or \
                 players.getname(objname) or players.get(objtzid) or \
                 mobs.getname(objname) or mobs.get(objtzid)
@@ -239,8 +240,6 @@ def cmd_teleport(s, r=None):
     else:
         obj = s.player
         origin = s.player.room
-        destname = r.get('objname', '')
-        desttzid = r.get('objtzid', 0)
 
         if not destname and not desttzid:
             destination = s.player.home
