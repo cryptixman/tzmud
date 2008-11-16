@@ -133,7 +133,7 @@ class Player(Character):
         hasher.update(pwtext)
         salt = os.urandom(4)
         hasher.update(salt)
-        pwhash = '{pw_v1}' + hasher.digest() + salt
+        pwhash = '{pw_v1}' + hasher.hexdigest() + salt
 
         self.pwhash = pwhash
 
@@ -147,7 +147,7 @@ class Player(Character):
         hasher.update(pwtext)
         salt = self.pwhash[-4:]
         hasher.update(salt)
-        pwhash = hasher.digest()
+        pwhash = hasher.hexdigest()
 
         if pwhash == self.pwhash[7:-4]:
             return True
