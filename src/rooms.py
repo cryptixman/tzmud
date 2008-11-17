@@ -206,10 +206,10 @@ class Room(TZContainer):
         try:
             act = info['act']
             actor = info['actor']
-            vis = info.get('vis', False)
+            sidefx = info.get('sidefx', False)
             for player in self.players():
                 if actor is None or \
-                        (player != actor and (vis or player.can_see(actor))):
+                        (player != actor and (sidefx or player.can_see(actor))):
                     player.act_near(info)
                 for item in player.items():
                     item.act_near(info)
@@ -598,6 +598,12 @@ class Exit(TZObj):
 
         if self.weight:
             otherx.weight = self.weight
+
+    def get_linked_exit(self):
+        if self._link_exit_id:
+            return tzindex.get(self._link_exit_id)
+        else:
+            return None
 
     def look(self, s):
         '''Return a multiline message (list of strings) to a player looking

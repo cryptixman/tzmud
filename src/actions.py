@@ -398,12 +398,13 @@ def cmd_go(s, r):
     if success:
         s.message(x.destination)
 
-        if len(s.room.players()) > 1:
-            for player in s.room.players():
-                if player != s.player:
-                    s.message(player, 'is here.')
+        ps = filter(s.player.can_see, s.room.players())
+        for player in ps:
+            if player != s.player:
+                s.message(player, 'is here.')
 
-        for mob in s.room.mobs():
+        ms = filter(s.player.can_see, s.room.mobs())
+        for mob in ms:
             s.message(mob, 'is here.')
 
     else:
@@ -573,7 +574,7 @@ def cmd_say(s, r):
     quoted = '"' + words + '"'
     s.message('You', verb+',', quoted)
     s.room.action(dict(act='say', actor=s.player, verb=verb,
-                            raw=words, vis=True))
+                            raw=words, sidefx=True))
 
 
 def cmd_listen(s, r):
@@ -614,7 +615,7 @@ def cmd_shout(s, r):
     s.message('You shout,', quoted)
     spread = 2
     s.room.action(dict(act='shout', actor=s.player, raw=words,
-                            spread=spread, vis=True))
+                            spread=spread, sidefx=True))
 
 
 def cmd_emote(s, r):

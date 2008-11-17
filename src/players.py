@@ -460,7 +460,10 @@ Player (%s): %s  [%s]
 
         digger = info['actor']
         x = info['exit']
-        self.message(digger, 'digs a new exit', x, '.')
+        if self.can_see(digger):
+            self.message(digger, 'digs a new exit', x, '.')
+        elif self.can_see(x):
+            self.message('A new exit', x, 'appears.')
 
     def near_use(self, info):
         'Someone has used something near this player.'

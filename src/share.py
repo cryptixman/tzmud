@@ -382,6 +382,9 @@ Character (%s): %s
         '''return True if character can see the given object.
         '''
 
+        if obj is None:
+            return False
+
         if obj.visible or obj is self or wizard.verify(self):
             return True
 
@@ -465,7 +468,7 @@ Character (%s): %s
         self.add(item)
         room.remove(item)
         item.get(self)
-        room.action(dict(act='get', actor=self, item=item, vis=True))
+        room.action(dict(act='get', actor=self, item=item, sidefx=True))
 
     def drop_item(self, item):
         'Drop item from inventory.'
@@ -477,7 +480,7 @@ Character (%s): %s
         room = self.room
         room.add(item)
         item.drop(self)
-        room.action(dict(act='drop', actor=self, item=item, vis=True))
+        room.action(dict(act='drop', actor=self, item=item, sidefx=True))
 
     def wear(self, item):
         "Add the given item to this character's list of worn items."

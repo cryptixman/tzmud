@@ -309,10 +309,16 @@ def cmd_dig(s, r):
         else:
             xi = rooms.Exit(exitinname, room=destination, destination=room)
             xo.link(xi)
+            destination.action(dict(act='dig', actor=None,
+                                        exit=xi, sidefx=True))
 
     elif exitoutname:
         if exitinname or xi is None:
             xo = rooms.Exit(exitoutname, room=room, destination=destination, return_name=exitinname)
+            room.action(dict(act='dig', actor=s.player, exit=xo, sidefx=True))
+            xi = xo.get_linked_exit()
+            destination.action(dict(act='dig', actor=None,
+                                        exit=xi, sidefx=True))
         else:
             s.message('#', exitintzid, 'is not an exit in', destination, '.')
             raise TypeError
