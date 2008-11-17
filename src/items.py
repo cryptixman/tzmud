@@ -133,7 +133,8 @@ class Item(TZObj):
     def __str__(self):
         'Returns the colorized name of this item.'
 
-        return green(self.name)
+        name = TZObj.__str__(self)
+        return green(name)
 
     def __repr__(self):
         return '''\

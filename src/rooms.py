@@ -206,8 +206,10 @@ class Room(TZContainer):
         try:
             act = info['act']
             actor = info['actor']
+            vis = info.get('vis', False)
             for player in self.players():
-                if player != actor:
+                if actor is None or \
+                        (player != actor and (vis or player.can_see(actor))):
                     player.act_near(info)
                 for item in player.items():
                     item.act_near(info)
@@ -427,34 +429,35 @@ class Room(TZContainer):
 
         msgs = TZContainer.look(self, looker)
 
-        exits = self.exits()
-        if exits:
+        xs = filter(looker.can_see, self.exits())
+        if xs:
             msgs.append('')
             msgs.append('Exits: ')
-            msgs.append('    ' + ', '.join(map(str, exits)))
+            msgs.append('    ' + ', '.join(map(str, xs)))
             #print msgs
 
-        items = self.items()
-        if items:
+        iis = filter(looker.can_see, self.items())
+        if iis:
             msgs.append('')
-            if len(items) > 1:
+            if len(iis) > 1:
                 msgs.append('You see some items here:')
             else:
                 msgs.append('You see something here:')
 
-            for item in items:
+            for item in iis:
                 msgs.append('    ' + str(item))
 
-        if len(self.players()) > 1:
+        ps = filter(looker.can_see, self.players())
+        if len(ps) > 1:
             msgs.append('')
-            for player in self.players():
+            for player in ps:
                 if player != looker:
                     msgs.append(str(player) + ' is here.')
 
-        mobs = self.mobs()
-        if mobs:
+        ms = filter(looker.can_see, self.mobs())
+        if ms:
             msgs.append('')
-            for mob in mobs:
+            for mob in ms:
                 msgs.append(str(mob) + ' is here.')
 
         return msgs
@@ -462,7 +465,8 @@ class Room(TZContainer):
     def __str__(self):
         'Return the colorized name of this room.'
 
-        return red(self.name)
+        name = TZContainer.__str__(self)
+        return red(name)
 
     def __repr__(self):
         return '''\
@@ -629,7 +633,8 @@ class Exit(TZObj):
     def __str__(self):
         'Return the colorized name of this exit.'
 
-        return yellow(self.name)
+        name = TZObj.__str__(self)
+        return yellow(name)
 
     def __repr__(self):
         return '%s --> %s' % (self.name, self.destination)

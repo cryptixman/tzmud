@@ -33,6 +33,7 @@ from persistent import Persistent
 from persistent.list import PersistentList
 from persistent.dict import PersistentDict
 
+import wizard
 import conf
 from db import TZODB, TZIndex, tzid
 zodb = TZODB()
@@ -54,6 +55,7 @@ class TZObj(Persistent):
 
     gettable = True
     wearable = False
+    visible = True
 
     def __init__(self, name='', short='', long='', owner=None):
         self.tzid = tzid()
@@ -63,7 +65,7 @@ class TZObj(Persistent):
         self.long = long if long else self.long
 
         self.settings = PersistentList()
-        self.settings += ['name', 'short', 'long']
+        self.settings += ['name', 'short', 'long', 'visible']
 
         self.owner = owner
         tzindex.add(self)
@@ -74,7 +76,10 @@ class TZObj(Persistent):
         tzindex.remove(self)
 
     def __str__(self):
-        return self.name
+        if self.visible:
+            return self.name
+        else:
+            return '(%s)' % self.name
 
     def __copy__(self):
         new_item = self.__class__(self.name, self.short, self.long)
@@ -360,6 +365,26 @@ Character (%s): %s
 
         return r
 
+    def look_at(self, obj):
+        '''This character is looking at the given object.
+
+        returns a list of strings.
+
+        Takes in to account whether the object is visible
+            to this character.
+
+        '''
+
+        if self.can_see(obj):
+            return obj.look(self)
+
+    def can_see(self, obj):
+        '''return True if character can see the given object.
+        '''
+
+        if obj.visible or obj is self or wizard.verify(self):
+            return True
+
     def look(self, looker):
         '''Return a multiline message (list of strings) for a player looking
             at this character.
@@ -367,11 +392,11 @@ Character (%s): %s
         '''
 
         msgs = TZContainer.look(self, looker)
-        items = self.items()
-        if items:
+        iis = filter(looker.can_see, self.items())
+        if iis:
             msgs.append('')
             msgs.append('Holding:')
-            for item in items:
+            for item in iis:
                 if self.is_wearing(item):
                     msgs.append('    ' + str(item) + '*')
                 else:
@@ -440,7 +465,7 @@ Character (%s): %s
         self.add(item)
         room.remove(item)
         item.get(self)
-        room.action(dict(act='get', actor=self, item=item))
+        room.action(dict(act='get', actor=self, item=item, vis=True))
 
     def drop_item(self, item):
         'Drop item from inventory.'
@@ -452,7 +477,7 @@ Character (%s): %s
         room = self.room
         room.add(item)
         item.drop(self)
-        room.action(dict(act='drop', actor=self, item=item))
+        room.action(dict(act='drop', actor=self, item=item, vis=True))
 
     def wear(self, item):
         "Add the given item to this character's list of worn items."

@@ -153,7 +153,8 @@ class Mob(Character):
     def __str__(self):
         'Return the colorized name of this mob.'
 
-        return magenta(self.name)
+        name = Character.__str__(self)
+        return magenta(name)
 
     def __repr__(self):
         return '''\

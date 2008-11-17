@@ -217,7 +217,8 @@ class Player(Character):
     def __str__(self):
         'Return the colorized name of this player.'
 
-        return blue(self.name)
+        name = Character.__str__(self)
+        return blue(name)
 
     def __repr__(self):
         return '''\
@@ -253,14 +254,20 @@ Player (%s): %s  [%s]
 
         getter = info['actor']
         item = info['item']
-        self.message(getter, 'gets', item, '.')
+        if self.can_see(getter) and self.can_see(item):
+            self.message(getter, 'gets', item, '.')
+        elif self.can_see(item):
+            self.message(item, 'disappears.')
 
     def near_drop(self, info):
         'Someone has "drop"ped near this player.'
 
         dropper = info['actor']
         item = info['item']
-        self.message(dropper, 'drops', item, '.')
+        if self.can_see(dropper) and self.can_see(item):
+            self.message(dropper, 'drops', item, '.')
+        elif self.can_see(item):
+            self.message(item, 'appears.')
 
     def near_wear(self, info):
         'Someone has "wear"ed near this player.'
@@ -361,18 +368,18 @@ Player (%s): %s  [%s]
         'Someone has "teleport"ed away from near this player.'
 
         teleporter = info['character']
-        if teleporter != self:
+        if teleporter is not self and self.can_see(teleporter):
             self.message(teleporter, 'disappears.')
-        else:
+        elif teleporter is self:
             self.message('You feel yourself being ripped away from where you are...')
 
     def near_teleport_character_in(self, info):
         'Someone has "teleport"ed in near this player.'
 
         teleporter = info['character']
-        if teleporter != self:
+        if teleporter is not self and self.can_see(teleporter):
             self.message(teleporter, 'appears.')
-        else:
+        elif teleporter is self:
             self.message('You have been teleported.')
             self.message(self.room.name)
 
@@ -380,13 +387,15 @@ Player (%s): %s  [%s]
         'Something has been "teleport"ed away from near this player.'
 
         item = info['item']
-        self.message(item, 'disappears.')
+        if self.can_see(item):
+            self.message(item, 'disappears.')
 
     def near_teleport_item_in(self, info):
         'Something has been "teleport"ed in near this player.'
 
         item = info['item']
-        self.message(item, 'appears.')
+        if self.can_see(item):
+            self.message(item, 'appears.')
 
     def near_sleep(self, info):
         'Someone has gone to sleep near this player.'

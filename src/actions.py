@@ -57,12 +57,14 @@ def cmd_look(s, r):
 
     '''
 
-    obj = find(r, s.room, s.player, s.room)
+    player = s.player
+    room = s.room
+    obj = find(r, room, player, room)
 
-    if obj is not None:
+    if obj is not None and player.can_see(obj):
         s.message('You look at', obj, '.')
-        s.mlmessage(obj.look(s.player))
-        s.room.action(dict(act='look', actor=s.player, actee=obj))
+        s.mlmessage(player.look_at(obj))
+        s.room.action(dict(act='look', actor=player, actee=obj))
     else:
         s.message('You do not see that here.')
 
@@ -102,12 +104,18 @@ def cmd_get(s, r):
     objtzid = r.get('objtzid', '')
 
     if objname == 'all':
-        for item in s.room.items():
+        for item in filter(s.player.can_see, s.room.items()):
             s.player.get_item(item, s.room)
             s.player.message('You get', item, '.')
         return
 
     item = find(r, s.room)
+    if not s.player.can_see(item):
+        iis = filter(s.player.can_see, find(r, s.room, all=True))
+        if iis:
+            item = iis[0]
+        else:
+            item = None
     have = s.player.itemname(objname) or s.player.item(objtzid)
 
     if item:
@@ -564,7 +572,8 @@ def cmd_say(s, r):
         verb = 'say'
     quoted = '"' + words + '"'
     s.message('You', verb+',', quoted)
-    s.room.action(dict(act='say', actor=s.player, verb=verb, raw=words))
+    s.room.action(dict(act='say', actor=s.player, verb=verb,
+                            raw=words, vis=True))
 
 
 def cmd_listen(s, r):
@@ -604,7 +613,8 @@ def cmd_shout(s, r):
     quoted = '"' + words + '"'
     s.message('You shout,', quoted)
     spread = 2
-    s.room.action(dict(act='shout', actor=s.player, raw=words, spread=spread))
+    s.room.action(dict(act='shout', actor=s.player, raw=words,
+                            spread=spread, vis=True))
 
 
 def cmd_emote(s, r):
