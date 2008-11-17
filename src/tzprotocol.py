@@ -205,6 +205,9 @@ class TZ(basic.LineReceiver):
         self.factory.clients.remove(self)
 
         try:
+            room = self.room
+            room.action(dict(act='quit', actor=self.player))
+
             self.room.rmplayer(self.player)
             self.player._rid = None
             self.player.logged_in = False

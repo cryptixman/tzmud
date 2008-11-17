@@ -643,7 +643,6 @@ def cmd_quit(s, r=None):
 
     '''
 
-    s.room.action(dict(act='quit', actor=s.player))
     s.transport.loseConnection()
 
 
