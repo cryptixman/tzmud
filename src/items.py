@@ -187,7 +187,7 @@ Item (%s): %s
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coins', 'Hat', 'Camera', 'Photograph'
+    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coins', 'Hat', 'Camera', 'Photograph', 'InvRing',
 
 
 class Rose(Item):
@@ -237,6 +237,20 @@ class WizRing(Item):
 
     def unwear(self, character):
         wizard.remove(character)
+
+class InvRing(Item):
+    'A ring which makes the wearer invisible.'
+
+    name = 'silver ring'
+    short = 'A thin band of silver.'
+    wearable = True
+    name_aka = ['ring',]
+
+    def wear(self, character):
+        character.setting('visible', 'False')
+
+    def unwear(self, character):
+        character.setting('visible', 'True')
 
 
 class Key(Item):

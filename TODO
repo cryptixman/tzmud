@@ -18,7 +18,6 @@
 - Human/Humanoid mob for subclassing
 - remove old-style password verification in v0.9
 - allow cloning special Exit types
-- Ring of invisibilty
 - potion of see invisible things
 - SpawnPoint object to create mobs periodically
 
