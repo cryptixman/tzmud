@@ -42,7 +42,7 @@ import tzprotocol
 import rooms
 import items
 
-from share import TZContainer, Character
+from share import TZContainer, Character, class_as_string
 from colors import magenta
 
 
@@ -111,7 +111,7 @@ def nudge_all():
 class Mob(Character):
     'Base class for all mob (mobile) objects in the MUD.'
 
-    actionperiod = 10 # seconds
+    _period = 10 # seconds
 
     def __init__(self, name='', short='', long=''):
         Character.__init__(self, name, short, long)
@@ -125,6 +125,8 @@ class Mob(Character):
         self.set_default_action_weights()
         self.set_action_weights(action_awake=500,
                                 action_move=0)
+
+        self.settings += ['period',]
 
     def destroy(self):
         'Get rid of this mob and remove it from the mob index.'
@@ -250,15 +252,15 @@ Mob: %s (%s) [in room %s]: %s
             #print 'mob.act COMMIT'
             commit()
 
-        reactor.callLater(self.actionperiod, self.act)
+        reactor.callLater(self._period, self.act)
 
     def nudge(self, delayfactor=10):
         'Make sure the mob is calling act() regularly.'
 
         now = time.time()
 
-        if now > self._last_act + self.actionperiod * delayfactor:
-            reactor.callLater(self.actionperiod, self.act)
+        if now > self._last_act + self._period * delayfactor:
+            reactor.callLater(self._period, self.act)
         else:
             print 'Mob acted too recently to nudge.'
 
@@ -295,7 +297,7 @@ Mob: %s (%s) [in room %s]: %s
 def classes():
     'Return a list of the names of the clonable mobs'
 
-    return 'Cat', 'Sloth', 'Snake', 'PackRat', 'Photographer'
+    return 'Cat', 'Sloth', 'Snake', 'PackRat', 'Photographer', 'Spawner'
 
 
 class Cat(Mob):
@@ -345,7 +347,7 @@ class Snake(Mob):
 
     name = 'snake'
     short = 'A green garter snake.'
-    actionperiod = 1 # seconds
+    _period = 1 # seconds
 
 
     def __init__(self, name='', short='', long=''):
@@ -358,7 +360,7 @@ class Snake(Mob):
 class PackRat(Mob):
     'Collects things and brings them back to its nest.'
 
-    actionperiod = 5 # seconds
+    _period = 5 # seconds
     name_aka = ['rat']
 
     name = 'packrat'
@@ -455,7 +457,7 @@ class PackRat(Mob):
 class Photographer(Mob):
     'Wanders around taking pictures'
 
-    actionperiod = 25 # seconds
+    _period = 25 # seconds
     name_aka = ['photographer']
 
     name = 'photographer'
@@ -498,3 +500,37 @@ class Photographer(Mob):
             picname = random.choice(picnames)
             pic = self.itemname(picname)
             self.drop_item(pic)
+
+
+class Spawner(Mob):
+    '''Periodically creates a mob. Only spawns when there is not a
+            mob of that type in the room.
+
+    '''
+
+    name = 'spawner'
+    _period = 600 # seconds
+    visible = False
+
+    def __init__(self, name='', short='', long=''):
+        Mob.__init__(self, name, short, long)
+        self.settings += ['mobtype', ]
+        self._mobtype = 'Cat'
+        self.set_action_weights(action_sleep=0,
+                                action_awake=0,
+                                action_move=0,)
+
+    def action_spawn(self):
+        room = self.room
+        ms = room.mobs()
+        for mob in ms:
+            mobcls = class_as_string(mob)
+            if mobcls == self._mobtype:
+                return
+
+        import mobs
+        spawncls = getattr(mobs, self._mobtype)
+        mob = spawncls()
+        mob.home = room
+        mob.move(room)
+        self.room.action(dict(act='arrive', actor=mob, fromx=None))
