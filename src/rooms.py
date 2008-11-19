@@ -39,8 +39,6 @@ commit = zodb.commit
 abort = zodb.abort
 
 import conf
-import players
-import rooms
 import mobs
 import items
 from share import TZContainer, TZObj, class_as_string
@@ -706,17 +704,9 @@ class SmallRoom(Room):
         characters = self.players() + self.mobs()
         if len(characters) > self.max_characters:
             x = info['fromx']
-            from_room = x.destination
             arriver.message('The room is too full to enter.')
-            arriver.move(from_room)
+            arriver.go(x)
             arriver.message(from_room)
-            self.action(dict(act='leave', actor=arriver, tox=x))
-
-            backx = None
-            for backx in from_room.exits():
-                if backx.destination == self:
-                    break
-            from_room.action(dict(act='arrive', actor=arriver, fromx=backx))
 
 
 class Trap(Room):
@@ -771,7 +761,7 @@ class TeleTrap(TimedTrap):
             TimedTrap.spring_trap(self)
 
             if not self._targets:
-                rms = rooms.ls()
+                rms = ls()
             else:
                 rms = [getattr(rooms, name) for name in self._targets]
 
