@@ -33,7 +33,6 @@ from persistent import Persistent
 from persistent.list import PersistentList
 from persistent.dict import PersistentDict
 
-import wizard
 import conf
 from db import TZODB, TZIndex, tzid
 zodb = TZODB()
@@ -527,21 +526,14 @@ Character (%s): %s
     def _follow(self, leaver, x):
         'Follow along if this character is following someone who left.'
 
-        self.room.action(dict(act='leave', actor=self, tox=x))
-        origin = self.room
         try:
-            self.move(x.destination)
+            self.go(x)
         except:
             #print 'Character._follow ABORT'
             abort()
         else:
             #print 'Character._follow COMMIT'
             commit()
-        backx = None
-        for backx in x.destination.exits():
-            if backx.destination == origin:
-                break
-        self.room.action(dict(act='arrive', actor=self, fromx=backx))
 
 
 
@@ -807,3 +799,4 @@ def upgradeall():
 import players
 import rooms
 import mobs
+import wizard
