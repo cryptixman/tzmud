@@ -146,8 +146,10 @@ def dbclean():
 
     '''
 
-    cmd = 'rm %s*' % conf.datafs
-    os.system(cmd)
+    import glob
+    pths = glob.glob('%s*' % conf.datafs)
+    for pth in pths:
+        os.remove(pth)
 
 def dbinit():
     'Remove old database and start from a complete fresh start.'

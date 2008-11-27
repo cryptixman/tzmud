@@ -245,7 +245,10 @@ def db_pack():
     zodb.commit()
 
     import conf
-    os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
+    import glob
+    pths = glob.glob('%s/*%s.*' % (conf.backupdir, conf.datafsname))
+    for pth in pths:
+        os.remove(pth)
 
 def db_depopulate():
     if len(sys.argv) == 2:
@@ -278,7 +281,10 @@ def db_depopulate():
     zodb.commit()
 
     import conf
-    os.system('rm %s/*%s.*' % (conf.backupdir, conf.datafsname))
+    import glob
+    pths = glob.glob('%s/*%s.*' % (conf.backupdir, conf.datafsname))
+    for pth in pths:
+        os.remove(pth)
 
 def db_display(fname=None):
     zodb = TZODB(fname)

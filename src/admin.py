@@ -301,7 +301,7 @@ def cmd_svnup(s):
 
     import os
     import conf
-    cmd = 'svn up'
+    cmd = conf.svn
     os.system(cmd)
 
     cmd_restart(s)

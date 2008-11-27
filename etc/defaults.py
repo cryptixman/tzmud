@@ -40,5 +40,6 @@ port = 4444
 
 home_id = 1
 
+svn = '/usr/bin/svn'
 
 web = False
