@@ -43,6 +43,8 @@ def create_conf():
     f.write('# Make configuration changes here.\n')
     f.write('# See etc/defaults.py for available parameters.\n')
     f.write('\n')
+    f.write('# After making changes, verify the config file with:\n')
+    f.write('# python tzcontrol.py -c\n')
     f.write('\n')
     f.close()
 
@@ -70,12 +72,31 @@ except ImportError:
     create_conf()
     print 'etc/conf.py created'
     print
-    print 'Please check configuration before starting server.'
+    print 'Please check configuration before starting server:'
+    print '  python tzcontrol.py -c'
     print
     import conf
     check_db()
     sys.exit(0)
 
+
+def verify_config():
+    varstrings = ['python:-', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'twistdpid2:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-']
+    for varstring in varstrings:
+        varname, vartype = varstring.split(':')
+        print 'Checking var:',
+        print '%-15s' % varname,
+        val = getattr(conf, varname)
+        if os.path.exists(val):
+            print 'ok'
+        elif vartype == '-':
+            dirname = os.path.dirname(val)
+            if os.path.exists(dirname):
+                print 'directory ok'
+            else:
+                print 'directory', dirname, 'does not exist'
+        else:
+            print '!!'
 
 def pid():
     'Return the pid of the running server.'
@@ -333,6 +354,9 @@ def main():
         parser.add_option('-U', '--upgradedb', dest='upgradedb',
             action="store_true",
             help='Upgrade the database. Use after adding or removing attributes from persistent objects.')
+        parser.add_option('-c', '--verify-config', dest='verify_config',
+            action="store_true",
+            help='Verify the config.py file.')
 
         (options, args) = parser.parse_args()
 
@@ -364,6 +388,8 @@ def main():
                 parser.print_help()
         elif options.upgradedb:
             upgradedb()
+        elif options.verify_config:
+            verify_config()
         else:
             parser.print_help()
 
