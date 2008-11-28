@@ -336,7 +336,7 @@ class TZ(basic.LineReceiver):
                     self.room.exitname(cmd) is not None):
                 actions.cmd_go(self, dict(direction=cmd))
             else:
-                self.message('Command not understood.')
+                self.message("What's that?")
             return
 
         try:

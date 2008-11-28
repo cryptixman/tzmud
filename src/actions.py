@@ -390,7 +390,7 @@ def cmd_go(s, r):
     origin = s.room
     x = origin.exitname(objname) or origin.exit(objtzid)
     if x is None:
-        s.message('Not an exit.')
+        s.message("You can't go that way.")
         return
 
     success, msg = s.player.go(x)
@@ -551,7 +551,7 @@ def cmd_exits(s, r=None):
         exits = ', '.join(str(x) for x in s.room.exits())
         s.message(exits, indent=4)
     else:
-        s.message('No obvious exits.')
+        s.message('You see no obvious exits.')
 
 
 def cmd_say(s, r):
