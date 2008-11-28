@@ -258,6 +258,8 @@ Player (%s): %s  [%s]
             self.message(getter, 'gets', item, '.')
         elif self.can_see(item):
             self.message(item, 'disappears.')
+        elif self.can_see(getter):
+            self.message(getter, 'gets something...')
 
     def near_drop(self, info):
         'Someone has "drop"ped near this player.'
