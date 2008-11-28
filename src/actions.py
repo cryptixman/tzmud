@@ -111,9 +111,13 @@ def cmd_get(s, r):
 
     item = find(r, s.room)
     if not s.player.can_see(item):
-        iis = filter(s.player.can_see, find(r, s.room, all=True))
-        if iis:
-            item = iis[0]
+        allitems = find(r, s.room, all=True)
+        if allitems is not None:
+            iis = filter(s.player.can_see, allitems)
+            if iis:
+                item = iis[0]
+            else:
+                item = None
         else:
             item = None
     have = s.player.itemname(objname) or s.player.item(objtzid)
