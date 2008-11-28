@@ -269,7 +269,8 @@ def db_depopulate():
             continue
         player = dbroot['players'][name]
         room = player.room
-        room.rmplayer(player)
+        if room is not None:
+            room.rmplayer(player)
         del dbroot['players'][name]
         del dbroot['players']['_index'][player.tzid]
         del dbroot['_index'][player.tzid]
