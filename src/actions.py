@@ -77,6 +77,7 @@ def cmd_info(s, r):
     '''
 
     objs = find(r, s.room, s.player, s.player, all=True)
+    objs = filter(s.player.can_see, objs)
 
     if objs:
         for obj in objs:
