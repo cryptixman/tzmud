@@ -48,8 +48,8 @@ obj2ref = obj2nameref | obj2tzidref
 
 look_verb1 = oneOf('look l', caseless=True)('verb')
 look_verb1.setParseAction(replaceWith('look'))
-look_verb2a = CaselessLiteral('look')
-look_verb2b = CaselessLiteral('l')
+look_verb2a = CaselessLiteral('look ')
+look_verb2b = CaselessLiteral('l ')
 look_verb2 = (look_verb2a|look_verb2b)('verb')
 look_verb2.setParseAction(replaceWith('look'))
 look1 = look_verb1 + LineEnd()
