@@ -395,8 +395,13 @@ def cmd_go(s, r):
     origin = s.room
     x = origin.exitname(objname) or origin.exit(objtzid)
     if x is None:
-        s.message("You can't go that way.")
-        return
+        xs = origin.exits()
+        if len(xs)==1:
+            if objname in ['out', 'exit', 'leave']:
+                x = xs[0]
+        else:
+            s.message("You can't go that way.")
+            return
 
     success, msg = s.player.go(x)
 
