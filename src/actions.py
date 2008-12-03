@@ -396,6 +396,7 @@ def cmd_go(s, r):
     x = origin.exitname(objname) or origin.exit(objtzid)
     if x is None:
         xs = origin.exits()
+        xs = filter(s.player.can_see, xs)
         if len(xs)==1:
             if objname in ['out', 'exit', 'leave']:
                 x = xs[0]
@@ -558,7 +559,9 @@ def cmd_exits(s, r=None):
 
     if s.room.exitnames():
         s.message('Exits:')
-        exits = ', '.join(str(x) for x in s.room.exits())
+        xs = s.room.exits()
+        xs = filter(s.player.can_see, xs)
+        exits = ', '.join(str(x) for x in xs)
         s.message(exits, indent=4)
     else:
         s.message('You see no obvious exits.')
