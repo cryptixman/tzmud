@@ -102,8 +102,9 @@ remove_verb = CaselessLiteral('remove')('verb')
 remove = remove_verb + objref
 
 
-go_verb = CaselessLiteral('go')('verb')
-go = go_verb + objref + LineEnd()
+go_verb = oneOf('go enter')('verb')
+go_verb.setParseAction(replaceWith('go'))
+go = go_verb + Optional('to') + objref + LineEnd()
 
 direction = objref
 

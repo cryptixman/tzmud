@@ -381,11 +381,31 @@ def cmd_remove(s, r):
 
 
 def cmd_go(s, r):
-    '''go <exit name>
+    '''go [to] [<exit>|<room>]
 
-    Go through the given exit.
+    Go through the given exit or to the given room. No need to specify
+        the name of the exit or room if there is only one way out.
 
-    Alternate: <exit name>
+    Alternates: enter [<exit>] or <exit> or [out|exit|leave]
+
+    Examples:
+        house
+        > exits
+        Exits:
+            east, north
+        > east
+        place
+        > exits
+        Exits:
+            west
+        > leave
+        house
+        > enter place
+        place
+        > exit
+        house
+        > east
+        place
 
     '''
 
@@ -397,9 +417,36 @@ def cmd_go(s, r):
     if x is None:
         xs = origin.exits()
         xs = filter(s.player.can_see, xs)
-        if len(xs)==1:
-            if objname in ['out', 'exit', 'leave']:
+
+        if objname:
+            found = False
+            for x in xs:
+                if found:
+                    break
+
+                dest = x.destination
+                print objname, dest.name
+
+                if dest.name == objname:
+                    found = True
+                    break
+
+                if hasattr(dest, 'name_aka'):
+                    for aka in item.name_aka:
+                        if aka == objname:
+                            found = True
+                            break
+
+        alternates = ['out', 'exit', 'leave']
+
+        if found:
+            pass
+        elif objname in alternates:
+            if len(xs)==1:
                 x = xs[0]
+            else:
+                s.message(objname, 'through which exit?')
+                return
         else:
             s.message("You can't go that way.")
             return
