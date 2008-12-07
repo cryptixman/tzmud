@@ -687,7 +687,7 @@ class Exit(TZObj):
 def classes():
     'Return a list of the names of the clonable rooms.'
 
-    return 'Room', 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap', 'HeavyDoorRoom'
+    return 'Room', 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap'
 
 
 class SmallRoom(Room):
@@ -919,17 +919,3 @@ class Zoo(Room):
 
         self.respawn(outside, mobclass)
 
-
-
-
-class HeavyDoorRoom(Room):
-    'A room with a heavy door.'
-
-    name = 'hdr'
-    short = "Whoa that's a big door."
-
-    def __init__(self, name=''):
-        Room.__init__(self, name)
-        x = Exit('big door')
-        x._weight = 5
-        self.addexit(x)
