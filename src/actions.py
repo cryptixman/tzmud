@@ -93,7 +93,7 @@ def cmd_time(s, r=None):
 
 
 def cmd_get(s, r):
-    '''get <item>
+    '''get [the] <item>
 
     Pick up something and put it in your inventory.
 
@@ -107,7 +107,7 @@ def cmd_get(s, r):
     if objname == 'all':
         for item in filter(s.player.can_see, s.room.items()):
             s.player.get_item(item, s.room)
-            s.player.message('You get', item, '.')
+            s.player.message('You get the', item, '.')
         return
 
     item = find(r, s.room)
@@ -126,7 +126,7 @@ def cmd_get(s, r):
     if item:
         if item.gettable:
             s.player.get_item(item, s.room)
-            s.player.message('You get', item, '.')
+            s.player.message('You get the', item, '.')
         else:
             s.message('You cannot get that.')
 
@@ -150,7 +150,7 @@ def cmd_drop(s, r):
     if objname == 'all':
         for item in s.player.items():
             s.player.drop_item(item)
-            s.player.message('You drop', item, '.')
+            s.player.message('You drop the', item, '.')
         return
 
     item = s.player.itemname(objname) or s.player.item(objtzid)
@@ -169,7 +169,7 @@ def cmd_drop(s, r):
                 s.message('You cannot split that item.')
 
         s.player.drop_item(item)
-        s.player.message('You drop', item, '.')
+        s.player.message('You drop the', item, '.')
 
     else:
         s.message('You do not have that.')
@@ -193,7 +193,14 @@ def cmd_put(s, r):
     container = player.itemname(obj2name) or room.itemname(obj2name) or \
                     player.item(obj2tzid) or room.item(obj2tzid)
 
-    if not hasattr(container, 'add'):
+    if container is None:
+        if obj2name:
+            s.message('You do not have a container called', obj2name, '.')
+            return
+        else:
+            s.message('You do not have such a container.')
+            return
+    elif not hasattr(container, 'add'):
         s.message("You can't put anything in there.")
         return
 
@@ -210,7 +217,7 @@ def cmd_put(s, r):
     player.remove(item)
     container.add(item)
 
-    s.message('You put', item, 'in', container, '.')
+    s.message('You put the', item, 'in the', container, '.')
     item.put(player, container)
     room.action(dict(act='put', actor=player, item=item, container=container))
 
@@ -262,7 +269,7 @@ def cmd_take(s, r):
             container.remove(item)
             player.add(item)
 
-            s.message('You take', item, 'from', container, '.')
+            s.message('You take the', item, 'from the', container, '.')
             item.take(player, container)
             room.action(dict(act='take', actor=player, item=item,
                                 container=container))
