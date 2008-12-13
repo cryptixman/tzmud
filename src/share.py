@@ -301,6 +301,18 @@ class TZContainer(TZObj):
         if item in self:
             self._item_ids.remove(item.tzid)
 
+    def has_inside(self, item):
+        '''Check for item in this container, including inside of
+            containers in this container.
+
+        '''
+
+        for i in self.items():
+            if i is item:
+                return True
+            if hasattr(i, 'has_inside'):
+                return i.has_inside(item)
+
 
 class Character(TZContainer):
     'Base class for Player and Mob classes.'
