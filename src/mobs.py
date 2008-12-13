@@ -511,11 +511,11 @@ class Spawner(Mob):
     name = 'spawner'
     _period = 600 # seconds
     visible = False
+    _mobtype = 'Cat'
 
     def __init__(self, name='', short='', long=''):
         Mob.__init__(self, name, short, long)
         self.settings += ['mobtype', ]
-        self._mobtype = 'Cat'
         self.set_action_weights(action_sleep=0,
                                 action_awake=0,
                                 action_move=0,)
