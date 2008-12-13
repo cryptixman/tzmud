@@ -187,7 +187,7 @@ Item (%s): %s
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coins', 'Hat', 'Camera', 'Photograph', 'InvRing',
+    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing',
 
 
 class Rose(Item):
@@ -284,7 +284,7 @@ class SkeletonKey(Key):
         return True
 
 
-class Coins(Item):
+class Coin(Item):
     'One or more coins.'
 
     name = 'coins'
