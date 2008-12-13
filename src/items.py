@@ -26,6 +26,8 @@ Items are generally gettable, and are sometimes wearable. Some
 
 import time
 
+from twisted.internet import reactor
+
 from persistent.list import PersistentList
 
 from db import TZODB, TZIndex
@@ -187,7 +189,7 @@ Item (%s): %s
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap'
+    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap'
 
 
 class Rose(Item):
@@ -391,12 +393,45 @@ class Photograph(Item):
     long = "It's blank."
 
 
-class GetTrap(Item):
+class Trap(Item):
+    'A surprise for a nearby character.'
+
+    def spring(self, character):
+        character.message('Gotcha!')
+
+class GetTrap(Trap):
     'getting this item springs the trap.'
 
     name = 'gettrap'
     short = 'Hey! That is an interesting looking thing....'
 
     def get(self, character):
-        character.message('Gotcha!')
+        self.spring(character)
         return False
+
+class TimeTrap(Trap):
+    'Trap which springs a set time after it is activated.'
+
+    name = 'timetrap'
+    _delay = 2 # seconds
+
+    def __init__(self, name='', short='', long=''):
+        Trap.__init__(self, name, short, long)
+        self.settings.append('delay')
+
+    def spring(self, character):
+        reactor.callLater(self._delay, self.spring_later, character)
+
+    def spring_later(self, character):
+        character.message('Boom!')
+
+class GetTimeTrap(TimeTrap, GetTrap):
+    'TimeTrap activated by getting it.'
+
+    def get(self, character):
+        self.spring(character)
+        return True
+
+    def spring_later(self, character):
+        if character.has_inside(self):
+            character.message('Boom!')
