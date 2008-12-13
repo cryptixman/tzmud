@@ -462,12 +462,15 @@ Character (%s): %s
     following = property(_get_following, _set_following)
 
     def get_item(self, item, room):
-        'Get item from room.'
+        'Get item from room. return True if successful, else False.'
 
-        self.add(item)
-        room.remove(item)
-        item.get(self)
-        room.action(dict(act='get', actor=self, item=item, sidefx=True))
+        if item.get(self):
+            self.add(item)
+            room.remove(item)
+            room.action(dict(act='get', actor=self, item=item, sidefx=True))
+            return True
+        else:
+            return False
 
     def drop_item(self, item):
         'Drop item from inventory.'

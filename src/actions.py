@@ -106,8 +106,8 @@ def cmd_get(s, r):
 
     if objname == 'all':
         for item in filter(s.player.can_see, s.room.items()):
-            s.player.get_item(item, s.room)
-            s.player.message('You get the', item, '.')
+            if s.player.get_item(item, s.room):
+                s.player.message('You get the', item, '.')
         return
 
     item = find(r, s.room)
@@ -125,8 +125,8 @@ def cmd_get(s, r):
 
     if item:
         if item.gettable:
-            s.player.get_item(item, s.room)
-            s.player.message('You get the', item, '.')
+            if s.player.get_item(item, s.room):
+                s.player.message('You get the', item, '.')
         else:
             s.message('You cannot get that.')
 

@@ -107,12 +107,12 @@ class Item(TZObj):
         TZObj.destroy(self)
 
     def get(self, character):
-        'Character has picked up this item.'
-        pass
+        'Character has picked up this item. return True if successful, else False'
+        return True
 
     def drop(self, character):
-        'Character has dropped this item.'
-        pass
+        'Character has dropped this item. return True if successful, else False'
+        return True
 
     def put(self, character, container):
         'Character has put this item in container.'
@@ -187,7 +187,7 @@ Item (%s): %s
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing',
+    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap'
 
 
 class Rose(Item):
@@ -334,6 +334,8 @@ class Coin(Item):
             character.remove(self)
             self.destroy()
 
+        return True
+
     def put(self, character, container):
         coins = container.itemname('coins')
         if coins is not None and coins is not self:
@@ -387,3 +389,14 @@ class Photograph(Item):
     name_aka = ['photo', 'photograph', 'picture']
     short = 'A glossy piece of paper with a realistic picture on it.'
     long = "It's blank."
+
+
+class GetTrap(Item):
+    'getting this item springs the trap.'
+
+    name = 'gettrap'
+    short = 'Hey! That is an interesting looking thing....'
+
+    def get(self, character):
+        character.message('Gotcha!')
+        return False
