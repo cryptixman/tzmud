@@ -808,6 +808,12 @@ def cmd_password(s, r):
         s.message('Incorrect password.')
 
 
+def cmd_xyzzy(s, r=None):
+    'xyzzy'
+
+    pass
+
+
 def cmd_help(s, r=None):
     '''help [<subject>]
 

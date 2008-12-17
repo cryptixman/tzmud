@@ -195,10 +195,14 @@ help_verb = oneOf('help ?', caseless=True)('verb')
 help_verb.setParseAction(replaceWith('help'))
 help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 
+
+xyzzy = CaselessLiteral('xyzzy')('verb') + LineEnd()
+
+
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | stats | set | unset | password | help | go | direction)
+actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | stats | set | unset | password | xyzzy | help | go | direction)
 
 
 
