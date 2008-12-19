@@ -190,7 +190,7 @@ class Room(TZContainer):
 
             The info dict should have at least act='action name' and
             actor=<character>. Different actions can pass whatever other
-            information deemed necessary throught the info dict.
+            information deemed necessary through the info dict.
 
         '''
 
