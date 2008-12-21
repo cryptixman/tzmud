@@ -130,7 +130,7 @@ def cmd_unset(s, r):
     setting = r['setting']
 
     val = obj.setting(setting)
-    if val is True:
+    if val in (True, False):
         value = 'False'
     else:
         value = ''
