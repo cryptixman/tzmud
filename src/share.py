@@ -45,18 +45,68 @@ tzindex = TZIndex()
 
 
 
+def int_attr(name, default=0):
+    'An attribute that will always hold an integer'
+
+    varname = '_%s' % name
+    def getter(self, var=varname):
+        return getattr(self, var, default)
+    def setter(self, val, var=varname):
+        val = int(val)
+        setattr(self, var, val)
+    return property(getter, setter)
+
+def bool_attr(name, default=False):
+    'An attribute that will always hold a boolean.'
+
+    varname = '_%s' % name
+    def getter(self, var=varname):
+        return getattr(self, var, default)
+    def setter(self, val, var=varname):
+        if val not in (False, True):
+            raise ValueError, 'Value must be a boolean.'
+        val = bool(val)
+        setattr(self, var, val)
+    return property(getter, setter)
+
+def str_attr(name, default='', blank_ok=True, setonce=False):
+    'An attribute that will always hold a string.'
+
+    varname = '_%s' % name
+    def getter(self, var=varname):
+        return getattr(self, var, default)
+    if not setonce:
+        def setter(self, val, var=varname):
+            if val=='' and not blank_ok:
+                raise ValueError, 'Blank string not allowed.'
+            val = str(val)
+            setattr(self, var, val)
+    else:
+        def setter(self, val, var=varname):
+            if val=='' and not blank_ok:
+                raise ValueError, 'Blank string not allowed.'
+            ival = getattr(self, varname, default)
+            if not ival:
+                val = str(val)
+                setattr(self, var, val)
+            else:
+                raise ValueError, 'Cannot be changed once set.'
+
+    return property(getter, setter)
+
+
 class TZObj(Persistent):
     'Base class for all MUD objects.'
 
-    name = 'proto'
-    short = ''
-    long = ''
+    name = str_attr('name', default='proto', blank_ok=False)
+    short = str_attr('short')
+    long = str_attr('long')
 
     gettable = True
     wearable = False
-    visible = True
+    visible = bool_attr('visible', default=True)
 
-    def __init__(self, name='', short='', long='', owner=None):
+    def __init__(self, name='', short='', long='', owner=None, container=None):
         self.tzid = tzid()
 
         self.name = name if name else self.name
@@ -64,9 +114,11 @@ class TZObj(Persistent):
         self.long = long if long else self.long
 
         self.settings = PersistentList()
-        self.settings += ['name', 'short', 'long', 'visible']
+        self.settings += ['name', 'short', 'long', 'owner', 'visible']
 
         self.owner = owner
+        self.container = container
+
         tzindex.add(self)
 
     def destroy(self):
@@ -84,6 +136,52 @@ class TZObj(Persistent):
         new_item = self.__class__(self.name, self.short, self.long)
         return new_item
 
+    def _set_owner(self, owner):
+        'Setter for the owner property.'
+        if owner is not None:
+            tzid = owner.tzid
+            if players.get(tzid) is None and mobs.get(tzid) is None:
+                raise ValueError, 'Owner must be a character (player or mob).'
+            self._ownerid = owner.tzid
+        else:
+            self._ownerid = None
+    def _get_owner(self):
+        'Getter for the owner property.'
+        return tzindex.get(self._ownerid)
+    owner = property(_get_owner, _set_owner)
+
+    def set_owner(self, iden):
+        'iden is the name or the id # for the owner'
+
+        if iden.startswith('#'):
+            tzid = iden[1:]
+            c = players.get(tzid) or mobs.get(tzid)
+        else:
+            name = iden
+            c = players.getname(name) or mobs.getname(name)
+
+        if c is None:
+            return False
+        else:
+            self.owner = c
+            return True
+
+    def _set_container(self, container):
+        '''Setter for the container property.
+
+        Should only be None for rooms.
+
+        '''
+        if container is not None:
+            self._containerid = container.tzid
+        else:
+            print self.name, 'has no parent'
+            self._containerid = None
+    def _get_container(self):
+        'Getter for the container property.'
+        return tzindex.get(self._containerid)
+    container = property(_get_container, _set_container)
+
     def setting(self, var, val=None):
         '''return the value of the given setting if val is None.
                 returns None if this object does not have that setting.
@@ -96,7 +194,7 @@ class TZObj(Persistent):
                 only acts if the name is given there.
 
 
-            Acts either the value of self.var or the value
+            Acts on either the value of self.var or the value
                 of self._var in that order.
 
         '''
@@ -125,21 +223,27 @@ class TZObj(Persistent):
                 return False
 
             if val.lower() == 'true':
-                if currval in (True, False):
-                    val = True
+                val = True
             elif val.lower() == 'false':
-                if currval in (True, False):
-                    val = False
-
-            try:
-                val = int(val)
-            except ValueError:
+                val = False
+            else:
                 try:
-                    val = float(val)
+                    val = int(val)
                 except ValueError:
-                    pass
+                    try:
+                        val = float(val)
+                    except ValueError:
+                        pass
 
-            if hasattr(self, var):
+            setter_name = 'set_%s' % var
+            setter = getattr(self, setter_name, None)
+
+            if setter is not None:
+                if setter(val):
+                    return True
+                else:
+                    return False
+            elif hasattr(self, var):
                 setattr(self, var, val)
                 return True
             elif hasattr(self, uvar):
@@ -319,6 +423,10 @@ class Character(TZContainer):
 
     gettable = False
 
+    stats_list = ['health', 'strength', ]
+    health = int_attr('health')
+    strength = int_attr('strength')
+
     def __init__(self, name='', short='', long=''):
         TZContainer.__init__(self, name, short, long)
 
@@ -343,14 +451,11 @@ Character (%s): %s
     def _set_default_stats(self):
         self._stats0 = PersistentDict()
 
-        stats_list = ['health', 'strength', ]
-        self.settings += stats_list
+        self.settings += self.stats_list
 
-        for name in stats_list:
-            uname = '_%s' % name
+        for name in self.stats_list:
             val = 0
             self._stats0[name] = val
-            setattr(self, uname, val)
 
     def go(self, x):
         '''Character is trying to go through exit x.

@@ -42,7 +42,7 @@ import tzprotocol
 import rooms
 import items
 
-from share import TZContainer, Character, class_as_string
+from share import TZContainer, Character, class_as_string, int_attr
 from colors import magenta
 
 
@@ -111,7 +111,7 @@ def nudge_all():
 class Mob(Character):
     'Base class for all mob (mobile) objects in the MUD.'
 
-    _period = 10 # seconds
+    period = int_attr('period', default=10) # seconds
 
     def __init__(self, name='', short='', long=''):
         Character.__init__(self, name, short, long)
@@ -252,15 +252,15 @@ Mob: %s (%s) [in room %s]: %s
             #print 'mob.act COMMIT'
             commit()
 
-        reactor.callLater(self._period, self.act)
+        reactor.callLater(self.period, self.act)
 
     def nudge(self, delayfactor=10):
         'Make sure the mob is calling act() regularly.'
 
         now = time.time()
 
-        if now > self._last_act + self._period * delayfactor:
-            reactor.callLater(self._period, self.act)
+        if now > self._last_act + self.period * delayfactor:
+            reactor.callLater(self.period, self.act)
         else:
             print 'Mob acted too recently to nudge.'
 
@@ -347,12 +347,12 @@ class Snake(Mob):
 
     name = 'snake'
     short = 'A green garter snake.'
-    _period = 1 # seconds
 
 
     def __init__(self, name='', short='', long=''):
         Mob.__init__(self, name, short, long)
         self.set_action_weights(action_move=2000)
+        self.period = 1 # second
 
     def action_reweight(self):
         pass
@@ -360,7 +360,6 @@ class Snake(Mob):
 class PackRat(Mob):
     'Collects things and brings them back to its nest.'
 
-    _period = 5 # seconds
     name_aka = ['rat']
 
     name = 'packrat'
@@ -372,6 +371,7 @@ class PackRat(Mob):
         self._searching = True
         self._has_dug_home = False
         self.set_action_weights(action_move=2000)
+        self.period = 5 # seconds
 
     def near_drop(self, info):
         if self._searching and self.room!=self.home and not self.items():
@@ -457,7 +457,6 @@ class PackRat(Mob):
 class Photographer(Mob):
     'Wanders around taking pictures'
 
-    _period = 25 # seconds
     name_aka = ['photographer']
 
     name = 'photographer'
@@ -471,6 +470,7 @@ class Photographer(Mob):
                                 action_awake=0,
                                 action_move=400,
                                 action_snap=1000)
+        self.period = 25 # seconds
 
     def action_snap(self):
         'Take a picture.'
@@ -509,7 +509,6 @@ class Spawner(Mob):
     '''
 
     name = 'spawner'
-    _period = 600 # seconds
     visible = False
     _mobtype = 'Cat'
 
@@ -519,6 +518,7 @@ class Spawner(Mob):
         self.set_action_weights(action_sleep=0,
                                 action_awake=0,
                                 action_move=0,)
+        self.period = 600 # seconds
 
     def action_spawn(self):
         room = self.room

@@ -36,7 +36,7 @@ dbroot = TZODB().root
 
 from colors import blue
 
-from share import Character
+from share import Character, str_attr
 
 import actions
 
@@ -87,6 +87,8 @@ def names():
 
 class Player(Character):
     'Base class for all players.'
+
+    name = str_attr('name', blank_ok=False, setonce=True)
 
     def __init__(self, name, short='', long=''):
         Character.__init__(self, name, short, long)

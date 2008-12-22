@@ -107,11 +107,15 @@ def cmd_set(s, r):
     setting = r['setting']
     value = r.get('value', "True")
 
-    if obj.setting(setting, value):
-        s.message('Set', setting, 'to', value, '.')
+    try:
+        success = obj.setting(setting, value)
+    except ValueError, e:
+        s.message('Error:', e)
     else:
-        s.message('Cannot set', setting, 'on', obj, '.')
-
+        if success:
+            s.message('Set', setting, 'to', value, '.')
+        else:
+            s.message('Cannot set', setting, 'on', obj, '.')
 
 def cmd_unset(s, r):
     '''unset <setting> on <object>
@@ -135,10 +139,15 @@ def cmd_unset(s, r):
     else:
         value = ''
 
-    if obj.setting(setting, value):
-        s.message('Unset', setting, '.')
+    try:
+        success = obj.setting(setting, value)
+    except ValueError, e:
+        s.message('Error:', e)
     else:
-        s.message('Cannot unset', setting, 'on', obj, '.')
+        if success:
+            s.message('Unset', setting, '.')
+        else:
+            s.message('Cannot unset', setting, 'on', obj, '.')
 
 
 def cmd_teleport(s, r=None):

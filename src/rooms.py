@@ -41,7 +41,7 @@ abort = zodb.abort
 import conf
 import mobs
 import items
-from share import TZContainer, TZObj, class_as_string
+from share import TZContainer, TZObj, class_as_string, int_attr
 from colors import green, yellow, red
 
 tzindex = TZIndex()
@@ -114,7 +114,7 @@ def nudge_all():
 class Room(TZContainer):
     'Base class for all rooms in the MUD.'
 
-    _period = 0
+    period = int_attr('period') # seconds
 
     def __init__(self, name='', short='', long='', owner=None,
                     exits=None, items=None):
@@ -155,25 +155,25 @@ class Room(TZContainer):
         TZContainer.destroy(self)
 
     def periodically(self):
-        '''Call self.periodic() every self._period seconds.
+        '''Call self.periodic() every self.period seconds.
 
-        if _period == 0, disable the periodic calls. If you need a
+        if period == 0, disable the periodic calls. If you need a
             room to call periodic very quickly, just use a very small
             but non-zero number.
 
         '''
 
-        if self._period:
+        if self.period:
             self._last_periodic = time.time()
             self.periodic()
-            reactor.callLater(self._period, self.periodic)
+            reactor.callLater(self.period, self.periodically)
 
     def nudge(self, delayfactor=10):
         'Nudge this room to make sure the periodic calls are happening.'
 
         now = time.time()
 
-        if now > self._last_periodic + self._period * delayfactor:
+        if now > self._last_periodic + self.period * delayfactor:
             self.periodically()
         else:
             print 'Too recent to nudge.'
@@ -794,10 +794,10 @@ class Zoo(Room):
 
     name = 'zoo'
     short = 'All sorts of strange creatures.'
-    _period = 3600 # 60 minutes
 
     def __init__(self, name=''):
         Room.__init__(self, name)
+        self.period = 3600 # 60 minutes
 
     def destroy(self):
         '''Get rid of the Zoo.

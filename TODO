@@ -19,19 +19,24 @@
 - remove old-style password verification in v0.9
 - allow cloning special Exit types
 - potion of see invisible things
-- SpawnPoint object to create mobs periodically
-- use proper articles in messages (ie. 'You get the rose')
 - item exchanging (give, take, accept, steal)
 - better info output so people can tell which object is which
 - Group items with the same name in the inventory (ie. 2 roses)
 - fix tzcontrol to work properly on windows
-- use object owner attribute to indicate where the item is, not
-    who created it. Ie... which room it is in, which character is
-    carring it, which container it is in.
+- set ownership for cloned objects
+- set_* methods as customized setting setters for objects
+    for instance, objects could have a set_owner method which
+    looks up the supplied word as the name of a character
+    and uses that to set the owner of the object.
+- add a new .parent attribute for objects to indicate
+    which room it is in, which character is
+    carrying it, or which container it is in.
 - room actions should pass through to items in containers
 - CrystalBall item which can locate/spy on objects
 - item for detecting invisible things...
     "you sense something you cannot see..."
+- add Region object to group Rooms
+- a way to export objects from / import objects to the database
 
 # Web Server
 - Build MUD areas by web.
