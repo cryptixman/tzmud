@@ -520,6 +520,15 @@ class Spawner(Mob):
                                 action_move=0,)
         self.period = 600 # seconds
 
+    def set_mobtype(self, mobtype):
+        'Make sure the mobtype exists.'
+
+        if mobtype not in classes():
+            raise ValueError, 'Given mob type does not exist.'
+        else:
+            self._mobtype = mobtype
+            return True
+
     def action_spawn(self):
         room = self.room
         ms = room.mobs()
