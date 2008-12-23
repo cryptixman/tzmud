@@ -313,6 +313,12 @@ class TZObj(Persistent):
             lines.append('    %s: %s' % (var, self.setting(var)))
         return lines
 
+    def near_listen(self, info):
+        obj = info['obj']
+        if obj==self:
+            listener = info['actor']
+            listener.message("You don't hear anything.")
+
 
 class TZContainer(TZObj):
     'Base class for all item-containing objects (including characters).'
