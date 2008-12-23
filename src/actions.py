@@ -219,8 +219,14 @@ def cmd_put(s, r):
                 player.item(objtzid) or room.item(objtzid)
 
     if item is None:
-        s.message('You do not have that.')
-        return
+        if objname == 'all':
+            for item in filter(s.player.can_see, s.player.items()):
+                if item is not container:
+                    cmd_put(s, dict(objtzid=item.tzid, obj2tzid=container.tzid))
+            return
+        else:
+            s.message('You do not have that.')
+            return
 
     if player.is_wearing(item):
         player.unwear(item)
@@ -289,7 +295,12 @@ def cmd_take(s, r):
 
         else:
             if objname:
-                s.message('There is no', objname, 'in', container.name, '.')
+                if objname == 'all':
+                    for item in filter(s.player.can_see, container.items()):
+                        cmd_take(s, dict(objtzid=item.tzid, obj2tzid=container.tzid))
+                    return
+                else:
+                    s.message('There is no', objname, 'in', container.name, '.')
             else:
                 s.message('There is no object #', objtzid, 'in', container.name, '.')
 
