@@ -37,7 +37,6 @@
     "you sense something you cannot see..."
 - add Region object to group Rooms
 - a way to export objects from / import objects to the database
-- better messages when mis-using wizard or admin commands
 - should be able to use the mirror
 - more general "use" framework
     maybe pass everything after "use thing" for further parsing
