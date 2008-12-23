@@ -222,9 +222,8 @@ def shutdown(s):
     for client in s.factory.clients:
         client.transport.loseConnection()
 
-    cmd = (conf.python, conf.tzcontrol, '-q')
-    os.spawnl(os.P_NOWAIT, conf.python, *cmd)
-
+    from twisted.internet import reactor
+    reactor.stop()
 
 def cmd_fresh(s):
     '''fresh

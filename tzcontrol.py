@@ -352,6 +352,16 @@ def main():
 
     if check_python_version():
 
+        system = platform.system()
+        if system != 'Linux':
+            print 'Warning: System is only tested on Linux.'
+            print 'Warning: Some options may not work properly.'
+            print
+            print 'If you can make this work properly on your system,'
+            print '     please submit a patch to:'
+            print '         http://tzmud.googlecode.com/'
+            print
+
         from optparse import OptionParser
 
         usage = "usage: %prog <option>"
