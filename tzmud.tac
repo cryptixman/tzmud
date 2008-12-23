@@ -65,29 +65,10 @@ class TZMUD(internet.TCPServer):
         zodb.pack()
         zodb.close()
 
-    def maybe_restart(self):
-        'Try to restart the server if _restart has been set.'
-
-        print 'maybe restarting...'
-        if factory._restart:
-            print '_restart is True'
-
-            if not os.path.exists(conf.twistdpid):
-                pidfile = conf.twistdpid
-            else:
-                pidfile = conf.twistdpid2
-
-            cmd = 'twistd --pidfile %s --logfile %s -y %s' % (pidfile,
-                                                                conf.twistdlog,
-                                                                conf.tztac,)
-            os.system(cmd)
-        else:
-            print '_restart is False'
 
 application = service.Application('tzmud_server')
 server = TZMUD(conf.port, factory)
 reactor.addSystemEventTrigger("after", "shutdown", server.close_db)
-reactor.addSystemEventTrigger("after", "shutdown", server.maybe_restart)
 import mobs
 reactor.callLater(10, mobs.nudge_all)
 import rooms

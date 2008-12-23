@@ -29,6 +29,7 @@ import shutil
 import datetime
 now = datetime.datetime.now
 import shutil
+import platform
 
 
 etc = os.path.abspath('etc')
@@ -81,7 +82,7 @@ except ImportError:
 
 
 def verify_config():
-    varstrings = ['python:-', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'twistdpid2:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-']
+    varstrings = ['python:-', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-']
     for varstring in varstrings:
         varname, vartype = varstring.split(':')
         print 'Checking var:',
@@ -102,7 +103,7 @@ def pid():
     'Return the pid of the running server.'
 
     twistdpid = None
-    for f in conf.twistdpid, conf.twistdpid2:
+    for f in conf.twistdpid, 'twistd.pid':
         try:
             twistdpid = int(file(f).read())
         except:
@@ -113,7 +114,7 @@ def pid():
 def rmpid():
     'Remove any pid files. Used to clean up after a server crash.'
 
-    for f in conf.twistdpid, conf.twistdpid2:
+    for f in conf.twistdpid, 'twistd.pid':
         try:
             os.remove(f)
         except OSError:
@@ -129,12 +130,30 @@ def start():
 
     p = pid()
     if p is None:
-        cmd = '%s --pidfile %s -y %s -l %s' % (conf.twistd,
-                                    conf.twistdpid,
-                                    conf.tztac,
-                                    conf.twistdlog)
+        system = platform.system()
+
+        if system != 'Linux':
+            cmd = '%s -y %s -l %s' % (conf.twistd,
+                                        conf.tztac,
+                                        conf.twistdlog)
+        else:
+            cmd = '%s -y %s --pidfile %s -l %s' % (conf.twistd,
+                                        conf.tztac,
+                                        conf.twistdpid,
+                                        conf.twistdlog)
         if check_db():
-            os.system(cmd)
+            import commands
+            status, output = commands.getstatusoutput(cmd)
+
+            if status:
+                print 'Unable to start server'
+                print 'Error code:', status
+                print
+                for line in output:
+                    print line
+
+            else:
+                print 'Server started'
     else:
         print 'Server is already running.'
 
@@ -142,22 +161,23 @@ def shutdown():
     'Try to shut down the server if it is running.'
 
     p = pid()
-    os.chmod(conf.tztac, 0)
     if p is not None:
         try:
             os.kill(p, 15)
         except OSError:
             print 'Server already shut down.'
             rmpid()
-        time.sleep(2)
-    os.chmod(conf.tztac, 0644)
+
+    dbunlock()
 
 def restart():
     'Shut down, wait a few seconds, then start up again.'
 
-    shutdown()
-    delay()
-    start()
+    cmd = (conf.python, conf.tzcontrol, '-q')
+    os.spawnl(os.P_NOWAIT, conf.python, *cmd)
+
+    cmd = (conf.python, conf.tzcontrol, '-d', '-s')
+    os.spawnl(os.P_NOWAIT, conf.python, *cmd)
 
 def dbclean():
     '''Remove all database related files.
@@ -171,6 +191,18 @@ def dbclean():
     pths = glob.glob('%s*' % conf.datafs)
     for pth in pths:
         os.remove(pth)
+
+def dbunlock():
+    '''Remove the Data.fs.lock file -- which for some reason is
+        not being removed when the database is closed, preventing
+        the server from restarting in some cases.
+
+    '''
+
+    try:
+        os.remove('%s.lock' % conf.datafs)
+    except OSError:
+        pass
 
 def dbinit():
     'Remove old database and start from a complete fresh start.'

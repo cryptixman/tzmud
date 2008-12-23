@@ -176,9 +176,16 @@ def cmd_restart(s, r=None):
     s.broadcast('WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!')
     s.broadcast('TZMud will restart in ' + str(delay) + ' seconds!')
 
-    s.factory._restart = True
     from twisted.internet import reactor
-    reactor.callLater(delay, shutdown, s)
+    reactor.callLater(delay, restart, s)
+
+
+def restart(s):
+    for client in s.factory.clients:
+        client.transport.loseConnection()
+
+    cmd = (conf.python, conf.tzcontrol, '-r')
+    os.spawnl(os.P_NOWAIT, conf.python, *cmd)
 
 
 def cmd_shutdown(s, r=None):
@@ -201,7 +208,6 @@ def cmd_shutdown(s, r=None):
     s.broadcast('WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!')
     s.broadcast('TZMud will shut down in ' + str(delay) + ' seconds!')
 
-    s.factory._restart = False
     from twisted.internet import reactor
     reactor.callLater(delay, shutdown, s)
 
@@ -216,13 +222,8 @@ def shutdown(s):
     for client in s.factory.clients:
         client.transport.loseConnection()
 
-    import os
-    for f in conf.twistdpid, conf.twistdpid2:
-        try:
-            pid = file(f).read()
-            os.kill(int(pid), 15)
-        except:
-            print f, 'not found'
+    cmd = (conf.python, conf.tzcontrol, '-q')
+    os.spawnl(os.P_NOWAIT, conf.python, *cmd)
 
 
 def cmd_fresh(s):
@@ -238,8 +239,8 @@ def cmd_fresh(s):
 
     cmd_shutdown(s)
 
-    cmd = '%s %s -d -f &' % (conf.python, conf.tzcontrol)
-    os.system(cmd)
+    cmd = (conf.python, conf.tzcontrol, '-f')
+    os.spawnl(os.P_NOWAIT, conf.python, *cmd)
 
 
 def cmd_rollback(s, r=None):
@@ -264,8 +265,8 @@ def cmd_rollback(s, r=None):
     else:
         rbf = ''
 
-    cmd = '%s %s -d -z %s &' % (conf.python, conf.tzcontrol, rbf)
-    os.system(cmd)
+    cmd = (conf.python, conf.tzcontrol, '-z', rbf)
+    os.spawnl(os.P_NOWAIT, conf.python, *cmd)
 
 
 def cmd_list(s, r):

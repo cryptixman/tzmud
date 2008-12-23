@@ -22,7 +22,6 @@ python_version = '2.5'
 twistd = '/usr/bin/twistd'
 twistdlog = 'var/log/twistd.log'
 twistdpid = 'var/run/twistd.pid'
-twistdpid2 = 'var/run/twistd2.pid'
 tztac = 'tzmud.tac'
 
 tzcontrol = 'tzcontrol.py'
