@@ -284,8 +284,8 @@ def cmd_dig(s, r):
 
     Connect exit to room and optionally from the new room back to here.
 
-    Destination or exits can be existing objects, or if they do not yet
-        exist, they will be created.
+    Destination or exits can be existing objects, or if they do not
+        yet exist, they will be created.
 
     '''
 
@@ -293,6 +293,8 @@ def cmd_dig(s, r):
 
     destname = r.get('destname', '')
     desttzid = r.get('desttzid', 0)
+    if not destname and not desttzid:
+        raise SyntaxError, 'Command used improperly.'
     destination = rooms.getname(destname) or rooms.get(desttzid)
 
     if destination is None and destname:
@@ -346,6 +348,8 @@ def cmd_lock(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used improperly.'
     x = s.room.exitname(objname) or s.room.exit(objtzid)
     if x is None:
         s.message('No such exit.')
@@ -417,6 +421,10 @@ def cmd_clone(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used improperly.'
+
     newname = r.get('new', '')
 
     # try to clone an item in the room or on the player
@@ -506,6 +514,8 @@ def cmd_study(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used improperly.'
 
     obj = find(r, s.room, s.player, s.room)
     if obj is not None:
@@ -599,12 +609,15 @@ def cmd_destroy(s, r):
 
     '''
 
+    objname = r.get('objname', '')
+    objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used improperly.'
+
     player = s.player
     room = s.room
-    obj = find(r, room, player, room)
+    obj = find(r, room, player)
     if obj is None:
-        objname = r.get('objname', '')
-        objtzid = r.get('objtzid', 0)
         obj = rooms.getname(objname) or \
                 rooms.get(objtzid) or \
                 tzindex.get(objtzid)

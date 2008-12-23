@@ -261,7 +261,7 @@ class TZ(basic.LineReceiver):
                 # normal command dispatch
                 section = actions
 
-                cmd = ''
+                cmd = '##nocmd'
                 rest = ''
                 if line[0] == '!':
                     if admin.verify(self.player):
@@ -275,9 +275,9 @@ class TZ(basic.LineReceiver):
                     try:
                         result = parse.full_parser.parseString(line)
                     except parse.ParseException:
-                        cmd = 'xvxvxvxvxvxvxvxvx'
+                        cmd = '##parseproblem'
                     else:
-                        cmd = result.asDict().get('verb', 'go')
+                        cmd = result.asDict().get('verb', '##noverb')
                         section = globals()[result['section']]
 
                         if section==wizard and not wizard.verify(self.player):
@@ -285,17 +285,15 @@ class TZ(basic.LineReceiver):
                             return
 
                         rest = result.asDict()
-                        #print rest
+                        #print 'rest', rest
 
-
-                if not cmd:
+                if cmd == '##nocmd':
                     parts = line.split()
                     cmd = parts[0]
                     try:
                         rest = ' '.join(parts[1:])
                     except IndexError:
                         rest = None
-
 
                 self.dispatch(section, cmd, rest)
 
@@ -331,10 +329,10 @@ class TZ(basic.LineReceiver):
         try:
             func_name = 'cmd_%s' % cmd
             func = getattr(section, func_name)
+
         except AttributeError:
-            if (section==actions and
-                    self.room.exitname(cmd) is not None):
-                actions.cmd_go(self, dict(direction=cmd))
+            if section==actions:
+                actions.cmd_go(self, dict(objname=cmd))
             else:
                 self.message("What's that?")
             return
@@ -347,9 +345,16 @@ class TZ(basic.LineReceiver):
         except:
             import traceback
             traceback.print_exc()
-            self.message('ERROR!')
-            raise
-            self.dispatch(section, 'help', cmd)
+            self.message('Not sure I understand.')
+            if section==wizard:
+                prefix = '@'
+            elif section==admin:
+                prefix = '!'
+            else:
+                prefix = ''
+            self.message('Try "%shelp %s"' % (prefix, cmd))
+            #raise
+            #self.dispatch(section, 'help', {'topic':cmd})
 
     def simessage(self, msg=''):
         'Send simple line to client. Used before player has logged in.'

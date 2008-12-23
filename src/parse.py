@@ -106,8 +106,6 @@ go_verb = oneOf('go enter')('verb')
 go_verb.setParseAction(replaceWith('go'))
 go = go_verb + Optional('to') + objref + LineEnd()
 
-direction = objref
-
 
 on_ = Suppress(CaselessLiteral('on '))
 use_verb = CaselessLiteral('use')('verb')
@@ -199,10 +197,13 @@ help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 xyzzy = CaselessLiteral('xyzzy')('verb') + LineEnd()
 
 
+catchall = objnameref('verb')
+
+
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | stats | set | unset | password | xyzzy | help | go | direction)
+actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | stats | set | unset | password | xyzzy | help | go | catchall)
 
 
 
@@ -293,7 +294,7 @@ destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | wizunset | help)
+wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | wizunset | help | catchall)
 
 
 full_parser = actions_parser | wizard_parser

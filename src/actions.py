@@ -63,7 +63,11 @@ def cmd_look(s, r):
 
     if obj is not None and player.can_see(obj):
         s.message('You look at', obj, '.')
-        s.mlmessage(player.look_at(obj))
+        msg = player.look_at(obj)
+        if msg:
+            s.mlmessage(msg)
+        else:
+            s.message('Nothing special')
         s.room.action(dict(act='look', actor=player, actee=obj))
     else:
         s.message('You do not see that here.')
@@ -103,6 +107,8 @@ def cmd_get(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
 
     if objname == 'all':
         for item in filter(s.player.can_see, s.room.items()):
@@ -145,6 +151,9 @@ def cmd_drop(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
+
     number = r.get('number', '')
 
     if objname == 'all':
@@ -183,6 +192,8 @@ def cmd_put(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
 
     obj2name = r.get('obj2name', '')
     obj2tzid = r.get('obj2tzid', 0)
@@ -233,6 +244,8 @@ def cmd_take(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
     number = r.get('number', '')
 
     obj2name = r.get('obj2name', '')
@@ -294,6 +307,8 @@ def cmd_use(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
 
     obj2name = r.get('obj2name', '')
     obj2tzid = r.get('obj2tzid', 0)
@@ -349,6 +364,8 @@ def cmd_wear(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
 
     player = s.player
 
@@ -375,6 +392,8 @@ def cmd_remove(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
 
     player = s.player
 
@@ -425,14 +444,13 @@ def cmd_go(s, r):
         xs = origin.exits()
         xs = filter(s.player.can_see, xs)
 
+        found = False
         if objname:
-            found = False
             for x in xs:
                 if found:
                     break
 
                 dest = x.destination
-                print objname, dest.name
 
                 if dest.name == objname:
                     found = True
@@ -448,7 +466,7 @@ def cmd_go(s, r):
 
         if found:
             pass
-        elif objname in alternates:
+        elif (objname in alternates) or (not objname and not objtzid):
             if len(xs)==1:
                 x = xs[0]
             else:
@@ -488,6 +506,10 @@ def cmd_lock(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        s.message('Lock which door?')
+        return
+
     x = s.room.exitname(objname) or s.room.exit(objtzid)
     if x is None:
         s.message('No such exit.')
@@ -535,6 +557,10 @@ def cmd_unlock(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
+    if not objname and not objtzid:
+        s.message('Unlock which door?')
+        return
+
     x = s.room.exitname(objname) or s.room.exit(objtzid)
     if x is None:
         s.message('No such exit.')
@@ -653,6 +679,8 @@ def cmd_listen(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
+    if not objname and not objtzid:
+        raise SyntaxError, 'Command used incorrectly.'
 
     player = s.player
     room = s.room
