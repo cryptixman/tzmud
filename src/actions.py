@@ -801,7 +801,7 @@ def cmd_stats(s, r=None):
     for k in keys:
         v = s.player.setting(k)
         spaces = maxlen - len(k)
-        s.message('    ', k, ' '*spaces, ':', v)
+        s.message('    ', k, ' '*spaces, ':', '%4d'%v)
 
 
 def cmd_unset(s, r):
