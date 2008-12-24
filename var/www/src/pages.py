@@ -70,7 +70,7 @@ class Index(TZPage):
 
     def data_players(self, ctx, data):
         p = players.ls()
-        p.sort(key=attrgetter('name'))
+        #p.sort(key=attrgetter('name'))
         return p
 
     def render_players(self, ctx, data):
@@ -85,7 +85,7 @@ class Index(TZPage):
 
     def data_rooms(self, ctx, data):
         r = rooms.ls()
-        r.sort(key=attrgetter('name'))
+        #r.sort(key=attrgetter('name'))
         return r
 
     def render_rooms(self, ctx, data):
@@ -96,3 +96,19 @@ class Index(TZPage):
             lines.append(T.tr[tzid, name])
 
         return T.table[lines]
+
+    def render_idtable(self, ctx, data):
+        lines = []
+        for obj in data:
+            tzid = T.td(_class="objtzid")[obj.tzid, ':']
+            name = T.td(_class="objname")[obj.name]
+            lines.append(T.tr[tzid, name])
+        return T.table[lines]
+
+    def render_idtable_sortalpha(self, ctx, data):
+        data.sort(key=attrgetter('name'))
+        return self.render_idtable(ctx, data)
+
+    def render_idtable_sortid(self, ctx, data):
+        data.sort(key=attrgetter('tzid'))
+        return self.render_idtable(ctx, data)

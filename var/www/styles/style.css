@@ -69,3 +69,11 @@ td.roomtzid{
 td.roomname{
     padding-left: 1em;
 }
+
+td.objtzid{
+    text-align:right;
+    width: 3em;
+}
+td.objname{
+    padding-left: 1em;
+}
