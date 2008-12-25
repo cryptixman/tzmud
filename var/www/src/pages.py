@@ -39,6 +39,9 @@ class TZPage(rend.Page):
     def child_styles(self, request):
         return static.File('var/www/styles')
 
+    def child_rooms(self, request):
+        return Rooms()
+
     def render_head(self, context, data):
         return xmlf('head.html')
 
@@ -60,6 +63,16 @@ class TZPage(rend.Page):
         rebuild(pages)
         return self
 
+    def data_players(self, ctx, data):
+        p = players.ls()
+        #p.sort(key=attrgetter('name'))
+        return p
+
+    def data_rooms(self, ctx, data):
+        r = rooms.ls()
+        #r.sort(key=attrgetter('name'))
+        return r
+
 class Index(TZPage):
     docFactory = xmlf('index.html')
     title = 'TZMud Web Interace'
@@ -68,12 +81,13 @@ class Index(TZPage):
         print 'test', ctx, data
         return "TEST!"
 
-    def data_players(self, ctx, data):
-        p = players.ls()
-        #p.sort(key=attrgetter('name'))
-        return p
+    def render_process_index(self, ctx, data):
+        roomname = ctx.arg('roomname')
+        if roomname:
+            newroom = rooms.Room(roomname)
+        return 'Processing'
 
-    def render_players(self, ctx, data):
+    def render_index_players(self, ctx, data):
         lines = []
         for player in data:
             name = player.name
@@ -83,17 +97,16 @@ class Index(TZPage):
             lines.append(T.li[name])
         return T.ul[lines]
 
-    def data_rooms(self, ctx, data):
-        r = rooms.ls()
-        #r.sort(key=attrgetter('name'))
-        return r
-
-    def render_rooms(self, ctx, data):
+    def render_index_rooms(self, ctx, data):
         lines = []
         for room in data:
             tzid = T.td(_class="roomtzid")[room.tzid, ':']
             name = T.td(_class="roomname")[room.name]
-            lines.append(T.tr[tzid, name])
+            if not room.exits():
+                row = T.tr(_class='warn')
+            else:
+                row = T.tr
+            lines.append(row[tzid, name])
 
         return T.table[lines]
 
@@ -112,3 +125,41 @@ class Index(TZPage):
     def render_idtable_sortid(self, ctx, data):
         data.sort(key=attrgetter('tzid'))
         return self.render_idtable(ctx, data)
+
+
+class Rooms(TZPage):
+    docFactory = xmlf('rooms.html')
+    title = 'Rooms'
+    def render_process_rooms(self, ctx, data):
+        return 'No processing done.'
+
+    def render_rooms(self, ctx, data):
+        lines = []
+        for room in data:
+            empty = T.td()['']
+            tzid = T.td(_class="tzid")[room.tzid, ':']
+            name = T.td(_class="text")[room.name]
+            shortline = T.td(_class="text")[room.short]
+            longline = T.td(_class="text")[room.long]
+            exits = room.exits()
+            if not exits:
+                row = T.tr(_class='warn')
+            else:
+                row = T.tr
+            lines.append(row[tzid, name])
+            if room.short:
+                lines.append(row[empty, shortline])
+            if room.long:
+                lines.append(row[empty, longline])
+            if exits:
+                xlines = []
+                for x in exits:
+                    xinfo = '%s --> %s (%s)' % (x.name,
+                                                     x.destination.name,
+                                                     x.destination.tzid)
+                    xline = (xinfo, T.br)
+                    xlines.append(xline)
+                xd = T.td(_class="text2")[xlines]
+                lines.append(row[empty, xd])
+
+        return T.table[lines]

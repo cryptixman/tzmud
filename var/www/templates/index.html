@@ -8,15 +8,20 @@
 
     <h3 nevow:data="trial" nevow:render="data">(replace)</h3>
 
-    <div class="players">
+    <div nevow:render="process_index" />
+
+    <form action="." method="post">
+    <div class="index_players">
     <h3>Players</h3>
     <div nevow:data="players" nevow:render="idtable_sortid" />
     </div>
 
-    <div class="rooms">
-    <h3>Rooms</h3>
-    <div nevow:data="rooms" nevow:render="idtable_sortalpha" />
+    <div class="index_rooms">
+    <h3><a href="/rooms">Rooms</a></h3>
+    <div nevow:data="rooms" nevow:render="index_rooms" />
+    Add new room: <input name="roomname" />
     </div>
+    </form>
 
     <br clear="all" />
     <a href="NON">LINK COLOR</a>

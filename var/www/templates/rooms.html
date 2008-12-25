@@ -1,0 +1,20 @@
+<html xmlns:nevow="http://nevow.com/ns/nevow/0.1">
+<head nevow:render="head" />
+<body>
+    <div nevow:render="header" />
+
+    <h1>TZMud Rooms</h1>
+
+    <div nevow:render="process_rooms" />
+
+    <form action="." method="post">
+    <div class="rooms">
+    <h3>Rooms</h3>
+    <div nevow:data="rooms" nevow:render="rooms" />
+    Add new room: <input name="roomname" />
+    </div>
+    </form>
+
+    <div nevow:render="footer" />
+</body>
+</html>
