@@ -190,7 +190,7 @@ Item (%s): %s
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing'
+    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap'
 
 
 class Rose(Item):
@@ -451,6 +451,15 @@ class Photograph(Item):
     long = "It's blank."
 
 
+class LeadBox(ContainerItem):
+    'Container which prevents nearby actions from affecting its contents'
+
+    name = 'lead box'
+    name_aka = ['box']
+
+    def act_near(self, info):
+        TZObj.act_near(self, info)
+
 class Trap(Item):
     'A surprise for a nearby character.'
 
@@ -493,3 +502,23 @@ class GetTimeTrap(TimeTrap, GetTrap):
     def spring_later(self, character):
         if character.has_inside(self):
             character.message('Boom!')
+
+class VoiceTrap(TimeTrap):
+    'Trap activated by voice command.'
+
+    name = 'voicetrap'
+    command = 'activate'
+
+    def __init__(self, name='', short='', long=''):
+        TimeTrap.__init__(self, name, short, long)
+        self.settings.append('command')
+
+    def spring(self, character):
+        character.message('Zap!')
+
+    def near_say(self, info):
+        c = info['actor']
+        msg = info['raw']
+        m = msg.lower()
+        if m == self.command:
+            self.spring(c)
