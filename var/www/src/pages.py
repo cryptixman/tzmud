@@ -99,6 +99,7 @@ class Index(TZPage):
 
     def render_index_rooms(self, ctx, data):
         lines = []
+        data.sort(key=attrgetter('name'))
         for room in data:
             tzid = T.td(_class="roomtzid")[room.tzid, ':']
             name = T.td(_class="roomname")[room.name]
@@ -135,6 +136,7 @@ class Rooms(TZPage):
 
     def render_rooms(self, ctx, data):
         lines = []
+        data.sort(key=attrgetter('tzid'))
         for room in data:
             empty = T.td()['']
             tzid = T.td(_class="tzid")[room.tzid, ':']
