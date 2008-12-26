@@ -34,7 +34,6 @@
 - should be able to use the mirror
 - more general "use" framework
     maybe pass everything after "use thing" for further parsing
-- LeadBox to keep room actions from penetrating to items inside
 - allow settings that are lists (and append/delete from lists)
 - fix ordering of messages when characters are following someone
 - objects that affect attributes might step on each other
