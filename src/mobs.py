@@ -288,7 +288,7 @@ Mob: %s (%s) [in room %s]: %s
                                 fol in room.mobs()):
             return
 
-        exits = room.exits()
+        exits = filter(self.can_see, room.exits())
         if exits:
             x = random.choice(exits)
             success, msg = self.go(x)
@@ -325,14 +325,15 @@ class Cat(Mob):
         '''
 
         speaker = info['actor']
-        msg = info['raw']
-        m = msg.lower()
-        if m.startswith('here kitty'):
-            self.following = speaker
-            speaker.message(self, 'starts following you.')
-        elif m.startswith('go away'):
-            self.following = self
-            speaker.message(self, 'stops following you.')
+        if speaker is not self: # not quite sure how this could be false
+            msg = info['raw']
+            m = msg.lower()
+            if m.startswith('here kitty'):
+                self.following = speaker
+                speaker.message(self, 'starts following you.')
+            elif m.startswith('go away'):
+                self.following = self
+                speaker.message(self, 'stops following you.')
 
 
 class Sloth(Mob):
@@ -374,14 +375,17 @@ class PackRat(Mob):
         self.period = 5 # seconds
 
     def near_drop(self, info):
-        if self._searching and self.room!=self.home and not self.items():
-            item = info['item']
-            if item in self.room:
-                self.get_item(item, self.room)
-                self._searching = False
+        dropper = info['actor']
+        if dropper is not self:
+            if (self._searching and self.room!=self.home
+                            and not self.items() and self.awake):
+                item = info['item']
+                if item in self.room:
+                    self.get_item(item, self.room)
+                    self._searching = False
 
-                if not self._has_dug_home:
-                    self._dig_home()
+                    if not self._has_dug_home:
+                        self._dig_home()
 
     def action_move(self):
         x = self._choose_exit()
@@ -396,7 +400,7 @@ class PackRat(Mob):
 
     def _choose_exit(self):
         origin = self.room
-        exits = origin.exits()
+        exits = filter(self.can_see, origin.exits())
         x = None
         if exits:
             if self._searching:
@@ -426,7 +430,7 @@ class PackRat(Mob):
                         del self._path_home[-1]
 
     def _search(self):
-        items = self.room.items()
+        items = filter(self.can_see, self.room.items())
         if items:
             item = items[0]
             self.get_item(item, self.room)

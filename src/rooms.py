@@ -182,6 +182,9 @@ class Room(TZContainer):
         '''An action has occurred in this room which must be passed on to all
             players, mobs and items in the room.
 
+        The action should also be passed on to all items that are carried
+            by characters in this room (and to items inside of containers).
+
         Uses a callLater to make sure that reactions to the action occur
             after the action has been reported.
 
@@ -206,11 +209,7 @@ class Room(TZContainer):
             actor = info['actor']
             sidefx = info.get('sidefx', False)
             for player in self.players():
-                if actor is None or \
-                        (player != actor and (sidefx or player.can_see(actor))):
-                    player.act_near(info)
-                for item in player.items():
-                    item.act_near(info)
+                player.act_near(info)
             for mob in self.mobs():
                 if mob != actor:
                     mob.act_near(info)
@@ -235,10 +234,13 @@ class Room(TZContainer):
                         if bx.destination == self:
                             info['fromx'] = bx
                             break
+                    # EEE -- Could calling this here be a transaction problem?
                     room.action(info)
 
-        except:
-            #print 'room._action ABORT'
+        except Exception, e:
+            print 'room._action ABORT'
+            for line in e:
+                print line
             abort()
             #raise
 
@@ -625,7 +627,7 @@ class Exit(TZObj):
 
     def near_listen(self, info):
         obj = info['obj']
-        if obj==self:
+        if obj is self:
             listener = info['actor']
             d = self.destination
             if d.mobs() or d.players():
@@ -695,18 +697,34 @@ class SmallRoom(Room):
 
     name = 'small room'
     short = 'Seems kind of crowded in here.'
-    max_characters = 1
+    max = int_attr('max', default=1)
+
+    def __init__(self, name=''):
+        Room.__init__(self, name)
+        self.settings.append('max')
 
     def near_arrive(self, info):
-        'A character has just arrived here. If the room is full, send back!'
+        '''A character has just arrived here. If the room is full, send back!
+
+        # EEE -- this causes a strange problem with someone is following.
+        #       The messages are coming through in incorrect order, and
+        #       seemingly from the wrong rooms. Not quite sure how to
+        #       fix this.
+
+        '''
 
         arriver = info['actor']
         characters = self.players() + self.mobs()
-        if len(characters) > self.max_characters:
+        if len(characters) > self.max:
             x = info['fromx']
             arriver.message('The room is too full to enter.')
-            arriver.go(x)
-            arriver.message(from_room)
+            if x is None:
+                xs = self.exits()
+                if xs:
+                    x = random.choice(xs)
+            if x is not None:
+                arriver.go(x)
+                arriver.message(x.destination)
 
 
 class Trap(Room):
@@ -724,19 +742,22 @@ class TimedTrap(Room):
 
     name = 'timed trap'
     short = 'Is that a ticking sound you hear?'
-    _timer = 5 # seconds
+    timer = int_attr('timer', default=5) # seconds
 
     def __init__(self, name=''):
         Room.__init__(self, name)
         self._springing = False
+        self.settings.append('timer')
 
     def near_arrive(self, info):
         if not self._springing:
             self._springing = True
-            reactor.callLater(self._timer, self.spring_trap)
+            reactor.callLater(self.timer, self.spring_trap)
 
     def spring_trap(self):
         self._springing = False
+        for c in self.mobs() + self.players():
+            c.message('Gotcha!')
 
 
 class TeleTrap(TimedTrap):

@@ -246,46 +246,53 @@ Player (%s): %s  [%s]
 
         looker = info['actor']
         lookee = info['actee']
-        if lookee == self:
-            self.message(looker, 'looks at you.')
-        else:
-            self.message(looker, 'looks at', lookee, '.')
+        if looker is not self and self.can_see(looker):
+            if lookee is self:
+                self.message(looker, 'looks at you.')
+            elif self.can_see(lookee):
+                self.message(looker, 'looks at', lookee, '.')
+            else:
+                self.message(looker, 'looks at something.')
 
     def near_get(self, info):
         'Someone has "get"ted near this player.'
 
         getter = info['actor']
         item = info['item']
-        if self.can_see(getter) and self.can_see(item):
-            self.message(getter, 'gets', item, '.')
-        elif self.can_see(item):
-            self.message(item, 'disappears.')
-        elif self.can_see(getter):
-            self.message(getter, 'gets something...')
+        if getter is not self:
+            if self.can_see(getter) and self.can_see(item):
+                self.message(getter, 'gets', item, '.')
+            elif self.can_see(item):
+                self.message(item, 'disappears.')
+            elif self.can_see(getter):
+                self.message(getter, 'gets something...')
 
     def near_drop(self, info):
         'Someone has "drop"ped near this player.'
 
         dropper = info['actor']
         item = info['item']
-        if self.can_see(dropper) and self.can_see(item):
-            self.message(dropper, 'drops', item, '.')
-        elif self.can_see(item):
-            self.message(item, 'appears.')
+        if dropper is not self:
+            if self.can_see(dropper) and self.can_see(item):
+                self.message(dropper, 'drops', item, '.')
+            elif self.can_see(item):
+                self.message(item, 'appears.')
 
     def near_wear(self, info):
         'Someone has "wear"ed near this player.'
 
         wearer = info['actor']
         item = info['item']
-        self.message(wearer, 'wears', item, '.')
+        if wearer is not self and self.can_see(wearer):
+            self.message(wearer, 'wears', item, '.')
 
     def near_unwear(self, info):
         'Someone has "remove"d near this player.'
 
         wearer = info['actor']
         item = info['item']
-        self.message(wearer, 'removes', item, '.')
+        if wearer is not self and self.can_see(wearer):
+            self.message(wearer, 'removes', item, '.')
 
     def near_put(self, info):
         'Someone has "put" something in a container near this player.'
@@ -293,7 +300,13 @@ Player (%s): %s  [%s]
         putter = info['actor']
         item = info['item']
         container = info['container']
-        self.message(putter, 'puts', item, 'in', container, '.')
+        if putter is not self and self.can_see(putter):
+            if self.can_see(item) and self.can_see(container):
+                self.message(putter, 'puts', item, 'in', container, '.')
+            elif self.can_see(item):
+                self.message(putter, 'did something with the', item, 'and it disappeared.')
+            elif self.can_see(container):
+                self.message(putter, 'puts something in the', container, '.')
 
     def near_take(self, info):
         'Someone has "take"n something from a container near this player.'
@@ -301,17 +314,24 @@ Player (%s): %s  [%s]
         taker = info['actor']
         item = info['item']
         container = info['container']
-        self.message(taker, 'takes', item, 'from', container, '.')
+        if taker is not self and self.can_see(taker):
+            if self.can_see(item) and self.can_see(container):
+                self.message(taker, 'takes', item, 'from', container, '.')
+            elif self.can_see(item):
+                self.message(taker, 'did something and the', item, 'appeared.')
+            elif self.can_see(container):
+                self.message(taker, 'removed something from the', container, '.')
 
     def near_leave(self, info):
         'Someone has "leave"ed near this player.'
 
         leaver = info['actor']
         x = info['tox']
-        self.message(leaver, 'leaves to', x, '.')
-        if self.following == leaver:
-            self.message('You follow', leaver, '.')
-            reactor.callLater(0, self._follow, leaver, x)
+        if leaver is not self and self.can_see(leaver):
+            self.message(leaver, 'leaves to', x, '.')
+            if self.following == leaver:
+                self.message('You follow', leaver, '.')
+                reactor.callLater(0, self._follow, leaver, x)
 
     def _follow(self, leaver, x):
         'Override Character._follow to show room name when arriving.'
@@ -324,10 +344,11 @@ Player (%s): %s  [%s]
 
         arriver = info['actor']
         x = info['fromx']
-        if x is not None:
-            self.message(arriver, 'arrives from', x, '.')
-        else:
-            self.message(arriver, 'arrives as if from nowhere.')
+        if arriver is not self and self.can_see(arriver):
+            if x is not None and self.can_see(x):
+                self.message(arriver, 'arrives from', x, '.')
+            else:
+                self.message(arriver, 'arrives as if from nowhere.')
 
     def near_say(self, info):
         'Someone has "say"ed near this player.'
@@ -336,7 +357,10 @@ Player (%s): %s  [%s]
         raw = info['raw']
         verb = info['verb'] + 's'
         quoted = '"' + raw + '"'
-        self.message(speaker, verb+',', quoted)
+        if speaker is not self:
+            if not self.can_see(speaker):
+                speaker = 'Someone'
+            self.message(speaker, verb+',', quoted)
 
     def near_shout(self, info):
         'Someone has "shout"ed near this player.'
@@ -344,29 +368,35 @@ Player (%s): %s  [%s]
         shouter = info['actor']
         raw = info['raw']
         x = info.get('fromx', None)
-        if x is None:
-            msg = str(shouter) + ' shouts, "' + raw + '"'
-        else:
-            msg = 'You hear a shout from ' + str(x) + '.'
-        self.message(msg)
+        if shouter is not self:
+            if x is None:
+                if not self.can_see(shouter):
+                    shouter = 'Someone'
+                msg = str(shouter) + ' shouts, "' + raw + '"'
+            else:
+                msg = 'You hear a shout from ' + str(x) + '.'
+            self.message(msg)
 
     def near_emote(self, info):
         'Someone has "emote"d near this player.'
 
         emoter = info['actor']
         raw = info['raw']
-        self.message(emoter, raw)
+        if emoter is not self and self.can_see(emoter):
+            self.message(emoter, raw)
 
     def near_quit(self, info):
         'Someone has "quit" near this player.'
 
         quitter = info['actor']
-        self.message(quitter, 'quits.')
+        if quitter is not self and self.can_see(quitter):
+            self.message(quitter, 'quits.')
 
     def near_teleport(self, info):
         wizard = info['actor']
         #wizard.room.action(dict(act='emote', actor=wizard, raw=msg))
-        self.message(wizard, 'waves his hands around mysteriously.')
+        if wizard is not self and self.can_see(wizard):
+            self.message(wizard, 'waves his hands around mysteriously.')
 
     def near_teleport_character_away(self, info):
         'Someone has "teleport"ed away from near this player.'
@@ -385,7 +415,7 @@ Player (%s): %s  [%s]
             self.message(teleporter, 'appears.')
         elif teleporter is self:
             self.message('You have been teleported.')
-            self.message(self.room.name)
+            self.message(self.room)
 
     def near_teleport_item_away(self, info):
         'Something has been "teleport"ed away from near this player.'
@@ -405,45 +435,60 @@ Player (%s): %s  [%s]
         'Someone has gone to sleep near this player.'
 
         sleeper = info['actor']
-        self.message(sleeper, 'goes to sleep.')
+        if sleeper is not self and self.can_see(sleeper):
+            self.message(sleeper, 'goes to sleep.')
 
     def near_awake(self, info):
         'Someone has woken up near this player.'
 
         sleeper = info['actor']
-        self.message(sleeper, 'wakes up.')
+        if sleeper is not self and self.can_see(sleeper):
+            self.message(sleeper, 'wakes up.')
 
     def near_clone_item(self, info):
         'Someone has "clone"d some item near this player.'
 
         cloner = info['actor']
         item = info['item']
-        self.message(cloner, "mumbles something you can't quite make out and ... ")
-        self.message(cloner, 'now has', item, '.')
+        if cloner is not self and self.can_see(cloner):
+            self.message(cloner, "mumbles something you can't quite make out and ... ")
+            if self.can_see(item):
+                self.message(cloner, 'now has', item, '.')
+            else:
+                self.message('Hmm... it looks like nothing happened.')
 
     def near_clone_mob(self, info):
         'Someone has "clone"d some mob near this player.'
 
         cloner = info['actor']
         mob = info['mob']
-        self.message(cloner, "mumbles something you can't quite make out and ... ")
-        self.message(mob, 'has appeared.')
+        if cloner is not self:
+            if self.can_see(cloner):
+                self.message(cloner, "mumbles something you can't quite make out and ... ")
+            if self.can_see(mob):
+                self.message(mob, 'has appeared.')
 
     def near_destroy_item(self, info):
         'Someone has "destroy"ed some item near this player.'
 
         destroyer = info['actor']
         item = info['item']
-        self.message(destroyer, "mumbles something you can't quite make out and ... ")
-        self.message(item, 'disappears.')
+        if destroyer is not self:
+            if self.can_see(destroyer):
+                self.message(destroyer, "mumbles something you can't quite make out and ... ")
+            if self.can_see(item):
+                self.message(item, 'disappears.')
 
     def near_destroy_mob(self, info):
         'Someone has "destroy"ed some mob near this player.'
 
         destroyer = info['actor']
         mob = info['mob']
-        self.message(destroyer, "mumbles something you can't quite make out and ... ")
-        self.message(mob, 'disappears.')
+        if destroyer is not self:
+            if self.can_see(destroyer):
+                self.message(destroyer, "mumbles something you can't quite make out and ... ")
+            if self.can_see(mob):
+                self.message(mob, 'disappears.')
 
     def near_lock(self, info):
         'Someone has "lock"ed  or "unlock"ed a door near this player.'
@@ -451,39 +496,59 @@ Player (%s): %s  [%s]
         locker = info['actor']
         action = info['action']
         door = info['door']
+        key = info['key']
 
-        if action=='lock':
-            self.message(locker, 'locks the door', door, '.')
-        elif action=='unlock':
-            self.message(locker, 'unlocks the door', door, '.')
-        else:
-            self.message(locker, 'trys a key in door', door, '.')
+        if locker is not self:
+            if self.can_see(locker) and self.can_see(door):
+                if self.can_see(key):
+                    keyphrase = 'with %s.' % key
+                else:
+                    keyphrase = '.'
+
+                if action=='lock':
+                    self.message(locker, 'locks the door', door, keyphrase)
+                elif action=='unlock':
+                    self.message(locker, 'unlocks the door', door, keyphrase)
+                else:
+                    if self.can_see(key):
+                        self.message(locker, 'trys', key, 'in door', door, '.')
+                    else:
+                        self.message(locker, 'seems to be locking', door, 'but you do not see any key.')
+            elif self.can_see(locker):
+                self.message(locker, 'is trying a key... but you do not see any door there.')
+            elif self.can_see(door):
+                self.message('You hear the lock turning in door', door, '.')
+            else:
+                self.message('You hear what sounds like a key in a lock.')
 
     def near_dig(self, info):
         'Someone has "dig"ged a new area near this player.'
 
         digger = info['actor']
         x = info['exit']
-        if self.can_see(digger):
-            self.message(digger, 'digs a new exit', x, '.')
-        elif self.can_see(x):
-            self.message('A new exit', x, 'appears.')
+        if digger is not self:
+            if self.can_see(digger):
+                self.message(digger, 'digs a new exit', x, '.')
+            elif self.can_see(x):
+                self.message('A new exit', x, 'appears.')
 
     def near_use(self, info):
         'Someone has used something near this player.'
 
-        #check for a customized message first
-        custom = info.get('custom', None)
-        if custom is not None:
-            self.message(custom % info)
-        else:
-            user = info['actor']
-            item = info['item']
-            target = info.get('target', None)
-            if target is None:
-                self.message(user, 'uses the', item, '.')
+        user = info['actor']
+
+        if user is not self:
+            #check for a customized message first
+            custom = info.get('custom', None)
+            if custom is not None:
+                self.message(custom % info)
             else:
-                self.message(user, 'uses the', item, 'on', target, '.')
+                item = info['item']
+                target = info.get('target', None)
+                if target is None:
+                    self.message(user, 'uses the', item, '.')
+                else:
+                    self.message(user, 'uses the', item, 'on', target, '.')
 
 
 if __name__ == '__main__':

@@ -36,6 +36,7 @@ dbroot = TZODB().root
 from share import TZObj, TZContainer
 
 import wizard
+import players
 from colors import green
 
 
@@ -189,7 +190,7 @@ Item (%s): %s
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap'
+    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing'
 
 
 class Rose(Item):
@@ -249,11 +250,68 @@ class InvRing(Item):
     name_aka = ['ring',]
 
     def wear(self, character):
+        for p in character.room.players():
+            if p is not character:
+                if p.can_see(character): # could already be invisible
+                    p.message(character, 'disappears.')
         character.setting('visible', 'False')
 
     def unwear(self, character):
+        pcantsee = [p for p in character.room.players() if not p.can_see(character)]
+        # EEE -- what if the character is wearing an InvRing
+        #       but is naturally invisible?
         character.setting('visible', 'True')
+        for player in pcantsee:
+            player.message(character, 'appears.')
 
+class DetectInvisRing(Item):
+    'A ring which allows the wearer to detect invisible objects.'
+
+
+    name = 'pearl ring'
+    short = 'A ring set with a large pearl.'
+    wearable = True
+    name_aka = ['ring',]
+    _wearerid = None
+
+    def wear(self, character):
+        self._wearerid = character.tzid
+
+    def unwear(self, character):
+        self._wearerid = None
+
+    def near_look(self, info):
+        wearer = players.get(self._wearerid) or mobs.get(self._wearerid)
+        looker = info['actor']
+        if looker is wearer:
+            room = wearer.room
+
+            found = False
+            for item in room.items():
+                if not item.visible:
+                    found = True
+                    break
+            if found:
+                wearer.message('There is something invisible here.')
+
+            found = False
+            for c in room.players() + room.mobs():
+                if not c.visible:
+                    found = True
+                    break
+            if found:
+                wearer.message('There is someone invisible here.')
+
+    def near_arrive(self, info):
+        wearer = players.get(self._wearerid) or mobs.get(self._wearerid)
+        if wearer is not None:
+            arriver = info['actor']
+            if arriver is wearer:
+                self.near_look(info)
+
+            else:
+                if not arriver.visible:
+                    wearer.message('Someone invisible just arrived.')
 
 class Key(Item):
     'An item for locking/ unlocking doors, and maybe other lockable things.'

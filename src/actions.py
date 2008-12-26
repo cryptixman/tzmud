@@ -67,7 +67,7 @@ def cmd_look(s, r):
         if msg:
             s.mlmessage(msg)
         else:
-            s.message('Nothing special')
+            s.message('Nothing special.')
         s.room.action(dict(act='look', actor=player, actee=obj))
     else:
         s.message('You do not see that here.')
@@ -550,10 +550,12 @@ def cmd_lock(s, r):
     if key.locks(x):
         x.lock(key)
         s.message('You lock the door', x, 'with key', key, '.')
-        s.room.action(dict(act='lock', actor=s.player, action='lock', door=x))
+        s.room.action(dict(act='lock', actor=s.player, action='lock',
+                            door=x, key=key))
     else:
         s.message('That key does not fit.')
-        s.room.action(dict(act='lock', actor=s.player, action='fail', door=x))
+        s.room.action(dict(act='lock', actor=s.player, action='fail',
+                            door=x, key=key))
 
 
 def cmd_unlock(s, r):
@@ -601,10 +603,12 @@ def cmd_unlock(s, r):
     if key.locks(x):
         x.unlock(key)
         s.message('You unlock the door', x, 'with key', key, '.')
-        s.room.action(dict(act='lock', actor=s.player, action='unlock', door=x))
+        s.room.action(dict(act='lock', actor=s.player, action='unlock',
+                                door=x, key=key))
     else:
         s.message('That key does not fit.')
-        s.room.action(dict(act='lock', actor=s.player, action='fail', door=x))
+        s.room.action(dict(act='lock', actor=s.player, action='fail',
+                                door=x, key=key))
 
 
 def cmd_follow(s, r=None):
@@ -677,8 +681,7 @@ def cmd_say(s, r):
         verb = 'say'
     quoted = '"' + words + '"'
     s.message('You', verb+',', quoted)
-    s.room.action(dict(act='say', actor=s.player, verb=verb,
-                            raw=words, sidefx=True))
+    s.room.action(dict(act='say', actor=s.player, verb=verb, raw=words))
 
 
 def cmd_listen(s, r):
@@ -720,8 +723,7 @@ def cmd_shout(s, r):
     quoted = '"' + words + '"'
     s.message('You shout,', quoted)
     spread = 2
-    s.room.action(dict(act='shout', actor=s.player, raw=words,
-                            spread=spread, sidefx=True))
+    s.room.action(dict(act='shout', actor=s.player, raw=words, spread=spread))
 
 
 def cmd_emote(s, r):

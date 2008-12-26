@@ -320,16 +320,14 @@ def cmd_dig(s, r):
         else:
             xi = rooms.Exit(exitinname, room=destination, destination=room)
             xo.link(xi)
-            destination.action(dict(act='dig', actor=None,
-                                        exit=xi, sidefx=True))
+            destination.action(dict(act='dig', actor=None, exit=xi))
 
     elif exitoutname:
         if exitinname or xi is None:
             xo = rooms.Exit(exitoutname, room=room, destination=destination, return_name=exitinname)
-            room.action(dict(act='dig', actor=s.player, exit=xo, sidefx=True))
+            room.action(dict(act='dig', actor=s.player, exit=xo))
             xi = xo.get_linked_exit()
-            destination.action(dict(act='dig', actor=None,
-                                        exit=xi, sidefx=True))
+            destination.action(dict(act='dig', actor=None, exit=xi))
         else:
             s.message('#', exitintzid, 'is not an exit in', destination, '.')
             raise TypeError
@@ -366,7 +364,8 @@ def cmd_lock(s, r):
     x.add_key(key)
     x.lock(key)
     s.message('You make the door', x, 'lockable with key', key, '.')
-    s.room.action(dict(act='lock', actor=s.player, action='lock', door=x))
+    s.room.action(dict(act='lock', actor=s.player, action='lock',
+                            door=x, key=key))
 
 
 def cmd_list(s, r):

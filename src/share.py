@@ -343,6 +343,21 @@ class TZContainer(TZObj):
 
         return obj.tzid in self._item_ids
 
+    def act_near(self, info):
+        '''Something has happened near this object. Handle it if necessary,
+            and pass the action on to any contained items.
+
+        '''
+
+        act = info['act']
+        method_name = 'near_%s' % act
+        method = getattr(self, method_name, None)
+        if method is not None:
+            method(info)
+
+        for item in self.items():
+            item.act_near(info)
+
     def items(self):
         'Return a list of the items in this container.'
 
@@ -482,8 +497,7 @@ Character (%s): %s
             for backx in dest.exits():
                 if backx.destination == room:
                     break
-            dest.action(dict(act='arrive',
-                                actor=self, fromx=backx))
+            dest.action(dict(act='arrive', actor=self, fromx=backx))
 
         return r
 
@@ -509,6 +523,8 @@ Character (%s): %s
 
         if obj.visible or obj is self or wizard.verify(self):
             return True
+        else:
+            return False
 
     def look(self, looker):
         '''Return a multiline message (list of strings) for a player looking
@@ -590,7 +606,7 @@ Character (%s): %s
         if item.get(self):
             self.add(item)
             room.remove(item)
-            room.action(dict(act='get', actor=self, item=item, sidefx=True))
+            room.action(dict(act='get', actor=self, item=item))
             return True
         else:
             return False
@@ -605,7 +621,7 @@ Character (%s): %s
         room = self.room
         room.add(item)
         item.drop(self)
-        room.action(dict(act='drop', actor=self, item=item, sidefx=True))
+        room.action(dict(act='drop', actor=self, item=item))
 
     def wear(self, item):
         "Add the given item to this character's list of worn items."
@@ -646,8 +662,9 @@ Character (%s): %s
 
         leaver = info['actor']
         x = info['tox']
-        if self.following==leaver and self.awake:
-            reactor.callLater(0, self._follow, leaver, x)
+        if leaver is not self and self.can_see(leaver):
+            if self.following==leaver and self.awake:
+                reactor.callLater(0, self._follow, leaver, x)
 
     def _follow(self, leaver, x):
         'Follow along if this character is following someone who left.'
