@@ -43,6 +43,8 @@
     take an InvPotion, then remove the InvRing. Should stay
     invisible until the potion wears out, but right now will
     be visible
+
+    to solve this, I am considering a sort of "modifier stack"
 - add all TODO items to the googlecode issue tracker
 
 # Web Server
