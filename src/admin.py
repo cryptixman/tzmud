@@ -381,7 +381,15 @@ def cmd_rebuild(s, r=None):
         except ImportError:
             s.message('Module not found.')
         else:
-            rebuild(mod)
+            try:
+                rebuild(mod)
+            except Exception, e:
+                s.message('Error rebuilding')
+                s.mlmessage(e)
+                print 'Error rebuilding'
+                for line in e:
+                    print line
+
 
 
 def cmd_help(s, r=None):
