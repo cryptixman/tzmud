@@ -392,6 +392,20 @@ Player (%s): %s  [%s]
         if quitter is not self and self.can_see(quitter):
             self.message(quitter, 'quits.')
 
+    def near_appear(self, info):
+        'Something has appeared near this player.'
+
+        appearer = info['actor']
+        if appearer is not self and self.can_see(appearer):
+            self.message(appearer, 'appears.')
+
+    def near_disappear(self, info):
+        'Something has disappeared near this player.'
+
+        disappearer = info['actor']
+        if disappearer is not self and self.can_see(disappearer):
+            self.message(disappearer, 'disappears.')
+
     def near_teleport(self, info):
         wizard = info['actor']
         #wizard.room.action(dict(act='emote', actor=wizard, raw=msg))

@@ -25,7 +25,7 @@
 - Group items with the same name in the inventory (ie. 2 roses)
 - fix tzcontrol to work properly on windows
 - set ownership for cloned objects
-- add a new .parent attribute for objects to indicate
+- add a new .container attribute for objects to indicate
     which room it is in, which character is
     carrying it, or which container it is in.
 - CrystalBall item which can locate/spy on objects
@@ -35,7 +35,6 @@
 - more general "use" framework
     maybe pass everything after "use thing" for further parsing
 - LeadBox to keep room actions from penetrating to items inside
-- set/unset visible should send a message about appearance/disappearance
 - allow settings that are lists (and append/delete from lists)
 - fix ordering of messages when characters are following someone
 - objects that affect attributes might step on each other

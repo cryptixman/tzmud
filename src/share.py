@@ -166,6 +166,17 @@ class TZObj(Persistent):
             self.owner = c
             return True
 
+    def set_visible(self, v):
+        was = self.visible
+        room = getattr(self, 'room', None)
+        self.visible = v
+        if room is not None:
+            if v and not was:
+                room.action(dict(act='appear', actor=self))
+            elif not v and was:
+                room.action(dict(act='disappear', actor=self))
+        return True
+
     def _set_container(self, container):
         '''Setter for the container property.
 
