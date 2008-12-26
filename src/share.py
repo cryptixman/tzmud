@@ -349,11 +349,7 @@ class TZContainer(TZObj):
 
         '''
 
-        act = info['act']
-        method_name = 'near_%s' % act
-        method = getattr(self, method_name, None)
-        if method is not None:
-            method(info)
+        TZObj.act_near(self, info)
 
         for item in self.items():
             item.act_near(info)
