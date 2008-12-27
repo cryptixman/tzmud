@@ -94,7 +94,12 @@ def cmd_py(s, r):
 
     '''
 
-    s.message(str(eval(r)))
+    try:
+        s.message(str(eval(r)))
+    except Exception, e:
+        s.message('ERROR')
+        for line in e:
+            s.message(line)
 
 
 def cmd_db(s, r=None):
