@@ -296,7 +296,7 @@ class DetectInvisRing(Item):
 
             found = False
             for c in room.players() + room.mobs():
-                if not c.visible:
+                if c is not wearer and not c.visible:
                     found = True
                     break
             if found:
