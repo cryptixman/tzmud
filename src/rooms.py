@@ -291,11 +291,13 @@ class Room(TZContainer):
         'Put the given player in this room.'
 
         self._player_ids.append(player.tzid)
+        player.container = self
 
     def rmplayer(self, player):
         'Remove the given player from this room.'
 
         self._player_ids.remove(player.tzid)
+        player.container = None
 
 
     def mobs(self):
@@ -355,11 +357,13 @@ class Room(TZContainer):
         'Move the given mob to this room.'
 
         self._mob_ids.append(mob.tzid)
+        mob.container = self
 
     def rmmob(self, mob):
         'Remove the given mob from this room.'
 
         self._mob_ids.remove(mob.tzid)
+        mob.container = None
 
 
     def exits(self):

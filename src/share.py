@@ -150,6 +150,25 @@ class TZObj(Persistent):
         return tzindex.get(self._ownerid)
     owner = property(_get_owner, _set_owner)
 
+    def _get_room(self):
+        ''''Getter for the room property.
+
+        .room is a read-only property that walks up the list of
+            object.container attributes until it finds one that
+            is None.
+
+        '''
+
+        if self.container is None:
+            return None
+        else:
+            if self.container.room is None:
+                return self.container
+            else:
+                return self.container.room
+        return rooms.get(self._rid)
+    room = property(_get_room)
+
     def set_owner(self, iden):
         'iden is the name or the id # for the owner'
 
@@ -168,13 +187,14 @@ class TZObj(Persistent):
 
     def set_visible(self, v):
         was = self.visible
-        room = getattr(self, 'room', None)
         self.visible = v
-        if room is not None:
-            if v and not was:
-                room.action(dict(act='appear', actor=self))
-            elif not v and was:
-                room.action(dict(act='disappear', actor=self))
+
+        room = self.room
+        if v and not was:
+            room.action(dict(act='appear', actor=self))
+        elif not v and was:
+            room.action(dict(act='disappear', actor=self))
+
         return True
 
     def _set_container(self, container):
@@ -354,6 +374,24 @@ class TZContainer(TZObj):
 
         return obj.tzid in self._item_ids
 
+    def has_inside(self, obj):
+        '''return true if obj is somewhere inside of this container.
+
+        Unlike __contains__, has_inside() will search recursively.
+
+        '''
+
+        found = False
+        for item in self.items():
+            if item is obj:
+                found = True
+                break
+            elif item.has_inside(obj):
+                found = True
+                break
+
+        return found
+
     def act_near(self, info):
         '''Something has happened near this object. Handle it if necessary,
             and pass the action on to any contained items.
@@ -422,6 +460,7 @@ class TZContainer(TZObj):
 
         if item not in self:
             self._item_ids.append(item.tzid)
+            item.container = self
 
     def remove(self, item):
         '''Remove the given item from this container, if it is there.
@@ -432,6 +471,7 @@ class TZContainer(TZObj):
 
         if item in self:
             self._item_ids.remove(item.tzid)
+            item.container = None
 
     def has_inside(self, item):
         '''Check for item in this container, including inside of
@@ -611,8 +651,8 @@ Character (%s): %s
         'Get item from room. return True if successful, else False.'
 
         if item.get(self):
-            self.add(item)
             room.remove(item)
+            self.add(item)
             room.action(dict(act='get', actor=self, item=item))
             return True
         else:

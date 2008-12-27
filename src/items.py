@@ -283,24 +283,26 @@ class DetectInvisRing(Item):
     def near_look(self, info):
         wearer = players.get(self._wearerid) or mobs.get(self._wearerid)
         looker = info['actor']
+        obj = info['actee']
         if looker is wearer:
             room = wearer.room
 
-            found = False
-            for item in room.items():
-                if not item.visible:
-                    found = True
-                    break
-            if found:
-                wearer.message('There is something invisible here.')
+            if obj is room:
+                found = False
+                for item in room.items():
+                    if not item.visible:
+                        found = True
+                        break
+                if found:
+                    wearer.message('There is something invisible here.')
 
-            found = False
-            for c in room.players() + room.mobs():
-                if c is not wearer and not c.visible:
-                    found = True
-                    break
-            if found:
-                wearer.message('There is someone invisible here.')
+                found = False
+                for c in room.players() + room.mobs():
+                    if c is not wearer and not c.visible:
+                        found = True
+                        break
+                if found:
+                    wearer.message('There is someone invisible here.')
 
     def near_arrive(self, info):
         wearer = players.get(self._wearerid) or mobs.get(self._wearerid)

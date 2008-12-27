@@ -397,14 +397,21 @@ Player (%s): %s  [%s]
 
         appearer = info['actor']
         if appearer is not self and self.can_see(appearer):
-            self.message(appearer, 'appears.')
+            if appearer.container.container is None:
+                # So, it is in the room, and not in a container
+                self.message(appearer, 'appears.')
+        elif appearer is not self and self.can_see(appearer):
+            container = appearer.container
+            self.message(appearer, 'appears in the', container, '.')
 
     def near_disappear(self, info):
         'Something has disappeared near this player.'
 
         disappearer = info['actor']
-        if disappearer is not self and self.can_see(disappearer):
-            self.message(disappearer, 'disappears.')
+        if disappearer is not self:
+            if disappearer.container.container is None:
+                # So, it is in the room, and not in a container
+                self.message(disappearer, 'disappears.')
 
     def near_teleport(self, info):
         wizard = info['actor']
