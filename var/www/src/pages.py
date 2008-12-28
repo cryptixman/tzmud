@@ -283,12 +283,13 @@ class Edit(TZPage):
         return ctx.tag[self.obj.name]
 
     def render_objclass(self, ctx, data):
+        name = self.obj.name
         cls = self.cls
         base = self.bse
         if cls != base:
-            return ctx.tag['%s(%s)' % (cls, base)]
+            return ctx.tag['%s : %s(%s)' % (name, cls, base)]
         else:
-            return ''
+            return ctx.tag['%s : %s' % (name, cls)]
 
     def render_clsinfo(self, ctx, data):
         return ctx.tag(_class="clsinfo")[self.obj.__doc__]
@@ -358,21 +359,24 @@ class Edit(TZPage):
 
         xs = self.obj.exits()
         xs.sort(key=attrgetter('name'))
-        lines = [T.tr[T.td['Exits'], T.td, T.td, T.td]]
-        for x in xs:
-            rs = rooms.ls()
-            choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
-            choices.insert(0, (None, 'None'))
-            tzid = getattr(x.destination, 'tzid', None)
-            destinfo = dict(name=x.name,
-                        choices=choices,
-                        selected=tzid,
-                        editmode=True)
+        if xs:
+            lines = [T.tr[T.td['Exits'], T.td, T.td, T.td]]
+            for x in xs:
+                rs = rooms.ls()
+                choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
+                choices.insert(0, (None, 'None'))
+                tzid = getattr(x.destination, 'tzid', None)
+                destinfo = dict(name=x.name,
+                            choices=choices,
+                            selected=tzid,
+                            editmode=True)
 
-            lines.append(T.tr[T.td[x.name],
-                            T.td[T.input(name='', value=x.name)],
-                            T.td['-->'],
-                            T.td[self.render_form_select(destinfo)]])
+                lines.append(T.tr[T.td[x.name],
+                                T.td[T.input(name='', value=x.name)],
+                                T.td['-->'],
+                                T.td[self.render_form_select(destinfo)]])
+
+        else:
+            lines = T.tr(_class="warn")[T.td['No exits']]
 
         return T.table[lines]
-
