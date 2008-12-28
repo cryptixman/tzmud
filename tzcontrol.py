@@ -83,21 +83,39 @@ except ImportError:
 
 def verify_config():
     varstrings = ['python:-', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-']
+
     for varstring in varstrings:
         varname, vartype = varstring.split(':')
         print 'Checking var:',
         print '%-15s' % varname,
         val = getattr(conf, varname)
-        if os.path.exists(val):
-            print 'ok'
-        elif vartype == '-':
-            dirname = os.path.dirname(val)
-            if os.path.exists(dirname):
-                print 'directory ok'
+
+        dirname, filename = os.path.split(val)
+
+        exists = os.path.exists(val)
+        isfile = os.path.isfile(val)
+        dir_exists = os.path.exists(dirname)
+        isdir = os.path.isdir(val)
+
+        if vartype == '-':
+            if exists and isfile:
+                print 'ok'
+            elif dir_exists and not exists:
+                print '!! file', filename, 'not found in', dirname
+            elif exists and isdir:
+                print '!! must give full path to file'
+            elif not dir_exists:
+                print '!! directory', dirname, 'does not exist'
             else:
-                print 'directory', dirname, 'does not exist'
-        else:
-            print '!!'
+                print '!!'
+
+        else: # vartype = 'd'
+            if exists and isdir:
+                print 'ok'
+            elif exists and not isdir:
+                print '!! must give directory path'
+            else:
+                print '!!'
 
 def pid():
     'Return the pid of the running server.'
