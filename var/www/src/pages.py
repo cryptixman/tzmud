@@ -311,49 +311,61 @@ class Edit(TZPage):
 
     def get_input_widget(self, name, data):
         if name=='owner':
-            if data is None:
-                tzid=None
-            else:
-                tzid=data.tzid
-            ps = players.ls()
-            ms = mobs.ls()
-            cs = ps + ms
-            choices = [(c.tzid, '%s (%s)' % (c.name, c.tzid)) for c in cs]
-            choices.insert(0, (None, 'None'))
-            choices.sort(key=itemgetter(1))
-            info = dict(name=name,
-                        choices=choices,
-                        selected=tzid,
-                        editmode=True)
-
-            return self.render_form_select(info)
-
-        if isinstance(data, str):
-            disabled = ''
-            if name=='name':
-                if self.bse=='Player':
-                    disabled = 'disabled'
-
-            if len(data) < 50:
-                if disabled:
-                    return T.input(name=name, value=data, size="60", disabled=disabled)
-                else:
-                    return T.input(name=name, value=data, size="60")
-            else:
-                return T.textarea(name=name, rows="4", cols="60")[data]
-
-        if isinstance(data, bool):
-            info = dict(name=name,
-                        choices=[(True, 'True'), (False, 'False')],
-                        selected=data,
-                        editmode=True)
-            return self.render_form_select(info)
-
-        if isinstance(data, int):
-            return T.input(name=name, value=data, size="5")
-
+            return self.owner_widget(name, data)
+        elif isinstance(data, str):
+            return self.str_widget(name, data)
+        elif isinstance(data, bool):
+            return self.bool_widget(name, data)
+        elif isinstance(data, int):
+            return self.int_widget(name, data)
         else:
-            return T.input(name=name, value=data)
+            return self.input_widget(name, data)
+
+    def owner_widget(self, name, data):
+        if data is None:
+            tzid=None
+        else:
+            tzid=data.tzid
+        ps = players.ls()
+        ms = mobs.ls()
+        cs = ps + ms
+        choices = [(c.tzid, '%s (%s)' % (c.name, c.tzid)) for c in cs]
+        choices.insert(0, (None, 'None'))
+        choices.sort(key=itemgetter(1))
+        info = dict(name=name,
+                    choices=choices,
+                    selected=tzid,
+                    editmode=True)
+
+        return self.render_form_select(info)
+
+    def str_widget(self, name, data):
+        disabled = ''
+        if name=='name':
+            if self.bse=='Player':
+                disabled = 'disabled'
+
+        if len(data) < 50:
+            if disabled:
+                return T.input(name=name, value=data, size="60", disabled=disabled)
+            else:
+                return T.input(name=name, value=data, size="60")
+        else:
+            return T.textarea(name=name, rows="4", cols="60")[data]
+
+    def bool_widget(self, name, data):
+        info = dict(name=name,
+                    choices=[(True, 'True'), (False, 'False')],
+                    selected=data,
+                    editmode=True)
+        return self.render_form_select(info)
+
+    def int_widget(self, name, data):
+        return T.input(name=name, value=data, size="5")
+
+    def input_widget(self, name, data):
+        return T.input(name=name, value=data)
+
 
     def render_settings(self, ctx, data):
         settings = self.obj.settings
