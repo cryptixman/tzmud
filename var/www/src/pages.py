@@ -373,7 +373,7 @@ class Edit(TZPage):
         lines = []
         for setting in settings:
             label = T.td(_class="textlabel")[setting]
-            val = getattr(self.obj, setting)
+            val = self.obj.setting(setting)
             print setting, val
             inpt = T.td[self.get_input_widget(setting, val)]
             lines.append(T.tr[label, inpt])
