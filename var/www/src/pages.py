@@ -166,32 +166,36 @@ class Rooms(TZPage):
         lines = []
         data.sort(key=attrgetter('tzid'))
         for room in data:
-            empty = T.td()['']
+            empty = T.td(_class='empty')['']
             tzid = T.td(_class="tzid")[room.tzid, ':']
             editlink = T.td(_class="text")[T.a(href="/edit/%s" % room.tzid)[room.name]]
             name = T.td(_class="text")[room.name]
             shortline = T.td(_class="text")[room.short]
             longline = T.td(_class="text")[room.long]
-            exits = room.exits()
-            if not exits:
-                row = T.tr(_class='warn')
+            xs = room.exits()
+            if not xs:
+                rowcls = 'warn'
             else:
-                row = T.tr
-            lines.append(row[tzid, editlink])
+                rowcls = 'normal'
+            lines.append(T.tr(_class=rowcls)[tzid, editlink])
             if room.short:
-                lines.append(row[empty, shortline])
+                lines.append(T.tr(_class=rowcls)[empty, shortline])
             if room.long:
-                lines.append(row[empty, longline])
-            if exits:
-                xlines = []
-                for x in exits:
-                    xinfo = '%s --> %s (%s)' % (x.name,
-                                                     x.destination.name,
-                                                     x.destination.tzid)
-                    xline = (xinfo, T.br)
-                    xlines.append(xline)
-                xd = T.td(_class="text2")[xlines]
-                lines.append(row[empty, xd])
+                lines.append(T.tr(_class=rowcls)[empty, longline])
+            if xs:
+                for x in xs:
+                    dest = x.destination
+                    desttzid = getattr(dest, 'tzid', 'None')
+                    destname = getattr(dest, 'name', None)
+                    xlink = T.a(href="/edit/%s" % x.tzid)[x.name]
+                    if dest is not None:
+                        roomlink = T.a(href="/edit/%s" % desttzid)[destname]
+                    else:
+                        roomlink = 'Broken'
+                    xd = T.td(_class="text2")[xlink, ' --> ', roomlink, ' (%s)' % desttzid]
+                    lines.append(T.tr(_class=rowcls)[empty, xd])
+
+            lines.append(T.tr(_class='normal')[empty, empty])
 
         return T.table[lines]
 
@@ -302,7 +306,8 @@ class Edit(TZPage):
             return ctx.tag['%s : %s' % (name, cls)]
 
     def render_clsinfo(self, ctx, data):
-        return ctx.tag(_class="clsinfo")[self.obj.__doc__]
+        doc = self.obj.__doc__
+        return ctx.tag(_class="clsinfo")[doc]
 
     def get_input_widget(self, name, data):
         if name=='owner':
@@ -320,7 +325,7 @@ class Edit(TZPage):
                         choices=choices,
                         selected=tzid,
                         editmode=True)
-            print info
+
             return self.render_form_select(info)
 
         if isinstance(data, str):
@@ -370,21 +375,29 @@ class Edit(TZPage):
         xs = self.obj.exits()
         xs.sort(key=attrgetter('name'))
         if xs:
-            lines = [T.tr[T.td['Exits'], T.td, T.td, T.td]]
+            lines = [T.tr[T.td['Exits'], T.td, T.td, T.td, T.td]]
+            rs = rooms.ls()
             for x in xs:
-                rs = rooms.ls()
+                dest = x.destination
                 choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
                 choices.insert(0, (None, 'None'))
-                tzid = getattr(x.destination, 'tzid', None)
+                desttzid = getattr(dest, 'tzid', None)
+                destname = getattr(dest, 'name', None)
                 destinfo = dict(name=x.name,
                             choices=choices,
-                            selected=tzid,
+                            selected=desttzid,
                             editmode=True)
 
-                lines.append(T.tr[T.td[x.name],
+                xlink = T.a(href="/edit/%s" % x.tzid)[x.name]
+                if dest is not None:
+                    roomlink = T.a(href="/edit/%s" % desttzid)[destname]
+                else:
+                    roomlink = 'Broken'
+                lines.append(T.tr[T.td[xlink],
                                 T.td[T.input(name='', value=x.name)],
                                 T.td['-->'],
-                                T.td[self.render_form_select(destinfo)]])
+                                T.td[self.render_form_select(destinfo)],
+                                T.td[roomlink]])
 
         else:
             lines = T.tr(_class="warn")[T.td['No exits']]
