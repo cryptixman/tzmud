@@ -424,7 +424,7 @@ def main():
             print '         http://tzmud.googlecode.com/'
             print
 
-        from optparse import OptionParser
+        from optparse import OptionParser, SUPPRESS_HELP
 
         usage = "usage: %prog <option>"
         parser = OptionParser(usage)
@@ -461,7 +461,13 @@ def main():
         parser.add_option('-c', '--verify-config', dest='verify_config',
             action="store_true",
             help='Verify the config.py file.')
-
+        # Option '-2' is used by tzcontrol.py to indicate that this
+        #   is the 2nd pass at running the script (this time hopefully
+        #   with the correct version). It should not be needed by the
+        #   user, so help output is suppressed.
+        parser.add_option('-2', dest='unused',
+            action="store_true",
+            help=SUPPRESS_HELP)
         (options, args) = parser.parse_args()
 
 
@@ -498,8 +504,20 @@ def main():
             parser.print_help()
 
     else:
-        cmd = '%s %s %s' % (conf.python, conf.tzcontrol, ' '.join(sys.argv[1:]))
-        os.system(cmd)
+        args = sys.argv[1:]
+        last = args[-1]
+
+        if last != '-2':
+            argstr = ' '.join(args)
+            cmd = '%s %s %s -2' % (conf.python, conf.tzcontrol, argstr)
+            os.system(cmd)
+        else:
+            print 'ERROR: Unable to locate the correct python version.'
+            print
+            print 'Please verify your config file with:'
+            print '   python tzcontrol.py -c'
+            print
+            print 'and ensure that the specified version is available.'
 
 
 if __name__ == '__main__':
