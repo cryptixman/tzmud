@@ -82,20 +82,26 @@ except ImportError:
 
 
 def verify_config():
-    varstrings = ['python:-', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-']
+    varstrings = ['python:-', 'python_version:ver', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-', 'port:int', 'local_only:bool', 'home_id:int', 'web:bool', 'web_local_only:bool', 'enable_cmd_py:bool']
 
     for varstring in varstrings:
         varname, vartype = varstring.split(':')
         print 'Checking var:',
         print '%-15s' % varname,
-        val = getattr(conf, varname)
 
-        dirname, filename = os.path.split(val)
+        try:
+            val = getattr(conf, varname)
+        except AttributeError:
+            print '!! variable is missing'
+            continue
 
-        exists = os.path.exists(val)
-        isfile = os.path.isfile(val)
-        dir_exists = os.path.exists(dirname)
-        isdir = os.path.isdir(val)
+        if vartype in ('-', 'd'):
+            dirname, filename = os.path.split(val)
+
+            exists = os.path.exists(val)
+            isfile = os.path.isfile(val)
+            dir_exists = os.path.exists(dirname)
+            isdir = os.path.isdir(val)
 
         if vartype == '-':
             if exists and isfile:
@@ -103,19 +109,50 @@ def verify_config():
             elif dir_exists and not exists:
                 print '!! file', filename, 'not found in', dirname
             elif exists and isdir:
-                print '!! must give full path to file'
+                print '!! must give the full path to the file'
             elif not dir_exists:
                 print '!! directory', dirname, 'does not exist'
             else:
                 print '!!'
 
-        else: # vartype = 'd'
+        elif vartype == 'd':
             if exists and isdir:
                 print 'ok'
             elif exists and not isdir:
-                print '!! must give directory path'
+                print '!! must give a directory path'
             else:
                 print '!!'
+
+        elif vartype == 'int':
+            try:
+                testval = int(val)
+            except:
+                testval = 'ERROR'
+
+            if testval == val:
+                print 'ok'
+            else:
+                print '!! must give an integer value'
+
+        elif vartype == 'bool':
+            try:
+                testval = bool(val)
+            except:
+                testval = 'ERROR'
+
+            if testval == val:
+                print 'ok'
+            else:
+                print '!! must give a boolean value'
+
+        elif vartype == 'ver':
+            try:
+                t1, t2 = val.split('.')
+                i1, i2 = int(t1), int(t2)
+            except:
+                print "!! must be a string in the form 'X.Y'"
+            else:
+                print 'ok'
 
 def pid():
     'Return the pid of the running server.'
@@ -357,10 +394,17 @@ def check_python_version():
 
     running_major, running_minor = sys.version_info[0:2]
 
-    major_txt, minor_txt = conf.python_version.split('.')
-    needed_major, needed_minor = int(major_txt), int(minor_txt)
+    try:
+        major_txt, minor_txt = conf.python_version.split('.')
+        needed_major, needed_minor = int(major_txt), int(minor_txt)
+    except:
+        print 'Warning: unable to verify python version.'
+        result = True
+    else:
+        result = (needed_major==running_major and
+                    needed_minor==running_minor)
 
-    return needed_major==running_major and needed_minor==running_minor
+    return result
 
 
 
