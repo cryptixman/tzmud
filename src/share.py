@@ -27,6 +27,10 @@ Notice that to avoid circular imports, this module imports
 '''
 
 
+import os
+import sys
+import glob
+
 from twisted.internet import reactor
 
 from persistent import Persistent
@@ -868,6 +872,30 @@ def module_as_string(obj, instance=True):
     return modstr
 
 
+def load_plugins():
+    print 'loading plugins'
+
+    plugins = os.path.abspath(conf.plugins)
+    sys.path.append(plugins)
+
+    pluginfiles = '%s/*.py' % conf.plugins
+    for path in glob.glob(pluginfiles):
+        filename = os.path.basename(path)
+        modname, ext = os.path.splitext(filename)
+        mod = __import__(modname)
+
+
+def register_plugin(mod, cls):
+    name = class_as_string(cls, instance=False)
+    if hasattr(mod, name):
+        print 'Warning: plugin class', name, 'conflicts.'
+        print 'plugin NOT registered.'
+    else:
+        mod.class_names.append(name)
+        setattr(mod, name, cls)
+        print 'plugin', name, 'registered.'
+
+
 def upgrade(obj):
     '''Use this function to upgrade objects any time they need
         to change (ie. if it needs to grow a new property.)
@@ -1004,3 +1032,6 @@ import players
 import rooms
 import mobs
 import wizard
+
+load_plugins()
+

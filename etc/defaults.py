@@ -27,6 +27,7 @@ tztac = 'tzmud.tac'
 tzcontrol = 'tzcontrol.py'
 
 src = 'src'
+plugins = 'src/plugins'
 
 dbmod = 'src/db.py'
 

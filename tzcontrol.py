@@ -82,7 +82,7 @@ except ImportError:
 
 
 def verify_config():
-    varstrings = ['python:-', 'python_version:ver', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-', 'port:int', 'local_only:bool', 'home_id:int', 'web:bool', 'web_local_only:bool', 'enable_cmd_py:bool']
+    varstrings = ['python:-', 'python_version:ver', 'twistd:-', 'twistdlog:-', 'twistdpid:-', 'tztac:-', 'tzcontrol:-', 'src:d', 'plugins:d', 'dbmod:-', 'dbdir:d', 'datafs:-', 'backupdir:d', 'svn:-', 'port:int', 'local_only:bool', 'home_id:int', 'web:bool', 'web_local_only:bool', 'enable_cmd_py:bool']
 
     for varstring in varstrings:
         varname, vartype = varstring.split(':')

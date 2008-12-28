@@ -42,6 +42,7 @@ import conf
 import mobs
 import items
 from share import TZContainer, TZObj, class_as_string, int_attr
+from share import register_plugin
 from colors import green, yellow, red
 
 tzindex = TZIndex()
@@ -107,6 +108,11 @@ def nudge_all():
     for room in ls():
         print 'nudging', room.name
         room.nudge(0)
+
+
+def register_room(cls):
+    import rooms
+    register_plugin(rooms, cls)
 
 
 
@@ -694,10 +700,13 @@ class Exit(TZObj):
         return self._weight
     weight = property(_get_weight, _set_weight)
 
+
+class_names = ['Room', 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap']
+
 def classes():
     'Return a list of the names of the clonable rooms.'
 
-    return 'Room', 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap'
+    return class_names
 
 
 class SmallRoom(Room):

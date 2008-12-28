@@ -45,7 +45,6 @@
 - add all TODO items to the googlecode issue tracker
 - allow players to set their own short and long descriptions
 - allow Spawner to spawn more than 1 of its mobtype in the room
-- create a plugin system
 
 # Web Server
 - Build MUD areas by web.

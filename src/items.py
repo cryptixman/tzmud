@@ -34,6 +34,7 @@ from db import TZODB, TZIndex
 dbroot = TZODB().root
 
 from share import TZObj, TZContainer
+from share import register_plugin
 
 import wizard
 import players
@@ -91,6 +92,11 @@ def names():
     '''
 
     return [item.name for item in dbroot['items'].values()]
+
+
+def register_item(cls):
+    import items
+    register_plugin(items, cls)
 
 
 
@@ -186,11 +192,12 @@ Item (%s): %s
 ''' % (self.tzid, self.name, self.short, self.long,
             [item for item in self.items()])
 
+class_names = ['Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap']
 
 def classes():
     'Returns a list of the names of the clonable items.'
 
-    return 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap'
+    return class_names
 
 
 class Rose(Item):

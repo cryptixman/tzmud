@@ -43,6 +43,7 @@ import rooms
 import items
 
 from share import TZContainer, Character, class_as_string, int_attr
+from share import register_plugin
 from colors import magenta
 
 
@@ -106,6 +107,11 @@ def nudge_all():
     for mob in ls():
         print 'nudging', mob.name
         mob.nudge(0)
+
+
+def register_mob(cls):
+    import mobs
+    register_plugin(mobs, cls)
 
 
 class Mob(Character):
@@ -294,10 +300,12 @@ Mob: %s (%s) [in room %s]: %s
             success, msg = self.go(x)
 
 
+class_names = ['Cat', 'Sloth', 'Snake', 'PackRat', 'Photographer', 'Spawner']
+
 def classes():
     'Return a list of the names of the clonable mobs'
 
-    return 'Cat', 'Sloth', 'Snake', 'PackRat', 'Photographer', 'Spawner'
+    return class_names
 
 
 class Cat(Mob):
