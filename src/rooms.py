@@ -697,7 +697,11 @@ def classes():
 
 
 class SmallRoom(Room):
-    'A room that can only hold so many characters.'
+    '''A room that can only hold so many characters.
+
+    max: Maximum number of characters in this room.
+
+    '''
 
     name = 'small room'
     short = 'Seems kind of crowded in here.'
