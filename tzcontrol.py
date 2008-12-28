@@ -148,7 +148,7 @@ def start():
             if status:
                 print 'Unable to start server'
                 print 'Error code:', status
-                print 'Command:', command
+                print 'Command:', cmd
                 print
                 print output
 
