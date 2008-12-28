@@ -56,14 +56,31 @@ div.footer{
     text-align: center;
 }
 
-div.index_players{
+div.leftcol{
     width: 45%;
     float: left;
     padding: 0;
+}
+
+div.index_players{
+    border: thin solid black;
+    padding-left: 25px;
+    margin-bottom: 1em;
+}
+
+div.index_mobs{
+    border: thin solid black;
+    padding-left: 25px;
+    margin-bottom: 1em;
+}
+
+div.index_items{
+    border: thin solid black;
     padding-left: 25px;
 }
 
 div.index_rooms{
+    border: thin solid black;
     width: 45%;
     float: right;
     padding: 0;

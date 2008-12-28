@@ -28,6 +28,7 @@ from twisted.python.rebuild import rebuild
 import players
 import rooms
 import mobs
+import items
 
 from rooms import Room, Exit
 from items import Item
@@ -87,19 +88,27 @@ class TZPage(rend.Page):
         #r.sort(key=attrgetter('name'))
         return r
 
+    def data_mobs(self, ctx, data):
+        r = mobs.ls()
+        #r.sort(key=attrgetter('name'))
+        return r
+
+    def data_items(self, ctx, data):
+        r = items.ls()
+        #r.sort(key=attrgetter('name'))
+        return r
+
 class Index(TZPage):
     docFactory = xmlf('index.html')
     title = 'TZMud Web Interace'
-
-    def data_trial(self, ctx, data):
-        print 'test', ctx, data
-        return "TEST!"
 
     def render_process_index(self, ctx, data):
         roomname = ctx.arg('roomname')
         if roomname:
             newroom = rooms.Room(roomname)
-        return 'Processing'
+            return 'Processing'
+        else:
+            return ''
 
     def render_index_players(self, ctx, data):
         lines = []
@@ -115,8 +124,10 @@ class Index(TZPage):
         lines = []
         data.sort(key=attrgetter('name'))
         for room in data:
+            editlink = T.a(href="/edit/%s" % room.tzid)[room.name]
             tzid = T.td(_class="roomtzid")[room.tzid, ':']
-            name = T.td(_class="roomname")[room.name]
+            #name = T.td(_class="roomname")[room.name]
+            name = T.td(_class="roomname")[editlink]
             if not room.exits():
                 row = T.tr(_class='warn')
             else:
@@ -128,8 +139,10 @@ class Index(TZPage):
     def render_idtable(self, ctx, data):
         lines = []
         for obj in data:
+            editlink = T.a(href="/edit/%s" % obj.tzid)[obj.name]
             tzid = T.td(_class="objtzid")[obj.tzid, ':']
-            name = T.td(_class="objname")[obj.name]
+            #name = T.td(_class="objname")[obj.name]
+            name = T.td(_class="objname")[editlink]
             lines.append(T.tr[tzid, name])
         return T.table[lines]
 
@@ -283,25 +296,35 @@ class Edit(TZPage):
     def get_input_widget(self, name, data):
         if name=='owner':
             if data is None:
-                tzid=''
+                tzid=None
             else:
                 tzid=data.tzid
             ps = players.ls()
             ms = mobs.ls()
             cs = ps + ms
             choices = [(c.tzid, '%s (%s)' % (c.name, c.tzid)) for c in cs]
+            choices.insert(0, (None, 'None'))
             choices.sort(key=itemgetter(1))
             info = dict(name=name,
                         choices=choices,
                         selected=tzid,
                         editmode=True)
+            print info
             return self.render_form_select(info)
 
         if isinstance(data, str):
+            disabled = ''
+            if name=='name':
+                if self.bse=='Player':
+                    disabled = 'disabled'
+
             if len(data) < 50:
-                return T.input(value=data, size="60")
+                if disabled:
+                    return T.input(name=name, value=data, size="60", disabled=disabled)
+                else:
+                    return T.input(name=name, value=data, size="60")
             else:
-                return T.textarea(rows="4", cols="60")[data]
+                return T.textarea(name=name, rows="4", cols="60")[data]
 
         if isinstance(data, bool):
             info = dict(name=name,
@@ -311,10 +334,10 @@ class Edit(TZPage):
             return self.render_form_select(info)
 
         if isinstance(data, int):
-            return T.input(value=data, size="5")
+            return T.input(name=name, value=data, size="5")
 
         else:
-            return T.input
+            return T.input(name=name, value=data)
 
     def render_settings(self, ctx, data):
         settings = self.obj.settings
@@ -324,8 +347,32 @@ class Edit(TZPage):
             label = T.td(_class="textlabel")[setting]
             val = getattr(self.obj, setting)
             print setting, val
-            inpt = T.td[self.get_input_widget(setting, val)(name=setting, value=val)]
+            inpt = T.td[self.get_input_widget(setting, val)]
             lines.append(T.tr[label, inpt])
+
+        return T.table[lines]
+
+    def render_exits(self, ctx, data):
+        if self.bse != 'Room':
+            return ''
+
+        xs = self.obj.exits()
+        xs.sort(key=attrgetter('name'))
+        lines = [T.tr[T.td['Exits'], T.td, T.td, T.td]]
+        for x in xs:
+            rs = rooms.ls()
+            choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
+            choices.insert(0, (None, 'None'))
+            tzid = getattr(x.destination, 'tzid', None)
+            destinfo = dict(name=x.name,
+                        choices=choices,
+                        selected=tzid,
+                        editmode=True)
+
+            lines.append(T.tr[T.td[x.name],
+                            T.td[T.input(name='', value=x.name)],
+                            T.td['-->'],
+                            T.td[self.render_form_select(destinfo)]])
 
         return T.table[lines]
 

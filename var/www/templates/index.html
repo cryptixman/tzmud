@@ -4,16 +4,25 @@
     <div nevow:render="header" />
 
     <h1>TZMud Web Interface</h1>
-    <h2>New, and Improved!</h2>
-
-    <h3 nevow:data="trial" nevow:render="data">(replace)</h3>
 
     <div nevow:render="process_index" />
 
     <form action="." method="post">
-    <div class="index_players">
-    <h3>Players</h3>
-    <div nevow:data="players" nevow:render="idtable_sortid" />
+    <div class="leftcol">
+        <div class="index_players">
+        <h3>Players</h3>
+        <div nevow:data="players" nevow:render="idtable_sortid" />
+        </div>
+
+        <div class="index_mobs">
+        <h3>Mobs</h3>
+        <div nevow:data="mobs" nevow:render="idtable_sortid" />
+        </div>
+
+        <div class="index_items">
+        <h3>Items</h3>
+        <div nevow:data="items" nevow:render="idtable_sortid" />
+        </div>
     </div>
 
     <div class="index_rooms">
