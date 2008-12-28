@@ -827,8 +827,8 @@ class Zoo(Room):
     short = 'All sorts of strange creatures.'
 
     def __init__(self, name=''):
-        Room.__init__(self, name)
         self.period = 3600 # 60 minutes
+        Room.__init__(self, name)
 
     def destroy(self):
         '''Get rid of the Zoo.
@@ -861,8 +861,8 @@ class Zoo(Room):
         self.populate()
 
     def populate(self):
-        '''If the Zoo has an area for a mob, check if it is still there
-            and if not, respawn it.
+        '''If the Zoo has an area for a mob, check that the mob is still
+            there and if not, respawn it.
 
         If the Zoo does not have an area for the mob, it may be a new mob,
             so build a place for it.
