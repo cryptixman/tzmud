@@ -36,9 +36,13 @@ datafs = '%s/%s' % (dbdir, datafsname)
 backupdir = 'var/db/backup'
 
 port = 4444
+local_only = True
 
 home_id = 1
 
 svn = '/usr/bin/svn'
 
 web = False
+web_local_only = True
+
+enable_cmd_py = False

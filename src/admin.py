@@ -94,6 +94,10 @@ def cmd_py(s, r):
 
     '''
 
+    if not conf.enable_cmd_py:
+        s.message('!py disabled.')
+        return
+
     try:
         s.message(str(eval(r)))
     except Exception, e:

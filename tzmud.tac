@@ -67,7 +67,12 @@ class TZMUD(internet.TCPServer):
 
 
 application = service.Application('tzmud_server')
-server = TZMUD(conf.port, factory)
+
+if conf.local_only:
+    server = TZMUD(conf.port, factory, 1, '127.0.0.1')
+else:
+    server = TZMUD(conf.port, factory)
+
 reactor.addSystemEventTrigger("after", "shutdown", server.close_db)
 import mobs
 reactor.callLater(10, mobs.nudge_all)
@@ -93,5 +98,10 @@ if conf.web:
 
     app2 = service.Application('tzmudweb')
     site = appserver.NevowSite(pages.Index())
-    webserver = internet.TCPServer(8080, site)
+
+    if conf.web_local_only:
+        webserver = internet.TCPServer(8080, site, 1, '127.0.0.1')
+    else:
+        webserver = internet.TCPServer(8080, site)
+
     webserver.setServiceParent(application)
