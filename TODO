@@ -43,6 +43,7 @@
 
     to solve this, I am considering a sort of "modifier stack"
 - add all TODO items to the googlecode issue tracker
+- allow players to set their own short and long descriptions
 
 # Web Server
 - Build MUD areas by web.
