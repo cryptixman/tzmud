@@ -840,18 +840,32 @@ def findname(objname, searchers, all=False):
         return None
 
 
-def class_as_string(obj):
-    'Return the class of the given object as a string.'
-
-    cls = obj.__class__
+def class_info(obj, instance):
+    if instance:
+        cls = obj.__class__
+    else:
+        cls = obj
     tostr = str(cls)
     q1 = tostr.find("'")
     q2 = tostr.find("'", q1+1)
     clsstr = tostr[q1+1:q2]
+    modstr = None
     dot = clsstr.find('.')
     if dot > 0:
-        mod, clsstr = clsstr.split('.')
+        modstr, clsstr = clsstr.split('.')
+    return modstr, clsstr
+
+def class_as_string(obj, instance=True):
+    'Return the class of the given object as a string.'
+
+    modstr, clsstr = class_info(obj, instance)
     return clsstr
+
+def module_as_string(obj, instance=True):
+    'Return the module of the given object as a string.'
+
+    modstr, clsstr = class_info(obj, instance)
+    return modstr
 
 
 def upgrade(obj):

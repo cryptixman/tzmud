@@ -88,11 +88,15 @@ td.text{
 td.text2{
     padding-left: 3em;
 }
+td.textlabel{
+    text-align:right;
+    padding-right: 1em;
+}
 
 
 td.objtzid{
     text-align:right;
-    width: 3em;
+    padding-right: 1em;
 }
 td.objname{
     padding-left: 1em;
@@ -105,4 +109,12 @@ td{
 
 tr.warn{
     background-color: #9E9E48;
+}
+
+p.clsinfo{
+    border: thin solid black;
+    width: 60%;
+    margin: auto;
+    padding: 1em;
+    margin-bottom: 2em;
 }
