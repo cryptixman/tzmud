@@ -120,6 +120,8 @@ class Room(TZContainer):
                     exits=None, items=None):
         TZContainer.__init__(self, name, short, long, owner, items)
 
+        self.settings.append('period')
+
         self._exit_ids = PersistentList()
         if exits is not None:
             for x in exits:
