@@ -205,16 +205,26 @@ class Edit(TZPage):
         tzid = int(segments[0])
         obj = tzindex.get(tzid)
         self.obj = obj
+
         bases = [Room, Exit, Item, Mob, Player]
+        found = False
         for base in bases:
             if issubclass(obj.__class__, base):
+                found = True
                 self.base = base
                 break
+        if not found:
+            # Module was probably rebuilt elsewhere (from the MUD).
+            # Try rebuilding then finding the base class again.
+            self.child_rebuild(None)
+            return self.locateChild(context, segments)
+        else:
+            self.bse = class_as_string(base, instance=False)
+
         self.cls = class_as_string(obj)
-        self.bse = class_as_string(base, instance=False)
         #print 'module:', module_as_string(obj)
         #print 'class:', class_as_string(obj)
-        #print 'base:', self.base
+        #print 'base:', self.bse
         return self, ()
 
     def form_options(self, options, selected=None):
