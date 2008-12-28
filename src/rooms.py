@@ -520,6 +520,8 @@ Room (%s): %s
 
 
 class Exit(TZObj):
+    'A way to move from one room to another.'
+
     _link_exit_id = 0
 
     def __init__(self, name, short='', long='', room=None, destination=None, return_name=''):
