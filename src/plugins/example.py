@@ -39,3 +39,31 @@ class Library(rooms.Room):
             rooms.Room.action(self, info)
 
 rooms.register_room(Library)
+
+
+
+class VaultRoom(rooms.Room):
+    name = 'vault room'
+
+    def __init__(self, name=''):
+        rooms.Room.__init__(self, name)
+        self.make_vault()
+
+    def make_vault(self):
+        vault = rooms.Room('vault')
+        x = rooms.Exit('the vault', room=self, destination=vault,
+                                                    return_name='exit')
+        x.locked = True
+        self.the_vault_exit = x
+
+    def near_say(self, info):
+        raw = info['raw']
+        x = self.the_vault_exit
+        if raw == 'open sesame' and x.locked:
+            x.locked = False
+            self.action(dict(act='unlock', actor=None, door=x, key=None))
+        elif raw == 'close sesame' and not x.locked:
+            x.locked = True
+            self.action(dict(act='lock', actor=None, door=x, key=None))
+
+rooms.register_room(VaultRoom)
