@@ -215,16 +215,20 @@ class Room(TZContainer):
         try:
             act = info['act']
             actor = info['actor']
-            sidefx = info.get('sidefx', False)
+
             for player in self.players():
                 player.act_near(info)
+
             for mob in self.mobs():
                 if mob != actor:
                     mob.act_near(info)
+
             for item in self.items():
                 item.act_near(info)
+
             for x in self.exits():
                 x.act_near(info)
+
             self.act_near(info)
 
             # Some actions can affect nearby rooms. If that is the case for
