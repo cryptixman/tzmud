@@ -197,8 +197,11 @@ def start():
                                         conf.twistdpid,
                                         conf.twistdlog)
         if check_db():
-            import commands
-            status, output = commands.getstatusoutput(cmd)
+            from subprocess import Popen, PIPE, STDOUT
+            p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
+                                    stderr=STDOUT, close_fds=True)
+            output, unused = p.communicate()
+            status = p.returncode
 
             if status:
                 print 'Unable to start server'
