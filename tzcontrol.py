@@ -199,7 +199,7 @@ def start():
         if check_db():
             from subprocess import Popen, PIPE, STDOUT
             p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE,
-                                    stderr=STDOUT, close_fds=True)
+                                                    stderr=STDOUT)
             output, unused = p.communicate()
             status = p.returncode
 
