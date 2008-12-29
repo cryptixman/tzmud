@@ -533,16 +533,21 @@ def cmd_lock(s, r):
         key = s.player.itemname(keyname) or s.player.item(keytzid)
     else:
         key = None
+        nkeys = 0
         for item in s.player.items():
             if hasattr(item, 'name_aka'):
                 for name in item.name_aka:
                     if name == 'key':
+                        nkeys += 1
                         if item.locks(x):
                             key = item
 
     if key is None:
         if not keyname and not keytzid:
-            s.message('Lock it with which key?')
+            if nkeys > 0:
+                s.message('None of your keys fit.')
+            else:
+                s.message('Lock it with what?')
         else:
             s.message('You do not have such a key.')
         return
@@ -550,12 +555,10 @@ def cmd_lock(s, r):
     if key.locks(x):
         x.lock(key)
         s.message('You lock the door', x, 'with key', key, '.')
-        s.room.action(dict(act='lock', actor=s.player, action='lock',
-                            door=x, key=key))
+        s.room.action(dict(act='lock', actor=s.player, door=x, key=key))
     else:
         s.message('That key does not fit.')
-        s.room.action(dict(act='lock', actor=s.player, action='fail',
-                            door=x, key=key))
+        s.room.action(dict(act='lockfail', actor=s.player, door=x, key=key))
 
 
 def cmd_unlock(s, r):
@@ -586,16 +589,21 @@ def cmd_unlock(s, r):
         key = s.player.itemname(keyname) or s.player.item(keytzid)
     else:
         key = None
+        nkeys = 0
         for item in s.player.items():
             if hasattr(item, 'name_aka'):
                 for name in item.name_aka:
                     if name == 'key':
+                        nkeys += 1
                         if item.locks(x):
                             key = item
 
     if key is None:
         if not keyname and not keytzid:
-            s.message('Unlock it with which key?')
+            if nkeys > 0:
+                s.message('None of your keys fit.')
+            else:
+                s.message('Unlock it with what?')
         else:
             s.message('You do not have such a key.')
         return
@@ -603,12 +611,10 @@ def cmd_unlock(s, r):
     if key.locks(x):
         x.unlock(key)
         s.message('You unlock the door', x, 'with key', key, '.')
-        s.room.action(dict(act='lock', actor=s.player, action='unlock',
-                                door=x, key=key))
+        s.room.action(dict(act='unlock', actor=s.player, door=x, key=key))
     else:
         s.message('That key does not fit.')
-        s.room.action(dict(act='lock', actor=s.player, action='fail',
-                                door=x, key=key))
+        s.room.action(dict(act='lockfail', actor=s.player, door=x, key=key))
 
 
 def cmd_follow(s, r=None):

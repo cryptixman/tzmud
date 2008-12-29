@@ -511,8 +511,12 @@ Player (%s): %s  [%s]
             if self.can_see(mob):
                 self.message(mob, 'disappears.')
 
-    def near_lock(self, info):
-        'Someone has "lock"ed  or "unlock"ed a door near this player.'
+    def _near_lock(self, info):
+        '''Someone has "lock"ed  or "unlock"ed a door near this player.
+
+        This code is shared and called from near_lock and near_unlock
+
+        '''
 
         locker = info['actor']
         action = info['action']
@@ -532,7 +536,7 @@ Player (%s): %s  [%s]
                     self.message(locker, 'unlocks the door', door, keyphrase)
                 else:
                     if self.can_see(key):
-                        self.message(locker, 'trys', key, 'in door', door, '.')
+                        self.message(locker, 'tries', key, 'in door', door, '.')
                     else:
                         self.message(locker, 'seems to be locking', door, 'but you do not see any key.')
             elif self.can_see(locker):
@@ -541,6 +545,24 @@ Player (%s): %s  [%s]
                 self.message('You hear the lock turning in door', door, '.')
             else:
                 self.message('You hear what sounds like a key in a lock.')
+
+    def near_lock(self, info):
+        'Someone has "lock"ed a door near this player.'
+
+        info['action'] = 'lock'
+        self._near_lock(info)
+
+    def near_unlock(self, info):
+        'Someone has "unlock"ed a door near this player.'
+
+        info['action'] = 'unlock'
+        self._near_lock(info)
+
+    def near_lockfail(self, info):
+        'Someone has tried the wrong key in a door near this player.'
+
+        info['action'] = 'fail'
+        self._near_lock(info)
 
     def near_dig(self, info):
         'Someone has "dig"ged a new area near this player.'

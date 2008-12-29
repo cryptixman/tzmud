@@ -364,8 +364,7 @@ def cmd_lock(s, r):
     x.add_key(key)
     x.lock(key)
     s.message('You make the door', x, 'lockable with key', key, '.')
-    s.room.action(dict(act='lock', actor=s.player, action='lock',
-                            door=x, key=key))
+    s.room.action(dict(act='lock', actor=s.player, door=x, key=key))
 
 
 def cmd_list(s, r):
