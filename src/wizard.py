@@ -425,7 +425,9 @@ def cmd_clone(s, r):
 
     newname = r.get('new', '')
 
-    # try to clone an item in the room or on the player
+    # first try to clone an item
+    # look first in the room or on the player
+    # then at existing item objects
     orig = s.player.itemname(objname) or \
                 s.player.item(objtzid) or \
                 s.room.itemname(objname) or \
@@ -433,6 +435,7 @@ def cmd_clone(s, r):
                 items.getname(objname) or \
                 items.get(objtzid)
 
+    # if it is not there, it might be an item class
     if orig is None:
         if objname in items.classes():
             cls = getattr(items, objname)
@@ -451,11 +454,14 @@ def cmd_clone(s, r):
         return
 
     # next, try to clone a mob
+    # look first in the room
+    # then at existing mobs
     orig = s.room.mobname(objname) or \
             s.room.mob(objtzid) or \
             mobs.getname(objname) or \
             mobs.get(objtzid)
 
+    # if it is not there, it might be a mob class
     if orig is None:
         if objname in mobs.classes():
             cls = getattr(mobs, objname)
@@ -475,9 +481,11 @@ def cmd_clone(s, r):
         return
 
     # finally, try to clone a room
+    # first look at existing rooms
     orig = rooms.getname(objname) or \
             rooms.get(objtzid)
 
+    # if it is not there, it might be a room class
     if orig is None:
         if objname in rooms.classes():
             cls = getattr(rooms, objname)
