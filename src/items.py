@@ -69,12 +69,13 @@ def getname(name, all=False):
     result = []
     for item in ls():
         if item.name == name:
-            result.append(item)
+            if not all:
+                return item
+            else:
+                result.append(item)
 
     if all:
         return result
-    elif len(result) == 1:
-        return result[0]
     else:
         return None
 

@@ -76,12 +76,13 @@ def getname(name, all=False):
     result = []
     for room in ls():
         if room.name == name:
-            result.append(room)
+            if not all:
+                return room
+            else:
+                result.append(room)
 
     if all:
         return result
-    elif len(result) == 1:
-        return result[0]
     else:
         return None
 

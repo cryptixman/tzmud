@@ -75,12 +75,13 @@ def getname(name, all=False):
     result = []
     for mob in ls():
         if mob.name == name:
-            result.append(mob)
+            if not all:
+                return mob
+            else:
+                result.append(mob)
 
     if all:
         return result
-    elif len(result) == 1:
-        return result[0]
     else:
         return None
 
