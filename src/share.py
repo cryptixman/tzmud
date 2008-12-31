@@ -483,8 +483,7 @@ class TZContainer(TZObj):
                     if item not in result:
                         result.append(item)
 
-        for item in self.items():
-            if hasattr(item, 'name_aka'):
+            elif hasattr(item, 'name_aka'):
                 for aka in item.name_aka:
                     if aka == name:
                         if not all:
