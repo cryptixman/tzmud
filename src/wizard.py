@@ -185,9 +185,11 @@ def cmd_teleport(s, r=None):
             item = s.room.itemname(objname) or s.room.item(objtzid)
             s.room.remove(item)
             destination.add(item)
-            s.room.action(dict(act='teleport_item_away', actor=None,
+            s.room.action(dict(act='teleport_item_away',
+                                actor=None,
                                 item=item))
             destination.action(dict(act='teleport_item_in',
+                                        delay=0.4,
                                         actor=None,
                                         item=item))
         elif s.player.itemname(objname) or s.player.item(objtzid):
@@ -197,7 +199,9 @@ def cmd_teleport(s, r=None):
             s.room.action(dict(act='teleport_item_away',
                                     actor=None,
                                     item=item))
-            destination.action(dict(act='teleport_item_in', actor=None,
+            destination.action(dict(act='teleport_item_in',
+                                delay=0.4,
+                                actor=None,
                                 item=item))
         elif s.room.playername(objname) or s.room.player(objtzid):
             player = s.room.playername(objname) or s.room.player(objtzid)
@@ -213,9 +217,13 @@ def cmd_teleport(s, r=None):
         elif s.room.mobname(objname) or s.room.mob(objtzid):
             mob = s.room.mobname(objname) or s.room.mob(objtzid)
             mob.move(destination)
-            s.room.action(dict(act='teleport_character_away', actor=None,
+            s.room.action(dict(act='teleport_character_away',
+                                delay=0.2,
+                                actor=None,
                                 character=mob))
-            destination.action(dict(act='teleport_character_in', actor=None,
+            destination.action(dict(act='teleport_character_in',
+                                delay=0.4,
+                                actor=None,
                                 character=mob))
         elif s.room.exit(objtzid) or s.room.exitname(objname):
             x = s.room.exit(objtzid) or s.room.exitname(objname)
@@ -225,9 +233,13 @@ def cmd_teleport(s, r=None):
         elif mobs.getname(objname) or mobs.get(objtzid):
             mob = obj
             mob.move(destination)
-            mob.room.action(dict(act='teleport_character_away', actor=None,
+            mob.room.action(dict(act='teleport_character_away',
+                                delay=0.2,
+                                actor=None,
                                 character=mob))
-            destination.action(dict(act='teleport_character_in', actor=None,
+            destination.action(dict(act='teleport_character_in',
+                                delay=0.4,
+                                actor=None,
                                 character=mob))
         elif players.getname(objname) or players.get(objtzid):
             player = obj
