@@ -104,6 +104,8 @@ def register_item(cls):
 class Item(TZObj):
     'Base class for all items in the MUD.'
 
+    name = 'proto item'
+
     def __init__(self, name='', short='', long='', owner=None):
         'Initialize this item, and add it to the item index.'
 

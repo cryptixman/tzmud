@@ -121,6 +121,7 @@ def register_room(cls):
 class Room(TZContainer):
     'Base class for all rooms in the MUD.'
 
+    name = 'proto room'
     period = int_attr('period') # seconds
 
     def __init__(self, name='', short='', long='', owner=None,
@@ -533,6 +534,7 @@ Room (%s): %s
 class Exit(TZObj):
     'A way to move from one room to another.'
 
+    name = 'proto exit'
     _link_exit_id = 0
 
     def __init__(self, name, short='', long='', room=None, destination=None, return_name=''):

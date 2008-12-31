@@ -102,13 +102,25 @@ def str_attr(name, default='', blank_ok=True, setonce=False):
 class TZObj(Persistent):
     'Base class for all MUD objects.'
 
-    name = str_attr('name', default='proto', blank_ok=False)
+    name = 'proto obj'
     short = str_attr('short')
     long = str_attr('long')
 
     gettable = True
     wearable = False
     visible = bool_attr('visible', default=True)
+
+    def __new__(cls, *args, **kw):
+        name = cls.name
+        if isinstance(name, str):
+            rename = True
+            cls.name = str_attr('name', default=name, blank_ok=False)
+        else:
+            rename = False
+        inst = super(TZObj, cls).__new__(cls, *args, **kw)
+        if rename:
+            inst.name = name
+        return inst
 
     def __init__(self, name='', short='', long='', owner=None, container=None):
         self.tzid = tzid()
@@ -137,8 +149,18 @@ class TZObj(Persistent):
             return '(%s)' % self.name
 
     def __copy__(self):
-        new_item = self.__class__(self.name, self.short, self.long)
+        new_item = self.__class__(self.name)
+        for var in self.settings:
+            new_item.setting(var, self.setting(var))
         return new_item
+
+    def set_name(self, val):
+        try:
+            self.name = val
+        except ValueError:
+            return False
+        else:
+            return True
 
     def _set_owner(self, owner):
         'Setter for the owner property.'
@@ -153,6 +175,24 @@ class TZObj(Persistent):
         'Getter for the owner property.'
         return tzindex.get(self._ownerid)
     owner = property(_get_owner, _set_owner)
+
+    def set_owner(self, iden):
+        'iden is owner or the name or the id # for the owner'
+
+        if hasattr(iden, 'tzid'):
+            c = iden
+        elif iden.startswith('#'):
+            tzid = iden[1:]
+            c = players.get(tzid) or mobs.get(tzid)
+        else:
+            name = iden
+            c = players.getname(name) or mobs.getname(name)
+
+        if c is None:
+            return False
+        else:
+            self.owner = c
+            return True
 
     def _get_room(self):
         ''''Getter for the room property.
@@ -173,31 +213,30 @@ class TZObj(Persistent):
         return rooms.get(self._rid)
     room = property(_get_room)
 
-    def set_owner(self, iden):
-        'iden is the name or the id # for the owner'
-
-        if iden.startswith('#'):
-            tzid = iden[1:]
-            c = players.get(tzid) or mobs.get(tzid)
-        else:
-            name = iden
-            c = players.getname(name) or mobs.getname(name)
-
-        if c is None:
-            return False
-        else:
-            self.owner = c
-            return True
-
     def set_visible(self, v):
         was = self.visible
+
+        if not v in (True, False):
+            try:
+                norm = v.lower()
+            except AttributeError:
+                pass
+            else:
+                if norm == 'true':
+                    v = True
+                elif norm == 'false':
+                    v = False
+                else:
+                    return False
+
         self.visible = v
 
         room = self.room
-        if v and not was:
-            room.action(dict(act='appear', actor=self))
-        elif not v and was:
-            room.action(dict(act='disappear', actor=self))
+        if room is not None:
+            if v and not was:
+                room.action(dict(act='appear', actor=self))
+            elif not v and was:
+                room.action(dict(act='disappear', actor=self))
 
         return True
 
@@ -254,22 +293,6 @@ class TZObj(Persistent):
             if var not in self.settings:
                 return False
 
-            if var == 'name' and not val:
-                return False
-
-            if val.lower() == 'true':
-                val = True
-            elif val.lower() == 'false':
-                val = False
-            else:
-                try:
-                    val = int(val)
-                except ValueError:
-                    try:
-                        val = float(val)
-                    except ValueError:
-                        pass
-
             setter_name = 'set_%s' % var
             setter = getattr(self, setter_name, None)
 
@@ -278,7 +301,23 @@ class TZObj(Persistent):
                     return True
                 else:
                     return False
-            elif hasattr(self, var):
+
+            try:
+                norm = val.lower()
+                if norm == 'true':
+                    val = True
+                elif norm == 'false':
+                    val = False
+            except AttributeError:
+                try:
+                    val = int(val)
+                except ValueError:
+                    try:
+                        val = float(val)
+                    except ValueError:
+                        pass
+
+            if hasattr(self, var):
                 setattr(self, var, val)
                 return True
             elif hasattr(self, uvar):
@@ -1033,5 +1072,6 @@ import rooms
 import mobs
 import wizard
 
-load_plugins()
+if conf.load_plugins:
+    load_plugins()
 

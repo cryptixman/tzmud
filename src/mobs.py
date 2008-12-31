@@ -118,6 +118,7 @@ def register_mob(cls):
 class Mob(Character):
     'Base class for all mob (mobile) objects in the MUD.'
 
+    name = 'proto mob'
     period = int_attr('period', default=10) # seconds
 
     def __init__(self, name='', short='', long=''):
