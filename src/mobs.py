@@ -480,6 +480,8 @@ class Photographer(Mob):
         Mob.__init__(self, name, short, long)
         camera = items.Camera()
         self.add(camera)
+        bag = items.Bag()
+        self.add(bag)
         self.set_action_weights(action_sleep=0,
                                 action_awake=0,
                                 action_move=400,
@@ -490,6 +492,7 @@ class Photographer(Mob):
         'Take a picture.'
 
         camera = self.itemname('camera')
+        bag = self.itemname('bag')
         r = self.room
         if r != self.home:
             i = r.items()
@@ -498,21 +501,27 @@ class Photographer(Mob):
             p = r.players()
             x = r.exits()
             choices = i or m or p or x or [r]
-            item = random.choice(choices)
-            photoname = 'photo of %s' % item.name
-            have_one_already = self.itemname(photoname)
+            obj = random.choice(choices)
+            photoname = 'photo of %s' % obj.name
+            have_one_already = bag.itemname(photoname)
 
             if have_one_already is None:
-                camera.use(self, item)
+                camera.use(self, obj)
+                photo = self.itemname(photoname)
+                self.remove(photo)
+                bag.add(photo)
 
     def action_drop(self):
         'Drop one of the pictures.'
 
-        picnames = self.itemnames()
+        bag = self.itemname('bag')
+        picnames = bag.itemnames()
         picnames = [n for n in picnames if n.startswith('photo of')]
         if picnames:
             picname = random.choice(picnames)
-            pic = self.itemname(picname)
+            pic = bag.itemname(picname)
+            bag.remove(pic)
+            self.add(pic)
             self.drop_item(pic)
 
 
