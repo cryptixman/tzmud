@@ -37,6 +37,9 @@ if __name__ == '__main__':
     etc = os.path.abspath('etc')
     sys.path.append(etc)
 
+    import conf
+    conf.load_plugins = False
+
 from conf import datafs, backupdir, datafsname
 
 class TZODB(object):

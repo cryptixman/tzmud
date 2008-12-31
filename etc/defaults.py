@@ -28,6 +28,7 @@ tzcontrol = 'tzcontrol.py'
 
 src = 'src'
 plugins = 'src/plugins'
+load_plugins = True
 
 dbmod = 'src/db.py'
 
