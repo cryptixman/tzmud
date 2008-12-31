@@ -222,23 +222,25 @@ class Player(Character):
         name = Character.__str__(self)
         return blue(name)
 
+    #def __repr__(self):
+        #return '''\
+#Player (%s): %s  [%s]
+    #%s
+    #%s
+
+    #Inventory:
+        #%s
+
+    #Home: %s
+
+#''' % (self.tzid, self.name, 'room %s' % self._rid or 'Not logged in',
+            #self.short,
+            #self.long,
+            #[item for item in self.items()],
+            #self.home)
+
     def __repr__(self):
-        return '''\
-Player (%s): %s  [%s]
-    %s
-    %s
-
-    Inventory:
-        %s
-
-    Home: %s
-
-''' % (self.tzid, self.name, 'room %s' % self._rid or 'Not logged in',
-            self.short,
-            self.long,
-            [item for item in self.items()],
-            self.home)
-
+        return '[Player] %s (%s)' % (self.name, self.tzid)
 
     # Near actions
     def near_look(self, info):

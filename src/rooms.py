@@ -486,32 +486,35 @@ class Room(TZContainer):
         name = TZContainer.__str__(self)
         return red(name)
 
+    #def __repr__(self):
+        #return '''\
+#Room (%s): %s
+    #%s
+    #%s
+    #Owner: %s
+
+    #Exits:
+        #%s
+
+    #Contents:
+        #%s
+
+    #Players:
+        #%s
+
+    #Mobs:
+        #%s
+
+#''' % (self.tzid, self.name, self.short, self.long, self.owner,
+            #[x for x in self.exits()],
+                #[item for item in self.items()],
+                #['%s (%s)' % (player.name, player.tzid)
+                    #for player in self.players()],
+                #['%s (%s)' % (mob.name, mob.tzid)
+                    #for mob in self.mobs()])
+
     def __repr__(self):
-        return '''\
-Room (%s): %s
-    %s
-    %s
-    Owner: %s
-
-    Exits:
-        %s
-
-    Contents:
-        %s
-
-    Players:
-        %s
-
-    Mobs:
-        %s
-
-''' % (self.tzid, self.name, self.short, self.long, self.owner,
-            [x for x in self.exits()],
-                [item for item in self.items()],
-                ['%s (%s)' % (player.name, player.tzid)
-                    for player in self.players()],
-                ['%s (%s)' % (mob.name, mob.tzid)
-                    for mob in self.mobs()])
+        return '[Room] %s (%s)' % (self.name, self.tzid)
 
     def __copy__(self):
         '''A copy of a room will have everything the same except...
