@@ -7,13 +7,11 @@
 
     <div nevow:render="process_rooms" />
 
-    <form action="." method="post">
     <div class="rooms">
     <h3>Rooms</h3>
     <div nevow:data="rooms" nevow:render="rooms" />
-    Add new room: <input name="roomname" />
+        <div nevow:render="addroomform" />
     </div>
-    </form>
 
     <div nevow:render="footer" />
 </body>

@@ -47,13 +47,28 @@ h2{
     text-align: center;
 }
 
+table.center{
+    margin-left: auto;
+    margin-right: auto;
+}
+
 div.header{
     background-color: black;
+    margin-bottom: 1em;
 }
 
 div.footer{
     background-color: black;
     text-align: center;
+}
+
+div.errmsg{
+    width: 60%;
+    margin: auto;
+    text-align: center;
+    color: white;
+    background-color: #B73E40;
+    border: thin solid black;
 }
 
 div.leftcol{
@@ -143,4 +158,10 @@ p.clsinfo{
     margin: auto;
     padding: 1em;
     margin-bottom: 2em;
+}
+
+div.addroom{
+    width: 100%;
+    margin: auto;
+    text-align: center;
 }

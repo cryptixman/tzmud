@@ -17,11 +17,13 @@
 
 
 from operator import attrgetter, itemgetter
+import urlparse
 
 from nevow import loaders, rend
 from nevow import static
 from nevow import tags as T
 from nevow.entities import nbsp
+from nevow import inevow
 
 from twisted.python.rebuild import rebuild
 
@@ -57,21 +59,109 @@ class TZPage(rend.Page):
     def child_edit(self, request):
         return Edit()
 
-    def render_head(self, context, data):
+    def render_head(self, ctx, data):
+        print 'head'
+        request = ctx.locate(inevow.IRequest)
+        print request.args
         return xmlf('head.html')
 
-    def render_title(self, context, data):
-        context.fillSlots('title', self.title)
-        return context.tag
+    def render_title(self, ctx, data):
+        ctx.fillSlots('title', self.title)
+        return ctx.tag
 
-    def render_scripts(self, context, data):
-        return context.tag
+    def render_scripts(self, ctx, data):
+        return ctx.tag
 
-    def render_header(self, context, data):
+    def render_header(self, ctx, data):
         return xmlf('header.html')
 
-    def render_footer(self, context, data):
+    def render_footer(self, ctx, data):
         return xmlf('footer.html')
+
+    def render_errmsg(self, ctx, data):
+        errmsg = ctx.arg('errmsg')
+
+        if errmsg:
+            lines = [T.h2['Error:']]
+            lines.append(T.h4[errmsg])
+            return T.div(_class="errmsg")[lines]
+        else:
+            return ''
+
+    def goback(self, request, msg=''):
+        headers = request.getAllHeaders()
+        backurl = headers.get('referer')
+        if backurl:
+            parsed = urlparse.urlsplit(backurl)
+            backpath = parsed.path
+
+        else:
+            backpath = '/'
+
+        request.redirect('%s?errmsg=%s' % (backpath, msg))
+
+
+    def form_options(self, options, selected=None):
+        r = []
+        for option in options:
+            if option == selected:
+                r.append(T.option(value=str(option), selected="selected")[str(option)])
+            else:
+                r.append(T.option(value=str(option))[str(option)])
+
+        return r
+
+    def form_options2(self, options, selected=None):
+        selected = str(selected)
+
+        r = []
+        for option_id, option_text in options:
+            option_id = str(option_id)
+            option_text = str(option_text)
+
+            if option_id == selected:
+                r.append(T.option(value=option_id, selected="selected")[option_text])
+            else:
+                r.append(T.option(value=option_id)[option_text])
+
+        return r
+
+    def render_form_select(self, data):
+        """Use to automatically render a select widget.
+
+        Pass in a dictionary with keys:
+
+        name: name of the select widget
+        choices: list of 2-tuples (value, text)
+        selected: value of selected choice (if any)
+        editmode: False if element should be disabled
+
+        """
+
+        #print 'start', data
+        name = data['name']
+        #print 'rendering select ', name, data
+        _id = name
+        choices = data['choices']
+        selected = data.get('selected', '')
+        editmode = data.get('editmode', True)
+
+        if not choices:
+            return 'No choices available.'
+
+        import types
+        if type(choices[0]) in types.StringTypes:
+            options = self.form_options(choices, selected)
+        else:
+            options = self.form_options2(choices, selected)
+
+        if editmode:
+            select = T.select(name=name, _id=_id)[options]
+        else:
+            select = T.select(name=name, _id=_id, disabled="disabled")[options]
+
+        return select
+
 
     def child_rebuild(self, request):
         import pages
@@ -98,17 +188,27 @@ class TZPage(rend.Page):
         #r.sort(key=attrgetter('name'))
         return r
 
+    def render_addroomform(self, ctx, data):
+        action = '/rooms/add/'
+        lines = [T.h2['Add Room']]
+        roomclasses = rooms.classes()
+        roomclasses.sort()
+        choices = [(cls, cls) for cls in roomclasses]
+        roomsinfo = dict(name='roomclass',
+                            choices=choices,
+                            selected='Room')
+        row = T.tr[T.td[self.render_form_select(roomsinfo)],
+                    T.td[T.input(name='roomname')],
+                    T.td[T.input(type='submit', value=' Add ')]]
+        tbl = T.table(_class="center")[row]
+        lines.append(tbl)
+        form = T.form(action=action, method='POST')[lines]
+
+        return T.div(_class='addroom')[form]
+
 class Index(TZPage):
     docFactory = xmlf('index.html')
     title = 'TZMud Web Interace'
-
-    def render_process_index(self, ctx, data):
-        roomname = ctx.arg('roomname')
-        if roomname:
-            newroom = rooms.Room(roomname)
-            return 'Processing'
-        else:
-            return ''
 
     def render_index_players(self, ctx, data):
         lines = []
@@ -161,6 +261,9 @@ class Rooms(TZPage):
 
     def render_process_rooms(self, ctx, data):
         return 'No processing done.'
+
+    def child_add(self, request):
+        return AddRoom()
 
     def render_rooms(self, ctx, data):
         lines = []
@@ -231,67 +334,6 @@ class Edit(TZPage):
         #print 'base:', self.bse
         return self, ()
 
-    def form_options(self, options, selected=None):
-        r = []
-        for option in options:
-            if option == selected:
-                r.append(T.option(value=str(option), selected="selected")[str(option)])
-            else:
-                r.append(T.option(value=str(option))[str(option)])
-
-        return r
-
-    def form_options2(self, options, selected=None):
-        selected = str(selected)
-
-        r = []
-        for option_id, option_text in options:
-            option_id = str(option_id)
-            option_text = str(option_text)
-
-            if option_id == selected:
-                r.append(T.option(value=option_id, selected="selected")[option_text])
-            else:
-                r.append(T.option(value=option_id)[option_text])
-
-        return r
-
-    def render_form_select(self, data):
-        """Use to automatically render a select widget.
-
-        Pass in a dictionary with keys:
-
-        name: name of the select widget
-        choices: list of 2-tuples (value, text)
-        selected: value of selected choice (if any)
-        editmode: False if element should be disabled
-
-        """
-
-        #print 'start', data
-        name = data['name']
-        #print 'rendering select ', name, data
-        _id = name
-        choices = data['choices']
-        selected = data.get('selected', '')
-        editmode = data.get('editmode', '')
-
-        if not choices:
-            return 'No choices available.'
-
-        import types
-        if type(choices[0]) in types.StringTypes:
-            options = self.form_options(choices, selected)
-        else:
-            options = self.form_options2(choices, selected)
-
-        if editmode:
-            select = T.select(name=name, _id=_id)[options]
-        else:
-            select = T.select(name=name, _id=_id, disabled="disabled")[options]
-
-        return select
-
 
     def render_name(self, ctx, data):
         return ctx.tag[self.obj.name]
@@ -334,8 +376,7 @@ class Edit(TZPage):
         choices.sort(key=itemgetter(1))
         info = dict(name=name,
                     choices=choices,
-                    selected=tzid,
-                    editmode=True)
+                    selected=tzid)
 
         return self.render_form_select(info)
 
@@ -356,8 +397,7 @@ class Edit(TZPage):
     def bool_widget(self, name, data):
         info = dict(name=name,
                     choices=[(True, 'True'), (False, 'False')],
-                    selected=data,
-                    editmode=True)
+                    selected=data)
         return self.render_form_select(info)
 
     def int_widget(self, name, data):
@@ -397,8 +437,7 @@ class Edit(TZPage):
                 destname = getattr(dest, 'name', None)
                 destinfo = dict(name=x.name,
                             choices=choices,
-                            selected=desttzid,
-                            editmode=True)
+                            selected=desttzid)
 
                 xlink = T.a(href="/edit/%s" % x.tzid)[x.name]
                 if dest is not None:
@@ -415,3 +454,22 @@ class Edit(TZPage):
             lines = T.tr(_class="warn")[T.td['No exits']]
 
         return T.table[lines]
+
+class AddRoom(TZPage):
+    docFactory = xmlf('process_and_redirect.html')
+
+    def render_process(self, ctx, data):
+        request = ctx.locate(inevow.IRequest)
+
+        roomname = ctx.arg('roomname')
+        roomclass = ctx.arg('roomclass')
+
+        if roomname and roomclass in rooms.classes():
+            cls = getattr(rooms, roomclass)
+            newroom = cls(roomname)
+            tzid = newroom.tzid
+            editpage = '/edit/%s' % tzid
+            request.redirect(editpage)
+        else:
+            self.goback(request, 'Give a name for the room.')
+
