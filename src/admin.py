@@ -391,7 +391,9 @@ def cmd_rebuild(s, r=None):
             s.message('Module not found.')
         else:
             try:
+                save = save_all_settings()
                 rebuild(mod)
+                restore_all_settings(save)
             except Exception, e:
                 s.message('Error rebuilding')
                 s.mlmessage(e)
@@ -399,7 +401,38 @@ def cmd_rebuild(s, r=None):
                 for line in e:
                     print line
 
+def save_obj_settings(obj):
+    save = {}
+    for name in obj.settings:
+        save[name] = obj.setting(name)
+    return save
 
+def restore_obj_settings(obj, save):
+    for name in obj.settings:
+        try:
+            setattr(obj, name, save[name])
+        except ValueError, e:
+            print e
+
+def save_all_settings():
+    save = {}
+    from db import TZIndex
+    tzindex = TZIndex()
+    for obj in tzindex.ls():
+        save[obj.tzid] = save_obj_settings(obj)
+    return save
+
+def restore_all_settings(save):
+    from db import TZIndex
+    tzindex = TZIndex()
+    refreshed = []
+    for obj in tzindex.ls():
+        cls = obj.__class__
+        if cls not in refreshed:
+            discard = cls('discard')
+            discard.destroy()
+            refreshed.append(cls)
+        restore_obj_settings(obj, save[obj.tzid])
 
 def cmd_help(s, r=None):
     '''help [<subject>]
