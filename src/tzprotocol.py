@@ -297,9 +297,12 @@ class TZ(basic.LineReceiver):
 
                 self.dispatch(section, cmd, rest)
 
-        except:
+        except Exception, e:
             abort()
             print 'lineReceived ABORTING TRANSACTION'
+            if conf.debug:
+                self.message('Debug')
+                self.mlmessage(e)
             try:
                 if self.room.tzid != self.player._rid:
                     print 'WARNING: Room mismatch. Trying to correct.'

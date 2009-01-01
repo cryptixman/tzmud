@@ -16,6 +16,8 @@
 # along with TZMud.  If not, see <http://www.gnu.org/licenses/>.
 
 
+debug = True
+
 python = '/usr/bin/python2.5'
 python_version = '2.5'
 
