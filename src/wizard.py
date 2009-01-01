@@ -492,12 +492,12 @@ def cmd_clone(s, r):
         s.room.action(dict(act='clone_mob', actor=s.player, mob=obj))
         return
 
-    # finally, try to clone a room
+    # next, try to clone a room
     # first look at existing rooms
     orig = rooms.getname(objname) or \
             rooms.get(objtzid)
 
-    # if it is not there, it might be a room class
+    # if it is not there, it might be a Room class
     if orig is None:
         if objname in rooms.classes():
             cls = getattr(rooms, objname)
@@ -512,6 +512,29 @@ def cmd_clone(s, r):
             obj.name = newname
         s.message(obj, 'created.')
         return
+
+    # Finally, try to clone an Exit
+    # fist look at existing exits in this room
+    orig = s.room.exitname(objname) or \
+            s.room.exit(objtzid)
+
+    # if it is not there, it might be an Exit class
+    if orig is None:
+        if objname in rooms.exit_classes():
+            cls = getattr(rooms, objname)
+            obj = cls()
+        else:
+            obj = None
+    else:
+        obj = copy.copy(orig)
+
+    if obj:
+        if newname:
+            obj.name = newname
+        s.room.addexit(obj)
+        s.message(obj, 'created.')
+        return
+
 
     else:
         name = objname or '#%s' % objtzid

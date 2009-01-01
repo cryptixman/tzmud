@@ -41,6 +41,7 @@ abort = zodb.abort
 import conf
 import mobs
 import items
+import players
 from share import TZContainer, TZObj, class_as_string, int_attr
 from share import register_plugin
 from colors import green, yellow, red
@@ -99,8 +100,10 @@ def names():
 
     '''
 
-
     return [room.name for room in dbroot['rooms'].values()]
+
+def isroom(obj):
+    return obj in ls()
 
 
 def nudge_all():
@@ -537,190 +540,6 @@ class Room(TZContainer):
         return c
 
 
-class Exit(TZObj):
-    'A way to move from one room to another.'
-
-    name = 'proto exit'
-    _link_exit_id = 0
-
-    def __init__(self, name='', short='', long='', room=None, destination=None, return_name=''):
-        TZObj.__init__(self, name, short, long)
-        self._rid = None
-        self.room = room
-
-        self.weight = 0
-        self.locked = False
-
-        if room is not None:
-            room.addexit(self)
-        self.destination = destination
-
-        if return_name and destination is not None:
-            x = destination.exitname(return_name)
-            if x is not None:
-                x.destination = room
-            else:
-                x = Exit(return_name, room=destination, destination=room)
-            self.link(x)
-
-        self._keys = PersistentList()
-
-        self.settings += ['locked', 'weight',]
-
-    def destroy(self):
-        'Get rid of this exit.'
-
-        if self.room is not None:
-            self.room.rmexit(self)
-        TZObj.destroy(self)
-
-    def go(self, character):
-        '''character is trying to go through this exit.
-
-        returns (True, None) if it works.
-        returns (False, 'Some message explaining why not.') if not.
-
-        '''
-
-        if self.destination is None:
-            return (False, 'Exit %s is broken....'%self)
-        if self.locked:
-            return (False, 'The door is locked.')
-        elif self.weight:
-            if character.setting('strength') < self.weight:
-                return (False, 'The door is too heavy.')
-
-        return (True, None)
-
-    def add_key(self, key):
-        'Make this door lockable with the given key.'
-
-        _key = key._key
-        if _key not in self._keys:
-            self._keys.append(_key)
-        if self._link_exit_id:
-            otherx = tzindex.get(self._link_exit_id)
-            if _key not in otherx._keys:
-                otherx._keys.append(_key)
-
-    def lock(self, key):
-        'Lock this door if the key is correct.'
-
-        if key.locks(self):
-            self.locked = True
-
-    def unlock(self, key):
-        'Unlock this door if the key is correct.'
-
-        if key.locks(self):
-            self.locked = False
-
-    def link(self, otherx):
-        '''Connect this door to another one, so that locking/ unlocking this
-            door will also lock/ unlock the connected door.
-
-        '''
-
-        self._link_exit_id = otherx.tzid
-        otherx._link_exit_id = self.tzid
-
-        if self.weight:
-            otherx.weight = self.weight
-
-    def get_linked_exit(self):
-        if self._link_exit_id:
-            return tzindex.get(self._link_exit_id)
-        else:
-            return None
-
-    def look(self, s):
-        '''Return a multiline message (list of strings) to a player looking
-            at this exit.
-
-        '''
-
-        if self.short or self.long:
-            msgs = TZObj.look(self, s)
-        else:
-            msgs = []
-            if self._destid is None or self.destination is None:
-                msgs.append('Broken exit.')
-            else:
-                if not self.locked:
-                    msgs.append('Exit %s to %s.' % (str(self), self.destination))
-                else:
-                    msgs.append('The exit %s is locked.' % self)
-
-        return msgs
-
-    def near_listen(self, info):
-        obj = info['obj']
-        if obj is self:
-            listener = info['actor']
-            d = self.destination
-            if d.mobs() or d.players():
-                listener.message('You hear someone there.')
-            else:
-                listener.message('It sounds quiet there.')
-
-
-    def __str__(self):
-        'Return the colorized name of this exit.'
-
-        name = TZObj.__str__(self)
-        return yellow(name)
-
-    def __repr__(self):
-        return '%s --> %s' % (self.name, self.destination)
-
-    def _set_room(self, room):
-        'Setter for the room property.'
-        if room is not None:
-            self._rid = room.tzid
-        else:
-            self._rid = None
-    def _get_room(self):
-        'Getter for the room property.'
-        return get(self._rid)
-    room = property(_get_room, _set_room)
-
-    def _set_destination(self, destination):
-        'Setter for the destination property.'
-        if destination is not None:
-            self._destid = destination.tzid
-        else:
-            self._destid = None
-    def _get_destination(self):
-        'Getter for the destination property.'
-        return get(self._destid)
-    destination = property(_get_destination, _set_destination)
-
-    def _set_locked(self, tf):
-        tf = bool(tf)
-        self._locked = tf
-        if self._link_exit_id:
-            otherx = tzindex.get(self._link_exit_id)
-            otherx._locked = tf
-    def _get_locked(self):
-        return self._locked
-    locked = property(_get_locked, _set_locked)
-
-    def _set_weight(self, w):
-        self._weight = w
-        if self._link_exit_id:
-            otherx = tzindex.get(self._link_exit_id)
-            otherx._weight = w
-    def _get_weight(self):
-        return self._weight
-    weight = property(_get_weight, _set_weight)
-
-
-class_names = ['Room', 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap']
-
-def classes():
-    'Return a list of the names of the clonable rooms.'
-
-    return class_names
 
 
 class SmallRoom(Room):
@@ -969,3 +788,209 @@ class Zoo(Room):
 
         self.respawn(outside, mobclass)
 
+
+class_names = ['Room', 'SmallRoom', 'Trap', 'TimedTrap', 'Zoo', 'TeleTrap']
+
+def classes():
+    'Return a list of the names of the clonable rooms.'
+
+    return class_names
+
+
+
+
+
+class Exit(TZObj):
+    'A way to move from one room to another.'
+
+    name = 'proto exit'
+    _link_exit_id = 0
+
+    def __init__(self, name='', short='', long='', room=None, destination=None, return_name=''):
+        TZObj.__init__(self, name, short, long)
+        self._rid = None
+        self.room = room
+
+        self.weight = 0
+        self.locked = False
+
+        if room is not None:
+            room.addexit(self)
+        self.destination = destination
+
+        if return_name and destination is not None:
+            x = destination.exitname(return_name)
+            if x is not None:
+                x.destination = room
+            else:
+                x = Exit(return_name, room=destination, destination=room)
+            self.link(x)
+
+        self._keys = PersistentList()
+
+        self.settings += ['locked', 'weight',]
+
+    def destroy(self):
+        'Get rid of this exit.'
+
+        if self.room is not None:
+            self.room.rmexit(self)
+        TZObj.destroy(self)
+
+    def go(self, character):
+        '''character is trying to go through this exit.
+
+        returns (True, None) if it works.
+        returns (False, 'Some message explaining why not.') if not.
+
+        '''
+
+        if self.destination is None:
+            return (False, 'Exit %s is broken....'%self)
+        if self.locked:
+            return (False, 'The door is locked.')
+        elif self.weight:
+            if character.setting('strength') < self.weight:
+                return (False, 'The door is too heavy.')
+
+        return (True, None)
+
+    def add_key(self, key):
+        'Make this door lockable with the given key.'
+
+        _key = key._key
+        if _key not in self._keys:
+            self._keys.append(_key)
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
+            if _key not in otherx._keys:
+                otherx._keys.append(_key)
+
+    def lock(self, key):
+        'Lock this door if the key is correct.'
+
+        if key.locks(self):
+            self.locked = True
+
+    def unlock(self, key):
+        'Unlock this door if the key is correct.'
+
+        if key.locks(self):
+            self.locked = False
+
+    def link(self, otherx):
+        '''Connect this door to another one, so that locking/ unlocking this
+            door will also lock/ unlock the connected door.
+
+        '''
+
+        self._link_exit_id = otherx.tzid
+        otherx._link_exit_id = self.tzid
+
+        if self.weight:
+            otherx.weight = self.weight
+
+    def get_linked_exit(self):
+        if self._link_exit_id:
+            return tzindex.get(self._link_exit_id)
+        else:
+            return None
+
+    def look(self, s):
+        '''Return a multiline message (list of strings) to a player looking
+            at this exit.
+
+        '''
+
+        if self.short or self.long:
+            msgs = TZObj.look(self, s)
+        else:
+            msgs = []
+            if self._destid is None or self.destination is None:
+                msgs.append('Broken exit.')
+            else:
+                if not self.locked:
+                    msgs.append('Exit %s to %s.' % (str(self), self.destination))
+                else:
+                    msgs.append('The exit %s is locked.' % self)
+
+        return msgs
+
+    def near_listen(self, info):
+        obj = info['obj']
+        if obj is self:
+            listener = info['actor']
+            d = self.destination
+            if d.mobs() or d.players():
+                listener.message('You hear someone there.')
+            else:
+                listener.message('It sounds quiet there.')
+
+
+    def __str__(self):
+        'Return the colorized name of this exit.'
+
+        name = TZObj.__str__(self)
+        return yellow(name)
+
+    def __repr__(self):
+        return '%s --> %s' % (self.name, self.destination)
+
+    def _set_room(self, room):
+        'Setter for the room property.'
+        if room is not None:
+            self._rid = room.tzid
+        else:
+            self._rid = None
+    def _get_room(self):
+        'Getter for the room property.'
+        return get(self._rid)
+    room = property(_get_room, _set_room)
+
+    def _set_destination(self, destination):
+        'Setter for the destination property.'
+        if destination is not None:
+            self._destid = destination.tzid
+        else:
+            self._destid = None
+    def _get_destination(self):
+        'Getter for the destination property.'
+        return get(self._destid)
+    destination = property(_get_destination, _set_destination)
+
+    def _set_locked(self, tf):
+        tf = bool(tf)
+        self._locked = tf
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
+            otherx._locked = tf
+    def _get_locked(self):
+        return self._locked
+    locked = property(_get_locked, _set_locked)
+
+    def _set_weight(self, w):
+        self._weight = w
+        if self._link_exit_id:
+            otherx = tzindex.get(self._link_exit_id)
+            otherx._weight = w
+    def _get_weight(self):
+        return self._weight
+    weight = property(_get_weight, _set_weight)
+
+
+class PlayersOnly(Exit):
+    'An Exit that only players can pass through. No mobs allowed!'
+
+    def go(self, character):
+        '''character is trying to go through this exit.'''
+
+        if players.isplayer(character):
+            return Exit.go(self, character)
+        else:
+            return (False, 'Exit is for players only.')
+
+
+exit_class_names = ['Exit', 'PlayersOnly', ]
+
+def exit_classes():
+    return exit_class_names
