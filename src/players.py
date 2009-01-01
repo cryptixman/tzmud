@@ -84,6 +84,9 @@ def names():
     k.remove('_index')
     return k
 
+def isplayer(obj):
+    return obj in ls()
+
 
 class Player(Character):
     'Base class for all players.'

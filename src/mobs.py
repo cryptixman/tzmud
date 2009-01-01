@@ -98,8 +98,10 @@ def names():
 
     '''
 
-
     return [mob.name for mob in dbroot['mobs'].values()]
+
+def ismob(obj):
+    return obj in ls()
 
 
 def nudge_all():

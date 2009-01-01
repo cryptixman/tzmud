@@ -94,6 +94,9 @@ def names():
 
     return [item.name for item in dbroot['items'].values()]
 
+def isitem(obj):
+    return obj in ls()
+
 
 def register_item(cls):
     import items
