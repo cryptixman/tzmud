@@ -539,7 +539,7 @@ class Exit(TZObj):
     name = 'proto exit'
     _link_exit_id = 0
 
-    def __init__(self, name, short='', long='', room=None, destination=None, return_name=''):
+    def __init__(self, name='', short='', long='', room=None, destination=None, return_name=''):
         TZObj.__init__(self, name, short, long)
         self._rid = None
         self.room = room
@@ -566,7 +566,8 @@ class Exit(TZObj):
     def destroy(self):
         'Get rid of this exit.'
 
-        self.room.rmexit(self)
+        if self.room is not None:
+            self.room.rmexit(self)
         TZObj.destroy(self)
 
     def go(self, character):
