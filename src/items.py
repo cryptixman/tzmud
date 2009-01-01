@@ -159,6 +159,8 @@ Item (%s): %s
 class ContainerItem(Item, TZContainer):
     'Base class for all items that can contain other items.'
 
+    name = 'container'
+
     def __init__(self, name='', short='', long='', owner=None):
         TZContainer.__init__(self, name, short, long, owner)
         add(self)
@@ -195,12 +197,7 @@ Item (%s): %s
 ''' % (self.tzid, self.name, self.short, self.long,
             [item for item in self.items()])
 
-class_names = ['Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap']
 
-def classes():
-    'Returns a list of the names of the clonable items.'
-
-    return class_names
 
 
 class Rose(Item):
@@ -537,3 +534,13 @@ class VoiceTimeTrap(TimeTrap, VoiceTrap):
     'TimeTrap activated by voice command.'
 
     name = 'voice timetrap'
+
+
+
+
+class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap']
+
+def classes():
+    'Returns a list of the names of the clonable items.'
+
+    return class_names
