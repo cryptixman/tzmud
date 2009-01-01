@@ -195,7 +195,7 @@ Item (%s): %s
 ''' % (self.tzid, self.name, self.short, self.long,
             [item for item in self.items()])
 
-class_names = ['Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap']
+class_names = ['Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap']
 
 def classes():
     'Returns a list of the names of the clonable items.'
@@ -473,10 +473,25 @@ class LeadBox(ContainerItem):
         TZObj.act_near(self, info)
 
 class Trap(Item):
-    'A surprise for a nearby character.'
+    '''A surprise for the character holding this item,
+        or for nearby characters.
 
-    def spring(self, character):
-        character.message('Gotcha!')
+    '''
+
+    def activate(self):
+        self.spring()
+
+    def spring(self):
+        container = self.container
+        room = self.room
+        import share
+        if container == room:
+            for c in room.mobs():
+                c.message('Gotcha!')
+            for p in room.players():
+                p.message('Gotcha!')
+        elif isinstance(container, share.Character):
+            container.message('Gotcha!')
 
 class GetTrap(Trap):
     'getting this item springs the trap.'
@@ -485,52 +500,40 @@ class GetTrap(Trap):
     short = 'Hey! That is an interesting looking thing....'
 
     def get(self, character):
-        self.spring(character)
-        return False
+        self.activate()
+        return True
 
 class TimeTrap(Trap):
     'Trap which springs a set time after it is activated.'
 
     name = 'timetrap'
-    _delay = 2 # seconds
+    delay = 2 # seconds
+    settings = ['delay']
 
-    def __init__(self, name='', short='', long=''):
-        Trap.__init__(self, name, short, long)
-        self.settings.append('delay')
-
-    def spring(self, character):
-        reactor.callLater(self._delay, self.spring_later, character)
-
-    def spring_later(self, character):
-        character.message('Boom!')
+    def activate(self):
+        delay = self.setting('delay')
+        reactor.callLater(delay, self.spring)
 
 class GetTimeTrap(TimeTrap, GetTrap):
     'TimeTrap activated by getting it.'
 
-    def get(self, character):
-        self.spring(character)
-        return True
+    name = 'gettimetrap'
 
-    def spring_later(self, character):
-        if character.has_inside(self):
-            character.message('Boom!')
-
-class VoiceTrap(TimeTrap):
+class VoiceTrap(Trap):
     'Trap activated by voice command.'
 
     name = 'voicetrap'
     command = 'activate'
-
-    def __init__(self, name='', short='', long=''):
-        TimeTrap.__init__(self, name, short, long)
-        self.settings.append('command')
-
-    def spring(self, character):
-        character.message('Zap!')
+    settings = ['command']
 
     def near_say(self, info):
         c = info['actor']
         msg = info['raw']
         m = msg.lower()
         if m == self.command:
-            self.spring(c)
+            self.activate()
+
+class VoiceTimeTrap(TimeTrap, VoiceTrap):
+    'TimeTrap activated by voice command.'
+
+    name = 'voice timetrap'

@@ -42,7 +42,7 @@ import tzprotocol
 import rooms
 import items
 
-from share import TZContainer, Character, class_as_string, int_attr
+from share import TZContainer, Character, class_as_string, int_attr, str_attr
 from share import register_plugin
 from colors import magenta
 
@@ -120,6 +120,7 @@ class Mob(Character):
 
     name = 'proto mob'
     period = int_attr('period', default=10) # seconds
+    settings = ['period']
 
     def __init__(self, name='', short='', long=''):
         Character.__init__(self, name, short, long)
@@ -133,8 +134,6 @@ class Mob(Character):
         self.set_default_action_weights()
         self.set_action_weights(action_awake=500,
                                 action_move=0)
-
-        self.settings += ['period',]
 
     def destroy(self):
         'Get rid of this mob and remove it from the mob index.'
@@ -308,6 +307,7 @@ def classes():
     'Return a list of the names of the clonable mobs'
 
     return class_names
+
 
 
 class Cat(Mob):
@@ -533,35 +533,37 @@ class Spawner(Mob):
 
     name = 'spawner'
     visible = False
-    _mobtype = 'Cat'
+    mobtype = str_attr('mobtype', default='Cat')
+    settings = ['mobtype']
+    period = 600 # 10 minutes
 
     def __init__(self, name='', short='', long=''):
         Mob.__init__(self, name, short, long)
-        self.settings += ['mobtype', ]
         self.set_action_weights(action_sleep=0,
                                 action_awake=0,
                                 action_move=0,)
-        self.period = 600 # seconds
 
     def set_mobtype(self, mobtype):
         'Make sure the mobtype exists.'
 
         if mobtype not in classes():
             raise ValueError, 'Given mob type does not exist.'
+            #return False
         else:
-            self._mobtype = mobtype
+            self.mobtype = mobtype
             return True
 
     def action_spawn(self):
         room = self.room
+        mobtype = self.setting('mobtype')
         ms = room.mobs()
         for mob in ms:
             mobcls = class_as_string(mob)
-            if mobcls == self._mobtype:
+            if mobcls == mobtype:
                 return
 
         import mobs
-        spawncls = getattr(mobs, self._mobtype)
+        spawncls = getattr(mobs, mobtype)
         mob = spawncls()
         mob.home = room
         mob.move(room)

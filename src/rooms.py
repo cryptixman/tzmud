@@ -215,6 +215,8 @@ class Room(TZContainer):
         'Actual action work is done here.'
 
         try:
+            print '_action', info
+
             act = info['act']
             actor = info['actor']
 
@@ -226,6 +228,7 @@ class Room(TZContainer):
                     mob.act_near(info)
 
             for item in self.items():
+                print 'acting on', item
                 item.act_near(info)
 
             for x in self.exits():
@@ -729,10 +732,10 @@ class SmallRoom(Room):
     name = 'small room'
     short = 'Seems kind of crowded in here.'
     max = int_attr('max', default=1)
+    settings = ['max']
 
     def __init__(self, name=''):
         Room.__init__(self, name)
-        self.settings.append('max')
 
     def near_arrive(self, info):
         '''A character has just arrived here. If the room is full, send back!
@@ -774,11 +777,8 @@ class TimedTrap(Room):
     name = 'timed trap'
     short = 'Is that a ticking sound you hear?'
     timer = int_attr('timer', default=5) # seconds
-
-    def __init__(self, name=''):
-        Room.__init__(self, name)
-        self._springing = False
-        self.settings.append('timer')
+    settings = ['timer']
+    _springing = False
 
     def near_arrive(self, info):
         if not self._springing:
@@ -846,10 +846,7 @@ class Zoo(Room):
 
     name = 'zoo'
     short = 'All sorts of strange creatures.'
-
-    def __init__(self, name=''):
-        self.period = 3600 # 60 minutes
-        Room.__init__(self, name)
+    period = 3600 # 60 minutes
 
     def destroy(self):
         '''Get rid of the Zoo.

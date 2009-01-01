@@ -99,28 +99,51 @@ def str_attr(name, default='', blank_ok=True, setonce=False):
     return property(getter, setter)
 
 
+class MetaTZObj(type):
+    def __new__(mcs, name, bases, dict):
+        settings = []
+        for base in bases:
+            if hasattr(base, 'settings'):
+                for stg in base.settings:
+                    if stg not in settings:
+                        settings.append(stg)
+        if 'settings' in dict:
+            for stg in dict['settings']:
+                if stg not in settings:
+                    settings.append(stg)
+        dict['settings'] = settings
+
+        for stg in settings:
+            origattr = dict.get(stg, None)
+            if type(origattr) is property:
+                attr = origattr
+                origattr = None
+            else:
+                for base in bases:
+                    attr = getattr(base, stg, None)
+                    if type(attr) is property:
+                        break
+            if type(attr) is property:
+                dict[stg] = attr
+                if origattr is not None:
+                    dict['_%s' % stg] = origattr
+
+        return type.__new__(mcs, name, bases, dict)
+
+
 class TZObj(Persistent):
     'Base class for all MUD objects.'
 
-    name = 'proto obj'
+    __metaclass__ = MetaTZObj
+    name = str_attr('name', default='proto obj', blank_ok=False)
     short = str_attr('short')
     long = str_attr('long')
+
+    settings = ['name', 'short', 'long', 'owner', 'visible']
 
     gettable = True
     wearable = False
     visible = bool_attr('visible', default=True)
-
-    def __new__(cls, *args, **kw):
-        name = cls.name
-        if isinstance(name, str):
-            rename = True
-            cls.name = str_attr('name', default=name, blank_ok=False)
-        else:
-            rename = False
-        inst = super(TZObj, cls).__new__(cls, *args, **kw)
-        if rename:
-            inst.name = name
-        return inst
 
     def __init__(self, name='', short='', long='', owner=None, container=None):
         self.tzid = tzid()
@@ -129,8 +152,9 @@ class TZObj(Persistent):
         self.short = short if short else self.short
         self.long = long if long else self.long
 
-        self.settings = PersistentList()
-        self.settings += ['name', 'short', 'long', 'owner', 'visible']
+        settings = PersistentList()
+        settings += self.settings
+        self.settings = settings
 
         self.owner = owner
         self.container = container
