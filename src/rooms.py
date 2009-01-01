@@ -215,25 +215,6 @@ class Room(TZContainer):
         'Actual action work is done here.'
 
         try:
-            print '_action', info
-
-            act = info['act']
-            actor = info['actor']
-
-            for player in self.players():
-                player.act_near(info)
-
-            for mob in self.mobs():
-                if mob != actor:
-                    mob.act_near(info)
-
-            for item in self.items():
-                print 'acting on', item
-                item.act_near(info)
-
-            for x in self.exits():
-                x.act_near(info)
-
             self.act_near(info)
 
             # Some actions can affect nearby rooms. If that is the case for
@@ -264,6 +245,26 @@ class Room(TZContainer):
         else:
             #print 'room._action COMMIT'
             commit()
+
+    def act_near(self, info):
+        '''Something has happened in this room. Handle it if necessary,
+            and pass the action on to any contained items.
+
+        '''
+
+        TZObj.act_near(self, info)
+
+        for player in self.players():
+            player.act_near(info)
+
+        for mob in self.mobs():
+            mob.act_near(info)
+
+        for item in self.items():
+            item.act_near(info)
+
+        for x in self.exits():
+            x.act_near(info)
 
     def players(self):
         'Return a list of all the players in this room'
