@@ -19,12 +19,15 @@ Changes in TZMud-0.8:
     - added configuration file verifcation tool
     - more readable and natural messages and commands
     - improved handling of object attributes
+    - Exit can now be subclassed and cloned
     - objects can now be invisible
     - objects can now have a weight
+    - rudimentary plugin framework
     - more teleportation commands
     - more secure password storage
     - xyzzy
-    - new items/ mobs:
+    - new items/ mobs/ exits:
         - ring of invisibility
         - traps
         - spawner
+        - players only exit
