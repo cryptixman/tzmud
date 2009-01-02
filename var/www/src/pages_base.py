@@ -197,6 +197,14 @@ class TZPage(rend.Page):
     def child_rebuild(self, ctx):
         import pages
         rebuild(pages)
+        import pages_index
+        rebuild(pages_index)
+        import pages_rooms
+        rebuild(pages_rooms)
+        import pages_edit
+        rebuild(pages_edit)
+        import pages_exits
+        rebuild(pages_exits)
         self.goback(ctx)
         return self
 
@@ -575,3 +583,10 @@ class UpdateExit(TZPage):
                     x.destination = dest
 
         self.goback(ctx)
+
+
+
+from pages_index import Index
+from pages_exits import Exits, UpdateExit
+from pages_edit import Edit, Destroy
+from pages_rooms import Rooms, AddRoom
