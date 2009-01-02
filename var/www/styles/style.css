@@ -46,6 +46,13 @@ h1{
 h2{
     text-align: center;
 }
+h2.section{
+    text-align: left;
+    color: white;
+    background-color: #2F4F50;
+    padding-left: 2em;
+    font-size: 120%;
+}
 
 table.center{
     margin-left: auto;
@@ -146,9 +153,9 @@ table{
     border-collapse: collapse;
 }
 
-tr.normal{
+.normal{
 }
-tr.warn{
+.warn{
     background-color: #9E9E48;
 }
 
@@ -164,4 +171,17 @@ div.addroom{
     width: 100%;
     margin: auto;
     text-align: center;
+}
+
+td.deletebtn{
+    color: yellow;
+    background-color: red;
+    border: thick solid #5E5B49;
+    text-align: center;
+}
+td.deletebtn a{
+    color: yellow;
+}
+td.deletebtn a:hover{
+    color: white;
 }

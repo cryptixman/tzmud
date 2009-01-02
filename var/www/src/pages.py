@@ -43,6 +43,32 @@ from db import TZIndex
 tzindex = TZIndex()
 
 
+def normalize_args(args, preserve=''):
+    '''Make args a 1:1 dict of key:value instead of key:[value, value, ]
+    by selecting the first item in the list to be the value.
+
+    If some values should be left as lists, pass in their keys
+    in the preserve parameter.
+
+    preserve can be a single key or list of keys to not change.
+
+    >>> normalize_args({'name': ['one', 'two', 'three']})
+    {'name': 'one'}
+    >>> normalize_args({'name': ['one', 'two', 'three'], 'id': ['12345']})
+    {'name': 'one', 'id': '12345'}
+    >>> normalize_args({'name': ['one', 'two', 'three'], 'id': ['12345']}, preserve='name')
+    {'name': ['one', 'two', 'three'], 'id': '12345'}
+    >>> normalize_args({'name': ['one', 'two', 'three'], 'id': ['12345']}, preserve=['name', 'id'])
+    {'name': ['one', 'two', 'three'], 'id': ['12345']}
+
+    '''
+
+    for k in args:
+        if not k == preserve and not k in preserve:
+            args[k] = args[k][0]
+    return args
+
+
 class xmlf(loaders.xmlfile):
     templateDir = 'var/www/templates'
 
@@ -56,13 +82,17 @@ class TZPage(rend.Page):
     def child_rooms(self, request):
         return Rooms()
 
+    def child_exits(self, request):
+        return Exits()
+
     def child_edit(self, request):
         return Edit()
 
+    def child_destroy(self, request):
+        return Destroy()
+
     def render_head(self, ctx, data):
-        print 'head'
         request = ctx.locate(inevow.IRequest)
-        print request.args
         return xmlf('head.html')
 
     def render_title(self, ctx, data):
@@ -88,7 +118,8 @@ class TZPage(rend.Page):
         else:
             return ''
 
-    def goback(self, request, msg=''):
+    def goback(self, rc, msg=''):
+        request = inevow.IRequest(rc)
         headers = request.getAllHeaders()
         backurl = headers.get('referer')
         if backurl:
@@ -163,9 +194,10 @@ class TZPage(rend.Page):
         return select
 
 
-    def child_rebuild(self, request):
+    def child_rebuild(self, ctx):
         import pages
         rebuild(pages)
+        self.goback(ctx)
         return self
 
     def data_players(self, ctx, data):
@@ -291,6 +323,7 @@ class Rooms(TZPage):
                     desttzid = getattr(dest, 'tzid', 'None')
                     destname = getattr(dest, 'name', None)
                     xlink = T.a(href="/edit/%s" % x.tzid)[x.name]
+
                     if dest is not None:
                         roomlink = T.a(href="/edit/%s" % desttzid)[destname]
                     else:
@@ -418,7 +451,7 @@ class Edit(TZPage):
             inpt = T.td[self.get_input_widget(setting, val)]
             lines.append(T.tr[label, inpt])
 
-        return T.table[lines]
+        return T.table(_class="center")[lines]
 
     def render_exits(self, ctx, data):
         if self.bse != 'Room':
@@ -427,33 +460,52 @@ class Edit(TZPage):
         xs = self.obj.exits()
         xs.sort(key=attrgetter('name'))
         if xs:
-            lines = [T.tr[T.td['Exits'], T.td, T.td, T.td, T.td]]
+            lines = [T.h2(_class="section")['Exits:']]
             rs = rooms.ls()
+            rs.sort(key=attrgetter('name'))
+            rows = []
             for x in xs:
                 dest = x.destination
                 choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
                 choices.insert(0, (None, 'None'))
                 desttzid = getattr(dest, 'tzid', None)
                 destname = getattr(dest, 'name', None)
-                destinfo = dict(name=x.name,
+                destfieldname = 'dest_%s' % x.tzid
+                destinfo = dict(name=destfieldname,
                             choices=choices,
                             selected=desttzid)
 
                 xlink = T.a(href="/edit/%s" % x.tzid)[x.name]
+                deletelink = T.td(_class="deletebtn")[T.a(href="/destroy/%s" % x.tzid)['X']]
+                namefieldname = 'name_%s' % x.tzid
+                nameinput = T.input(name=namefieldname, value=x.name)
                 if dest is not None:
                     roomlink = T.a(href="/edit/%s" % desttzid)[destname]
                 else:
                     roomlink = 'Broken'
-                lines.append(T.tr[T.td[xlink],
-                                T.td[T.input(name='', value=x.name)],
+                rows.append(T.tr[
+                                T.td[deletelink],
+                                T.td[xlink],
+                                T.td[nameinput],
                                 T.td['-->'],
                                 T.td[self.render_form_select(destinfo)],
-                                T.td[roomlink]])
+                                T.td[roomlink],
+                                T.td[T.input(_type="submit", value="update")]])
+            tbl = T.table(_class="center")[rows]
+            lines.append(tbl)
+            return T.form(action="/exits/update/", method="POST")[lines]
 
         else:
-            lines = T.tr(_class="warn")[T.td['No exits']]
+            return T.h2(_class="warn")['No exits']
 
-        return T.table[lines]
+
+class Destroy(Edit):
+    docFactory = xmlf('process_and_redirect.html')
+
+    def render_process(self, ctx, data):
+        self.obj.destroy()
+        self.goback(ctx)
+
 
 class AddRoom(TZPage):
     docFactory = xmlf('process_and_redirect.html')
@@ -473,3 +525,53 @@ class AddRoom(TZPage):
         else:
             self.goback(request, 'Give a name for the room.')
 
+
+
+class Exits(TZPage):
+    docFactory = xmlf('exits.html')
+    title = 'Exits'
+
+    def child_update(self, request):
+        return UpdateExit()
+
+
+class UpdateExit(TZPage):
+    docFactory = xmlf('process_and_redirect.html')
+
+    def render_process(self, ctx, data):
+        request = ctx.locate(inevow.IRequest)
+        args = normalize_args(request.args)
+        for arg, val in args.items():
+            if arg.startswith('name'):
+                unused, tzid = arg.split('_')
+                tzid = int(tzid)
+                name = val
+                destfield = 'dest_%s' % tzid
+                desttzid = args[destfield]
+                if desttzid == 'None':
+                    desttzid = None
+                    dest = None
+                else:
+                    desttzid = int(desttzid)
+                    dest = tzindex.get(desttzid)
+
+                x = tzindex.get(tzid)
+                if x is None:
+                    continue
+
+                origname = x.name
+                if x.destination is not None:
+                    origdesttzid = x.destination.tzid
+                else:
+                    origdesttzid = None
+
+                if name==origname and desttzid==origdesttzid:
+                    continue
+
+                if name != origname:
+                    x.name = name
+
+                if desttzid != origdesttzid:
+                    x.destination = dest
+
+        self.goback(ctx)
