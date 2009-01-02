@@ -178,7 +178,7 @@ def rmpid():
 def delay():
     'Wait for a few seconds before proceeding.'
 
-    time.sleep(5)
+    time.sleep(conf.restart_delay)
 
 def start():
     'Try to start the server if it is not already running.'

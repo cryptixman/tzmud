@@ -17,6 +17,7 @@
 
 
 debug = True
+restart_delay = 2
 
 python = '/usr/bin/python2.5'
 python_version = '2.5'
