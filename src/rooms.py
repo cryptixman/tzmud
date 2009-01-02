@@ -443,11 +443,14 @@ class Room(TZContainer):
 
         self._exit_ids.append(x.tzid)
         x.room = self
+        x.container = self
 
     def rmexit(self, x):
         'Remove an exit from this room.'
 
         self._exit_ids.remove(x.tzid)
+        x.room = None
+        x.container = None
 
 
     def look(self, looker):
@@ -983,6 +986,13 @@ class Exit(TZObj):
     def _get_weight(self):
         return self._weight
     weight = property(_get_weight, _set_weight)
+    def set_weight(self, w):
+        try:
+            w = int(w)
+        except ValueError:
+            return False
+
+        self.weight = w
 
 
 class PlayersOnly(Exit):
