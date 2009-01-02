@@ -46,20 +46,26 @@ class AddExit(TZPage):
         roomid = int(ctx.arg('roomid'))
         room = tzindex.get(roomid)
 
-        exitname = ctx.arg('exitname')
-        exitclass = ctx.arg('exitclass')
+        xname = ctx.arg('xname')
+        xclass = ctx.arg('xclass')
+
+        bxname = ctx.arg('bxname')
+        bxclass = ctx.arg('bxclass')
 
         destid = ctx.arg('dest')
         if destid is not None:
             destid = int(destid)
         dest = tzindex.get(destid)
 
-        print room, exitname, exitclass, dest
-
-        if exitname and exitclass in rooms.exit_classes():
-            cls = getattr(rooms, exitclass)
-            newexit = cls(exitname, room=room, destination=dest)
-            tzid = newexit.tzid
+        if xname and xclass in rooms.exit_classes():
+            xcls = getattr(rooms, xclass)
+            if bxname and bxclass in rooms.exit_classes():
+                bxcls = getattr(rooms, xclass)
+                bx = bxcls(xname, room=dest)
+                x = xcls(xname, room=room, destination=dest, return_name=bxname)
+            else:
+                x = xcls(xname, room=room, destination=dest)
+            tzid = x.tzid
             editpage = '/edit/%s' % roomid
             request.redirect(editpage)
         else:
