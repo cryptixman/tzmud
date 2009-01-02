@@ -19,6 +19,8 @@
 from db import TZIndex
 tzindex = TZIndex()
 
+from nevow import inevow
+
 from pages_base import TZPage, xmlf, normalize_args
 
 

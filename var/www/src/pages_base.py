@@ -80,16 +80,16 @@ class TZPage(rend.Page):
         return static.File('var/www/styles')
 
     def child_rooms(self, request):
-        return Rooms()
+        return pages_rooms.Rooms()
 
     def child_exits(self, request):
-        return Exits()
+        return pages_exits.Exits()
 
     def child_edit(self, request):
-        return Edit()
+        return pages_edit.Edit()
 
     def child_destroy(self, request):
-        return Destroy()
+        return pages_edit.Destroy()
 
     def render_head(self, ctx, data):
         request = ctx.locate(inevow.IRequest)
@@ -247,7 +247,7 @@ class TZPage(rend.Page):
         return T.div(_class='addroom')[form]
 
 
-from pages_index import Index
-from pages_exits import Exits, UpdateExit
-from pages_edit import Edit, Destroy
-from pages_rooms import Rooms, AddRoom
+import pages_index
+import pages_exits
+import pages_edit
+import pages_rooms

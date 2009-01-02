@@ -19,7 +19,7 @@
 
 
 body{
-    background-color: #5E5B49;
+    background-color: #D1CAA2;
 }
 
 .lt{
@@ -30,13 +30,16 @@ body{
 }
 
 a{
-    color: #1D92FF;
+    color: #293F8E;
 }
 a:hover{
-    color: #17C1FF;
+    color: white;
 }
 a:visited{
-    color: #B254A9;
+    color: #3451B7;
+}
+a:visited:hover{
+    color: white;
 }
 
 h1{
@@ -63,11 +66,24 @@ div.header{
     background-color: black;
     margin-bottom: 1em;
 }
+div.header a{
+    color: #8EAEFF;
+}
+div.header a:visited{
+    color: #8EAEFF;
+}
 
 div.footer{
     background-color: black;
     text-align: center;
 }
+div.footer a{
+    color: #8EAEFF;
+}
+div.footer a:visited{
+    color: #8EAEFF;
+}
+
 
 div.errmsg{
     width: 60%;
@@ -173,15 +189,30 @@ div.addroom{
     text-align: center;
 }
 
-td.deletebtn{
+span.deletelink{
     color: yellow;
     background-color: red;
-    border: thick solid #5E5B49;
+    border: thin solid black;
     text-align: center;
+    padding: 0 10px 0 10px;
 }
-td.deletebtn a{
+span.deletelink a{
     color: yellow;
 }
-td.deletebtn a:hover{
+span.deletelink a:hover{
     color: white;
+}
+
+span.editlink{
+    color: black;
+    background-color: #1CB93B;
+    border: thin solid black;
+    text-align: center;
+    padding: 0 10px 0 10px;
+}
+a span.editlink{
+    color: black;
+}
+a:hover span.editlink{
+    color: #0D571C;
 }

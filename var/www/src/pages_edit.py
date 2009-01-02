@@ -92,9 +92,13 @@ class Edit(TZPage):
         doc = self.obj.__doc__
         return ctx.tag(_class="clsinfo")[doc]
 
-    def get_input_widget(self, name, data):
-        if name=='owner':
-            return self.owner_widget(name, data)
+    def get_setting_widget(self, name, data):
+        if name == 'owner':
+            return self.owner_widget(name, data), self.editlink_widget(data)
+        elif name == 'room':
+            return self.rooms_widget(name, data), self.editlink_widget(data)
+        elif name == 'destination':
+            return self.rooms_widget(name, data), self.editlink_widget(data)
         elif isinstance(data, str):
             return self.str_widget(name, data)
         elif isinstance(data, bool):
@@ -104,11 +108,40 @@ class Edit(TZPage):
         else:
             return self.input_widget(name, data)
 
+    def editlink_widget(self, obj):
+        if obj is None:
+            tzid=None
+        else:
+            tzid=obj.tzid
+
+        if tzid is not None:
+            editlink = "/edit/%s" % tzid
+            link = T.a(href=editlink)[T.span(_class="editlink")[obj.name]]
+        else:
+            link = 'None'
+
+        return link
+
+    def deletelink_widget(self, obj):
+        if obj is None:
+            tzid=None
+        else:
+            tzid=obj.tzid
+
+        if tzid is not None:
+            editlink = "/destroy/%s" % tzid
+            link = T.a(href=editlink)[T.span(_class="deletelink")['X']]
+        else:
+            link = ''
+
+        return link
+
     def owner_widget(self, name, data):
         if data is None:
             tzid=None
         else:
             tzid=data.tzid
+
         ps = players.ls()
         ms = mobs.ls()
         cs = ps + ms
@@ -121,17 +154,34 @@ class Edit(TZPage):
 
         return self.render_form_select(info)
 
-    def str_widget(self, name, data):
+    def rooms_widget(self, name, x):
+        if x is None:
+            tzid=None
+        else:
+            tzid=x.tzid
+
+        rs = rooms.ls()
+        rs.sort(key=attrgetter('name'))
+        choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
+        choices.insert(0, (None, 'None'))
+        info = dict(name=name,
+                    choices=choices,
+                    selected=tzid)
+
+        return self.render_form_select(info)
+
+    def str_widget(self, name, data, size=60):
         disabled = ''
         if name=='name':
             if self.bse=='Player':
                 disabled = 'disabled'
 
         if len(data) < 50:
+            size = str(size)
             if disabled:
-                return T.input(name=name, value=data, size="60", disabled=disabled)
+                return T.input(name=name, value=data, size=size, disabled=disabled)
             else:
-                return T.input(name=name, value=data, size="60")
+                return T.input(name=name, value=data, size=size)
         else:
             return T.textarea(name=name, rows="4", cols="60")[data]
 
@@ -149,14 +199,19 @@ class Edit(TZPage):
 
 
     def render_settings(self, ctx, data):
-        settings = self.obj.settings
-        print settings
+        settings = self.obj.settings[:]
+        if self.bse != 'Room':
+            settings.append('room')
+        if self.bse == 'Exit':
+            settings.append('destination')
+
         lines = []
         for setting in settings:
             label = T.td(_class="textlabel")[setting]
             val = self.obj.setting(setting)
-            print setting, val
-            inpt = T.td[self.get_input_widget(setting, val)]
+            if val is None:
+                val = getattr(self.obj, setting, None)
+            inpt = T.td[self.get_setting_widget(setting, val)]
             lines.append(T.tr[label, inpt])
 
         return T.table(_class="center")[lines]
@@ -169,35 +224,20 @@ class Edit(TZPage):
         xs.sort(key=attrgetter('name'))
         if xs:
             lines = [T.h2(_class="section")['Exits:']]
-            rs = rooms.ls()
-            rs.sort(key=attrgetter('name'))
+
             rows = []
             for x in xs:
+                tzid = x.tzid
+                destf = 'dest_%s' % tzid
+                namef = 'name_%s' % tzid
                 dest = x.destination
-                choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
-                choices.insert(0, (None, 'None'))
-                desttzid = getattr(dest, 'tzid', None)
-                destname = getattr(dest, 'name', None)
-                destfieldname = 'dest_%s' % x.tzid
-                destinfo = dict(name=destfieldname,
-                            choices=choices,
-                            selected=desttzid)
-
-                xlink = T.a(href="/edit/%s" % x.tzid)[x.name]
-                deletelink = T.td(_class="deletebtn")[T.a(href="/destroy/%s" % x.tzid)['X']]
-                namefieldname = 'name_%s' % x.tzid
-                nameinput = T.input(name=namefieldname, value=x.name)
-                if dest is not None:
-                    roomlink = T.a(href="/edit/%s" % desttzid)[destname]
-                else:
-                    roomlink = 'Broken'
                 rows.append(T.tr[
-                                T.td[deletelink],
-                                T.td[xlink],
-                                T.td[nameinput],
+                                T.td[self.deletelink_widget(x)],
+                                T.td[self.editlink_widget(x)],
+                                T.td[self.str_widget(namef, x.name, 20)],
                                 T.td['-->'],
-                                T.td[self.render_form_select(destinfo)],
-                                T.td[roomlink],
+                                T.td[self.rooms_widget(destf, dest)],
+                                T.td[self.editlink_widget(dest)],
                                 T.td[T.input(_type="submit", value="update")]])
             tbl = T.table(_class="center")[rows]
             lines.append(tbl)
