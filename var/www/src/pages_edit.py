@@ -49,8 +49,28 @@ class Edit(TZPage):
     title = 'Edit Object'
 
     def locateChild(self, context, segments):
-        #print 'seg', context, segments
+        '''for pages that need to find which object they should operate on
+                from the URL. For instance /edit/102 should act on the
+                object with tzid = 102.
+
+        This method will set some convenience variables so that they will
+            be available later:
+
+            self.obj    --> the actual object
+            self.tzid   --> the tzid of the object
+            self.cls    --> name of the object's class (a string)
+            self.base   --> the most important base class of the object
+                                one of ...  rooms.Room
+                                            rooms.Exit
+                                            items.Item
+                                            mobs.Mob
+                                            players.Player
+            self.bse    --> name of the object's base class (a string)
+
+        '''
+
         tzid = int(segments[0])
+        self.tzid = tzid
         obj = tzindex.get(tzid)
         self.obj = obj
 
@@ -61,6 +81,7 @@ class Edit(TZPage):
                 found = True
                 self.base = base
                 break
+
         if not found:
             # Module was probably rebuilt elsewhere (from the MUD).
             # Try rebuilding then finding the base class again.
@@ -70,9 +91,7 @@ class Edit(TZPage):
             self.bse = class_as_string(base, instance=False)
 
         self.cls = class_as_string(obj)
-        #print 'module:', module_as_string(obj)
-        #print 'class:', class_as_string(obj)
-        #print 'base:', self.bse
+
         return self, ()
 
 
