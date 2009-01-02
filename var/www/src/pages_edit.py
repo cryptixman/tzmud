@@ -42,9 +42,10 @@ from share import module_as_string, class_as_string
 from db import TZIndex
 tzindex = TZIndex()
 
-from pages_base import TZPage, xmlf
+import pages_base
+from pages_base import xmlf
 
-class Edit(TZPage):
+class Edit(pages_base.TZPage):
     docFactory = xmlf('edit.html')
     title = 'Edit Object'
 
@@ -137,7 +138,7 @@ class Edit(TZPage):
             editlink = "/edit/%s" % tzid
             link = T.a(href=editlink)[T.span(_class="editlink")[obj.name]]
         else:
-            link = 'None'
+            link = ''
 
         return link
 
@@ -264,6 +265,31 @@ class Edit(TZPage):
 
         else:
             return T.h2(_class="warn")['No exits']
+
+    def render_addexitform(self, ctx, data):
+        if self.bse != 'Room':
+            return ''
+
+        tzid = self.tzid # to know which room to add the exit to
+        action = '/exits/add/'
+        lines = [T.h2['Add Exit']]
+        exitclasses = rooms.exit_classes()
+        exitclasses.sort()
+        choices = [(cls, cls) for cls in exitclasses]
+        exitsinfo = dict(name='exitclass',
+                            choices=choices,
+                            selected='Exit')
+        row = T.tr[T.td[self.render_form_select(exitsinfo)],
+                    T.td[T.input(name='exitname')],
+                    T.td['-->'],
+                    T.td[self.rooms_widget('dest', None)],
+                    T.td[T.input(type='submit', value=' Add ')]]
+        tbl = T.table(_class="center")[row]
+        lines.append(tbl)
+        lines.append(T.input(_type="hidden", name="roomid", value=tzid))
+        form = T.form(action=action, method='POST')[lines]
+
+        return T.div(_class='addexit')[form]
 
 
 class Destroy(Edit):

@@ -21,6 +21,8 @@ tzindex = TZIndex()
 
 from nevow import inevow
 
+import rooms
+
 from pages_base import TZPage, xmlf, normalize_args
 
 
@@ -28,9 +30,40 @@ class Exits(TZPage):
     docFactory = xmlf('exits.html')
     title = 'Exits'
 
+    def child_add(self, request):
+        return AddExit()
+
     def child_update(self, request):
         return UpdateExit()
 
+
+class AddExit(TZPage):
+    docFactory = xmlf('process_and_redirect.html')
+
+    def render_process(self, ctx, data):
+        request = ctx.locate(inevow.IRequest)
+
+        roomid = int(ctx.arg('roomid'))
+        room = tzindex.get(roomid)
+
+        exitname = ctx.arg('exitname')
+        exitclass = ctx.arg('exitclass')
+
+        destid = ctx.arg('dest')
+        if destid is not None:
+            destid = int(destid)
+        dest = tzindex.get(destid)
+
+        print room, exitname, exitclass, dest
+
+        if exitname and exitclass in rooms.exit_classes():
+            cls = getattr(rooms, exitclass)
+            newexit = cls(exitname, room=room, destination=dest)
+            tzid = newexit.tzid
+            editpage = '/edit/%s' % roomid
+            request.redirect(editpage)
+        else:
+            self.goback(request, 'Give a name for the exit.')
 
 class UpdateExit(TZPage):
     docFactory = xmlf('process_and_redirect.html')
