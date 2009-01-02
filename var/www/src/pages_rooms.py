@@ -18,6 +18,7 @@
 
 from operator import attrgetter, itemgetter
 from nevow import tags as T
+from nevow import inevow
 
 import players
 import rooms
