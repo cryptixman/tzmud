@@ -181,6 +181,9 @@ class Room(TZContainer):
             self.periodic()
             reactor.callLater(self.period, self.periodically)
 
+    def periodic(self):
+        pass
+
     def nudge(self, delayfactor=10):
         'Nudge this room to make sure the periodic calls are happening.'
 
@@ -242,6 +245,8 @@ class Room(TZContainer):
             print 'room._action ABORT'
             for line in e:
                 print line
+            import traceback
+            print traceback.format_exc()
             abort()
             #raise
 
@@ -963,7 +968,8 @@ class Exit(TZObj):
         self._locked = tf
         if self._link_exit_id:
             otherx = tzindex.get(self._link_exit_id)
-            otherx._locked = tf
+            if otherx is not None:
+                otherx._locked = tf
     def _get_locked(self):
         return self._locked
     locked = property(_get_locked, _set_locked)
@@ -972,7 +978,8 @@ class Exit(TZObj):
         self._weight = w
         if self._link_exit_id:
             otherx = tzindex.get(self._link_exit_id)
-            otherx._weight = w
+            if otherx is not None:
+                otherx._weight = w
     def _get_weight(self):
         return self._weight
     weight = property(_get_weight, _set_weight)
