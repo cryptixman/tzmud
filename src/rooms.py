@@ -993,6 +993,7 @@ class Exit(TZObj):
             return False
 
         self.weight = w
+        return True
 
 
 class PlayersOnly(Exit):
