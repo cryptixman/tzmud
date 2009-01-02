@@ -43,13 +43,31 @@ from db import TZIndex
 tzindex = TZIndex()
 
 import pages_base
-from pages_base import xmlf
+from pages_base import xmlf, normalize_args
 
 class Edit(pages_base.TZPage):
     docFactory = xmlf('edit.html')
     title = 'Edit Object'
 
-    def locateChild(self, context, segments):
+    def render_process(self, ctx, data):
+        request = inevow.IRequest(ctx)
+        args = normalize_args(request.args)
+
+        print 'args:', args
+
+        if args:
+            for s in self.obj.settings:
+                val = args.get(s, None)
+                if val is None:
+                    continue
+                if s == 'owner' and val != 'None':
+                    val = '#%s' % val
+                self.obj.setting(s, val)
+
+        return ''
+
+
+    def locateChild(self, ctx, segments):
         '''for pages that need to find which object they should operate on
                 from the URL. For instance /edit/102 should act on the
                 object with tzid = 102.
@@ -87,7 +105,7 @@ class Edit(pages_base.TZPage):
             # Module was probably rebuilt elsewhere (from the MUD).
             # Try rebuilding then finding the base class again.
             self.child_rebuild(None)
-            return self.locateChild(context, segments)
+            return self.locateChild(ctx, segments)
         else:
             self.bse = class_as_string(base, instance=False)
 
@@ -234,7 +252,14 @@ class Edit(pages_base.TZPage):
             inpt = T.td[self.get_setting_widget(setting, val)]
             lines.append(T.tr[label, inpt])
 
-        return T.table(_class="center")[lines]
+        empty = T.td(_class='empty')['']
+        lines.append(T.tr[empty, empty])
+        submit = T.input(_type="submit", value=" Change ")
+        lines.append(T.tr[empty, T.td[submit]])
+
+        tbl = T.table(_class="center")[lines]
+
+        return T.form(action=".", method="POST")[tbl]
 
     def render_exits(self, ctx, data):
         if self.bse != 'Room':
