@@ -43,7 +43,7 @@ from db import TZIndex
 tzindex = TZIndex()
 
 
-def normalize_args(args, preserve=''):
+def normalize_args(args, preserve='', remove='errmsg'):
     '''Make args a 1:1 dict of key:value instead of key:[value, value, ]
     by selecting the first item in the list to be the value.
 
@@ -63,9 +63,11 @@ def normalize_args(args, preserve=''):
 
     '''
 
-    for k in args:
+    for k in args.keys():
         if not k == preserve and not k in preserve:
             args[k] = args[k][0]
+        if k == remove or k in remove:
+            del args[k]
     return args
 
 
