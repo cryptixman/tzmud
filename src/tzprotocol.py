@@ -303,6 +303,8 @@ class TZ(basic.LineReceiver):
             if conf.debug:
                 self.message('Debug')
                 self.mlmessage(e)
+                import traceback
+                print traceback.format_exc()
             try:
                 if self.room.tzid != self.player._rid:
                     print 'WARNING: Room mismatch. Trying to correct.'
