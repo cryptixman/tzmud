@@ -402,7 +402,10 @@ class Player(Character):
 
         appearer = info['actor']
         if appearer is not self and self.can_see(appearer):
-            if appearer.container.container is None:
+            if appearer.container is None:
+                # The room disappeared... not sure what this means
+                pass
+            elif appearer.container.container is None:
                 # So, it is in the room, and not in a container
                 self.message(appearer, 'appears.')
         elif appearer is not self and self.can_see(appearer):
@@ -414,7 +417,10 @@ class Player(Character):
 
         disappearer = info['actor']
         if disappearer is not self:
-            if disappearer.container.container is None:
+            if disappearer.container is None:
+                # The room disappeared... not sure what this means
+                pass
+            elif disappearer.container.container is None:
                 # So, it is in the room, and not in a container
                 self.message(disappearer, 'disappears.')
 
