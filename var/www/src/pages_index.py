@@ -19,9 +19,10 @@
 from operator import attrgetter, itemgetter
 from nevow import tags as T
 
-from pages_base import TZPage, xmlf
+import pages_base
+from pages_base import xmlf
 
-class Index(TZPage):
+class Index(pages_base.TZPage):
     docFactory = xmlf('index.html')
     title = 'TZMud Web Interace'
 
