@@ -203,10 +203,14 @@ class TZObj(Persistent):
     def set_owner(self, iden):
         'iden is owner or the name or the id # for the owner'
 
+        if iden is None:
+            self.owner = None
+            return True
+
         if hasattr(iden, 'tzid'):
             c = iden
         elif iden.startswith('#'):
-            tzid = iden[1:]
+            tzid = int(iden[1:])
             c = players.get(tzid) or mobs.get(tzid)
         else:
             name = iden
