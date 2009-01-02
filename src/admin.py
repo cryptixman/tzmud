@@ -398,8 +398,9 @@ def cmd_rebuild(s, r=None):
                 s.message('Error rebuilding')
                 s.mlmessage(e)
                 print 'Error rebuilding'
-                for line in e:
-                    print line
+                import traceback
+                tb = traceback.format_exc()
+                print tb
 
 def save_obj_settings(obj):
     save = {}
