@@ -579,6 +579,7 @@ class Character(TZContainer):
     stats_list = ['health', 'strength', ]
     health = int_attr('health')
     strength = int_attr('strength')
+    settings = stats_list
 
     def __init__(self, name='', short='', long=''):
         TZContainer.__init__(self, name, short, long)
@@ -604,11 +605,8 @@ Character (%s): %s
     def _set_default_stats(self):
         self._stats0 = PersistentDict()
 
-        self.settings += self.stats_list
-
         for name in self.stats_list:
-            val = 0
-            self._stats0[name] = val
+            self._stats0[name] = self.setting(name)
 
     def go(self, x):
         '''Character is trying to go through exit x.
