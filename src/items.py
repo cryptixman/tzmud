@@ -38,6 +38,7 @@ from share import register_plugin
 
 import wizard
 import players
+import mobs
 from colors import green
 
 
@@ -539,9 +540,28 @@ class VoiceTimeTrap(TimeTrap, VoiceTrap):
     name = 'voice timetrap'
 
 
+class TreasureChest(ContainerItem):
+    'A chest with one of each Item inside'
+
+    name = 'treasure chest'
+    name_aka = ['chest',]
+
+    def __init__(self, name=''):
+        ContainerItem.__init__(self, name)
+
+        for clsname in classes():
+            if clsname == 'TreasureChest':
+                continue
+
+            import items
+            cls = getattr(items, clsname)
+            i = cls()
+            self.add(i)
 
 
-class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap']
+
+
+class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap', 'TreasureChest']
 
 def classes():
     'Returns a list of the names of the clonable items.'
