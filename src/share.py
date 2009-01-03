@@ -930,10 +930,13 @@ def findname(objname, searchers, all=False):
                 return found
             else:
                 objs.extend(found)
+
     if objs:
         return objs
-    else:
+    elif all:
         return []
+    else:
+        return None
 
 
 def class_info(obj, instance):
