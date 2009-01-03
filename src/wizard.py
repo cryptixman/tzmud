@@ -184,7 +184,7 @@ def cmd_teleport(s, r=None):
         if obj is None:
             s.message('No such object.')
         elif obj._bse == 'Room':
-            s.message('Cannot teleport the', obj, '.')
+            s.message('You cannot teleport a room.')
         else:
             obj.teleport(destination)
             s.message('You teleport', obj, '.')
