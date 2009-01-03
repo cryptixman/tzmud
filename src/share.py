@@ -283,6 +283,22 @@ class TZObj(Persistent):
         return tzindex.get(self._containerid)
     container = property(_get_container, _set_container)
 
+    def containers(self):
+        '''return a tuple of all the nested containers this object is in.
+
+        For instance, if this object is a hat in a box in a bag in a
+            player's inventory, this will return:
+
+        (<box>, <bag>, <player>, <room>)
+
+        '''
+
+        container = self.container
+        if container is None:
+            return tuple()
+        else:
+            return (container,) + container.containers()
+
     def setting(self, var, val=None):
         '''return the value of the given setting if val is None.
                 returns None if this object does not have that setting.
