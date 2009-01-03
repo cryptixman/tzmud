@@ -182,33 +182,11 @@ def cmd_teleport(s, r=None):
                 mobs.getname(objname) or mobs.get(objtzid)
         if obj is None:
             s.message('No such object.')
-            return
-        elif room.itemname(objname) or room.item(objtzid):
-            item = room.itemname(objname) or room.item(objtzid)
-            item.teleport(destination)
-        elif player.itemname(objname) or player.item(objtzid):
-            item = player.itemname(objname) or player.item(objtzid)
-            item.teleport(destination)
-        elif room.playername(objname) or room.player(objtzid):
-            p = room.playername(objname) or room.player(objtzid)
-            p.teleport(destination)
-        elif room.mobname(objname) or room.mob(objtzid):
-            mob = room.mobname(objname) or room.mob(objtzid)
-            mob.teleport(destination)
-        elif room.exit(objtzid) or room.exitname(objname):
-            x = room.exit(objtzid) or room.exitname(objname)
-            x.teleport(destination)
-        elif mobs.getname(objname) or mobs.get(objtzid):
-            mob = obj
-            mob.teleport(destination)
-        elif players.getname(objname) or players.get(objtzid):
-            p = obj
-            p.teleport(destination)
-        else:
+        elif obj._bse == 'Room':
             s.message('Cannot teleport the', obj, '.')
-            return
-
-        s.message('You teleport', obj, '.')
+        else:
+            obj.teleport(destination)
+            s.message('You teleport', obj, '.')
 
     else:
         if not destname and not desttzid:
