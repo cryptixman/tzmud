@@ -1006,8 +1006,8 @@ class Exit(TZObj):
     def teleport(self, destination):
         'Unhook this exit from its room and connect it to destination.'
 
-        self.room.rmexit(x)
-        destination.addexit(x)
+        self.room.rmexit(self)
+        destination.addexit(self)
 
 
 

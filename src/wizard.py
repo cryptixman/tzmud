@@ -179,7 +179,8 @@ def cmd_teleport(s, r=None):
 
         obj = find(r, room, player, room) or \
                 players.getname(objname) or players.get(objtzid) or \
-                mobs.getname(objname) or mobs.get(objtzid)
+                mobs.getname(objname) or mobs.get(objtzid) or \
+                tzindex.get(objtzid)
         if obj is None:
             s.message('No such object.')
         elif obj._bse == 'Room':
