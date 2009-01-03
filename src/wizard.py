@@ -292,11 +292,13 @@ def cmd_teleport(s, r=None):
 
 
 def cmd_summon(s, r):
-    '''If the name or id# given is an existing player or mob, this
-            will act like: teleport <character> to <here>.
+    '''summon <character>|<mob class>
 
-        If the name does not exist already, but is a mob class, this
-            will be like: clone <mobclass>.
+    If the name or id# given is an existing player or mob, this
+        will act like: teleport <character> to <here>.
+
+    If the name does not exist already, but is a mob class, this
+        will be like: clone <mobclass>.
 
     '''
 
