@@ -276,7 +276,6 @@ class TZObj(Persistent):
         if container is not None:
             self._containerid = container.tzid
         else:
-            print self.name, 'has no container'
             self._containerid = None
     def _get_container(self):
         'Getter for the container property.'
