@@ -116,6 +116,8 @@ class Item(TZObj):
         TZObj.__init__(self, name, short, long, owner)
         add(self)
 
+        self._bse = 'Item'
+
     def destroy(self):
         'Get rid of this item and remove it from the index.'
 
@@ -168,6 +170,8 @@ class ContainerItem(Item, TZContainer):
     def __init__(self, name='', short='', long='', owner=None):
         TZContainer.__init__(self, name, short, long, owner)
         add(self)
+
+        self._bse = 'Item'
 
     def destroy(self):
         'Get rid of this item and remove it from the index.'

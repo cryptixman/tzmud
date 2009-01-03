@@ -137,6 +137,8 @@ class Mob(Character):
         self.set_action_weights(action_awake=500,
                                 action_move=0)
 
+        self._bse = 'Mob'
+
     def destroy(self):
         'Get rid of this mob and remove it from the mob index.'
 

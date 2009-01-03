@@ -105,6 +105,8 @@ class Player(Character):
         self.last = None
         self.active = None
 
+        self._bse = 'Player'
+
     def destroy(self):
         'Get rid of this player and remove it from the indexes.'
 

@@ -146,6 +146,8 @@ class Room(TZContainer):
 
         self.periodically()
 
+        self._bse = 'Room'
+
     def destroy(self):
         '''Get rid of this room and remove it from the index.
 
@@ -837,6 +839,8 @@ class Exit(TZObj):
             self.link(x)
 
         self._keys = PersistentList()
+
+        self._bse = 'Exit'
 
     def destroy(self):
         'Get rid of this exit.'
