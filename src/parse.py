@@ -224,6 +224,9 @@ thingname = Combine(OneOrMore(~to_ + Word(alphanums)),
 teleport2 = teleport_verb + Optional(thingname|objtzidref) + to_ + obj2ref
 teleport = teleport2 | teleport1
 
+summon_verb = CaselessLiteral('summon')('verb')
+summon = summon_verb + objref + LineEnd()
+
 dig_verb = CaselessLiteral('dig')('verb')
 
 returnby_ = Suppress(CaselessLiteral('return by '))
@@ -294,7 +297,7 @@ destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (info | teleport | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | wizunset | help | catchall)
+wizard_parser = wiz + (info | teleport | summon | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | wizunset | help | catchall)
 
 
 full_parser = actions_parser | wizard_parser

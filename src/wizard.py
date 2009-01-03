@@ -211,7 +211,7 @@ def cmd_teleport(s, r=None):
                                 character=player))
             reactor.callLater(0.4, player.move, destination)
             destination.action(dict(act='teleport_character_in',
-                                        delay=0.4,
+                                        delay=0.6,
                                         actor=None,
                                         character=player))
         elif s.room.mobname(objname) or s.room.mob(objtzid):
@@ -249,7 +249,7 @@ def cmd_teleport(s, r=None):
                                     character=player))
             reactor.callLater(0.4, player.move, destination)
             destination.action(dict(act='teleport_character_in',
-                                        delay=0.4,
+                                        delay=0.6,
                                         actor=None,
                                         character=player))
         else:
@@ -290,6 +290,51 @@ def cmd_teleport(s, r=None):
         destination.action(dict(act='teleport_character_in', actor=None,
                                     character=s.player))
 
+
+def cmd_summon(s, r):
+    '''If the name or id# given is an existing player or mob, this
+            will act like: teleport <character> to <here>.
+
+        If the name does not exist already, but is a mob class, this
+            will be like: clone <mobclass>.
+
+    '''
+
+    room = s.room
+    objname = r.get('objname', '')
+    objtzid = r.get('objtzid', 0)
+
+    char = players.getname(objname) or players.get(objtzid) or \
+                mobs.getname(objname) or mobs.get(objtzid)
+
+    if char is not None:
+        origin = char.room
+        origin.action(dict(act='teleport_character_away',
+                            delay=0.2,
+                            actor=None,
+                            character=char))
+        reactor.callLater(0.4, char.move, room)
+        room.action(dict(act='teleport_character_in',
+                                    delay=0.6,
+                                    actor=s.player,
+                                    character=char))
+        s.message('You summon', char, '.')
+
+    elif objname in mobs.classes():
+        cls = getattr(mobs, objname)
+        mob = cls()
+        mob.move(room)
+        mob.home = room
+        room.action(dict(act='clone_mob', actor=s.player, mob=mob))
+        s.message('You summon', mob, '.')
+
+    else:
+        if objname:
+            iden = objname
+        else:
+            iden = '#%s' % objtzid
+
+        s.message('Unable to summon', iden, '.')
 
 def cmd_dig(s, r):
     '''dig <exit> to <destination> [return by <exit>]
