@@ -189,25 +189,26 @@ def cmd_teleport(s, r=None):
             obj.teleport(destination)
             s.message('You teleport', obj, '.')
 
+    elif not (destname or desttzid):
+        # send the player home
+        player.teleport()
+
     else:
-        if not destname and not desttzid:
-            destination = player.home
-        else:
-            destination = rooms.getname(destname) or \
-                            rooms.get(desttzid)
+        destination = rooms.getname(destname) or \
+                        rooms.get(desttzid)
 
-            if destination is None:
-                toplayer = players.getname(destname) or \
-                            players.get(desttzid)
+        if destination is None:
+            toplayer = players.getname(destname) or \
+                        players.get(desttzid)
 
-                if toplayer is not None:
-                    destination = toplayer.room
-                    if destination is None:
-                        s.message('Player is not logged in.')
-                        return
-                else:
-                    s.message('No such room or player.')
+            if toplayer is not None:
+                destination = toplayer.room
+                if destination is None:
+                    s.message('Player is not logged in.')
                     return
+            else:
+                s.message('No such room or player.')
+                return
 
         player.teleport(destination)
 
