@@ -481,6 +481,8 @@ def cmd_go(s, r):
             if len(xs)==1:
                 x = xs[0]
             else:
+                if not objname:
+                    objname = 'go'
                 s.message(objname, 'through which exit?')
                 return
         else:
