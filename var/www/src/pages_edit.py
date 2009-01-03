@@ -64,9 +64,17 @@ class Edit(pages_base.TZPage):
                 if s == 'owner' and val != 'None':
                     val = '#%s' % val
 
-
-
                 self.obj.setting(s, val)
+
+
+            toroomid = args.get('room', None)
+            if toroomid is not None:
+                toroomid = int(toroomid)
+                toroom = tzindex.get(toroomid)
+                room = self.obj.room
+                if toroom is not room:
+                    roomid = room.tzid
+                    print 'teleport from', room.name, 'to', toroom.name
 
 
 
