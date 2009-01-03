@@ -807,18 +807,20 @@ Character (%s): %s
             #print 'Character._follow COMMIT'
             commit()
 
-    def teleport(self, destination):
-        room = self.room
-        if room is not None:
-            room.action(dict(act='teleport_character_away',
-                                delay=0.2,
-                                actor=None,
-                                character=self))
-        reactor.callLater(0.4, self.move, destination)
-        destination.action(dict(act='teleport_character_in',
-                                    delay=0.6,
+    def teleport(self, destination=None):
+        destination = destination or self.home
+        if destination is not None:
+            room = self.room
+            if room is not None:
+                room.action(dict(act='teleport_character_away',
+                                    delay=0.2,
                                     actor=None,
                                     character=self))
+            reactor.callLater(0.4, self.move, destination)
+            destination.action(dict(act='teleport_character_in',
+                                        delay=0.6,
+                                        actor=None,
+                                        character=self))
 
 
 def find(r, room, player=None, default=None, all=False):
