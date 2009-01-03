@@ -813,6 +813,8 @@ class Exit(TZObj):
 
     name = 'proto exit'
     _link_exit_id = 0
+    self.settings = ['locked', 'weight',]
+
 
     def __init__(self, name='', short='', long='', room=None, destination=None, return_name=''):
         TZObj.__init__(self, name, short, long)
@@ -835,8 +837,6 @@ class Exit(TZObj):
             self.link(x)
 
         self._keys = PersistentList()
-
-        self.settings += ['locked', 'weight',]
 
     def destroy(self):
         'Get rid of this exit.'
