@@ -60,9 +60,15 @@ class Edit(pages_base.TZPage):
                 val = args.get(s, None)
                 if val is None:
                     continue
+
                 if s == 'owner' and val != 'None':
                     val = '#%s' % val
+
+
+
                 self.obj.setting(s, val)
+
+
 
         return ''
 
@@ -137,6 +143,8 @@ class Edit(pages_base.TZPage):
             return self.rooms_widget(name, data), self.editlink_widget(data)
         elif name == 'destination':
             return self.rooms_widget(name, data), self.editlink_widget(data)
+        elif name == 'mobtype':
+            return self.mobtypes_widget(name, data)
         elif isinstance(data, str):
             return self.str_widget(name, data)
         elif isinstance(data, bool):
@@ -234,6 +242,14 @@ class Edit(pages_base.TZPage):
 
     def input_widget(self, name, data):
         return T.input(name=name, value=data)
+
+    def mobtypes_widget(self, name, data):
+        choices = mobs.classes()
+        choices.sort()
+        info = dict(name=name,
+                    choices=choices,
+                    selected=data)
+        return self.render_form_select(info)
 
 
     def render_settings(self, ctx, data):
