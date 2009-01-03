@@ -238,7 +238,6 @@ class TZObj(Persistent):
                 return self.container
             else:
                 return self.container.room
-        return rooms.get(self._rid)
     room = property(_get_room)
 
     def set_visible(self, v):
@@ -907,7 +906,7 @@ def findname(objname, searchers, all=False):
     if objs:
         return objs
     else:
-        return None
+        return []
 
 
 def class_info(obj, instance):
