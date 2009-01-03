@@ -533,6 +533,7 @@ def cmd_clone(s, r):
             obj.name = newname
         s.room.addexit(obj)
         s.message(obj, 'created.')
+        s.room.action(dict(act='clone_exit', actor=s.player, x=obj))
         return
 
 

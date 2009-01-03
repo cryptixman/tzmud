@@ -398,22 +398,45 @@ class Player(Character):
             self.message(quitter, 'quits.')
 
     def near_appear(self, info):
-        'Something has appeared near this player.'
+        '''Something has appeared near this player.
+
+        This is talking about becoming not invisible anymore,
+            not about materializing from nowhere.
+
+        If you are looking for some kind of materialization, it
+            might be near_teleport_in, near_clone, near_dig
+            or some new near action that you design.
+
+        '''
 
         appearer = info['actor']
+        container = appearer.container
+        room = appearer.room
+
         if appearer is not self and self.can_see(appearer):
-            if appearer.container is None:
+            if container is None:
                 # The room disappeared... not sure what this means
                 pass
-            elif appearer.container.container is None:
-                # So, it is in the room, and not in a container
+            elif container.container is None:
+                # So, it is in the room, and not in any container
                 self.message(appearer, 'appears.')
-        elif appearer is not self and self.can_see(appearer):
-            container = appearer.container
-            self.message(appearer, 'appears in the', container, '.')
+            elif container is self:
+                # it is in this player's inventory
+                self.message(appearer, 'becomes visible.')
+            else:
+                container = appearer.container
+                self.message(appearer, 'appears in the', container, '.')
 
     def near_disappear(self, info):
-        'Something has disappeared near this player.'
+        '''Something has disappeared near this player.
+
+        This is talking about becoming invisible, not dematerializing.
+
+        If you are looking for some kind of dematerialization, you
+            might be looking for near_teleport_away, near_destroy,
+            or some new near action that you design.
+
+        '''
 
         disappearer = info['actor']
         if disappearer is not self:
@@ -499,6 +522,17 @@ class Player(Character):
                 self.message(cloner, "mumbles something you can't quite make out and ... ")
             if self.can_see(mob):
                 self.message(mob, 'has appeared.')
+
+    def near_clone_exit(self, info):
+        'Someone has "clone"d an exit near this player.'
+
+        cloner = info['actor']
+        x = info['x']
+        if cloner is not self:
+            if self.can_see(cloner):
+                self.message(cloner, "mumbles something you can't quite make out and ... ")
+            if self.can_see(x):
+                self.message('An exit', x, 'has appeared.')
 
     def near_destroy_item(self, info):
         'Someone has "destroy"ed some item near this player.'
