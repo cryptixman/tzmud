@@ -422,7 +422,7 @@ class Player(Character):
                 self.message(appearer, 'appears.')
             elif container is self:
                 # it is in this player's inventory
-                self.message(appearer, 'becomes visible.')
+                self.message(appearer, 'in your inventory becomes visible.')
             else:
                 container = appearer.container
                 self.message(appearer, 'appears in the', container, '.')
