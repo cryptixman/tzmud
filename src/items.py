@@ -148,6 +148,21 @@ class Item(TZObj):
         'Character has taken off this item.'
         pass
 
+    def teleport(self, destination):
+        'Teleport this item to room.'
+
+        room = self.room
+        room.remove(self)
+        destination.add(self)
+        room.action(dict(act='teleport_item_away',
+                            actor=None,
+                            item=self))
+        destination.action(dict(act='teleport_item_in',
+                                    delay=0.4,
+                                    actor=None,
+                                    item=self))
+
+
     def __str__(self):
         'Returns the colorized name of this item.'
 

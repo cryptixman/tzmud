@@ -549,6 +549,10 @@ class Room(TZContainer):
 
         return c
 
+    def teleport(self, destination):
+        'This makes no sense.'
+        raise AttributeError
+
 
 
 
@@ -998,6 +1002,13 @@ class Exit(TZObj):
 
         self.weight = w
         return True
+
+    def teleport(self, destination):
+        'Unhook this exit from its room and connect it to destination.'
+
+        self.room.rmexit(x)
+        destination.addexit(x)
+
 
 
 class PlayersOnly(Exit):

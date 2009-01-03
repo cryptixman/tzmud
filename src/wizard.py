@@ -160,8 +160,10 @@ def cmd_teleport(s, r=None):
 
     '''
 
-    if s.room is not None:
-        s.room.action(dict(act='teleport', actor=s.player))
+    room = s.room
+    player = s.player
+    if room is not None:
+        room.action(dict(act='teleport', actor=player))
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
@@ -175,83 +177,33 @@ def cmd_teleport(s, r=None):
             s.message('No such place.')
             return
 
-        obj = find(r, s.room, s.player, s.room) or \
+        obj = find(r, room, player, room) or \
                 players.getname(objname) or players.get(objtzid) or \
                 mobs.getname(objname) or mobs.get(objtzid)
         if obj is None:
             s.message('No such object.')
             return
-        elif s.room.itemname(objname) or s.room.item(objtzid):
-            item = s.room.itemname(objname) or s.room.item(objtzid)
-            s.room.remove(item)
-            destination.add(item)
-            s.room.action(dict(act='teleport_item_away',
-                                actor=None,
-                                item=item))
-            destination.action(dict(act='teleport_item_in',
-                                        delay=0.4,
-                                        actor=None,
-                                        item=item))
-        elif s.player.itemname(objname) or s.player.item(objtzid):
-            item = s.player.itemname(objname) or s.player.item(objtzid)
-            s.player.remove(item)
-            destination.add(item)
-            s.room.action(dict(act='teleport_item_away',
-                                    actor=None,
-                                    item=item))
-            destination.action(dict(act='teleport_item_in',
-                                delay=0.4,
-                                actor=None,
-                                item=item))
-        elif s.room.playername(objname) or s.room.player(objtzid):
-            player = s.room.playername(objname) or s.room.player(objtzid)
-            s.room.action(dict(act='teleport_character_away',
-                                delay=0.2,
-                                actor=None,
-                                character=player))
-            reactor.callLater(0.4, player.move, destination)
-            destination.action(dict(act='teleport_character_in',
-                                        delay=0.6,
-                                        actor=None,
-                                        character=player))
-        elif s.room.mobname(objname) or s.room.mob(objtzid):
-            mob = s.room.mobname(objname) or s.room.mob(objtzid)
-            mob.move(destination)
-            s.room.action(dict(act='teleport_character_away',
-                                delay=0.2,
-                                actor=None,
-                                character=mob))
-            destination.action(dict(act='teleport_character_in',
-                                delay=0.4,
-                                actor=None,
-                                character=mob))
-        elif s.room.exit(objtzid) or s.room.exitname(objname):
-            x = s.room.exit(objtzid) or s.room.exitname(objname)
-            s.room.rmexit(x)
-            destination.addexit(x)
-            s.message('Exit', x, 'moved.')
+        elif room.itemname(objname) or room.item(objtzid):
+            item = room.itemname(objname) or room.item(objtzid)
+            item.teleport(destination)
+        elif player.itemname(objname) or player.item(objtzid):
+            item = player.itemname(objname) or player.item(objtzid)
+            item.teleport(destination)
+        elif room.playername(objname) or room.player(objtzid):
+            p = room.playername(objname) or room.player(objtzid)
+            p.teleport(destination)
+        elif room.mobname(objname) or room.mob(objtzid):
+            mob = room.mobname(objname) or room.mob(objtzid)
+            mob.teleport(destination)
+        elif room.exit(objtzid) or room.exitname(objname):
+            x = room.exit(objtzid) or room.exitname(objname)
+            x.teleport(destination)
         elif mobs.getname(objname) or mobs.get(objtzid):
             mob = obj
-            mob.move(destination)
-            mob.room.action(dict(act='teleport_character_away',
-                                delay=0.2,
-                                actor=None,
-                                character=mob))
-            destination.action(dict(act='teleport_character_in',
-                                delay=0.4,
-                                actor=None,
-                                character=mob))
+            mob.teleport(destination)
         elif players.getname(objname) or players.get(objtzid):
-            player = obj
-            player.room.action(dict(act='teleport_character_away',
-                                    delay=0.2,
-                                    actor=None,
-                                    character=player))
-            reactor.callLater(0.4, player.move, destination)
-            destination.action(dict(act='teleport_character_in',
-                                        delay=0.6,
-                                        actor=None,
-                                        character=player))
+            p = obj
+            p.teleport(destination)
         else:
             s.message('Cannot teleport the', obj, '.')
             return
@@ -259,21 +211,18 @@ def cmd_teleport(s, r=None):
         s.message('You teleport', obj, '.')
 
     else:
-        obj = s.player
-        origin = s.player.room
-
         if not destname and not desttzid:
-            destination = s.player.home
+            destination = player.home
         else:
             destination = rooms.getname(destname) or \
                             rooms.get(desttzid)
 
             if destination is None:
-                player = players.getname(destname) or \
+                toplayer = players.getname(destname) or \
                             players.get(desttzid)
 
-                if player is not None:
-                    destination = player.room
+                if toplayer is not None:
+                    destination = toplayer.room
                     if destination is None:
                         s.message('Player is not logged in.')
                         return
@@ -281,14 +230,7 @@ def cmd_teleport(s, r=None):
                     s.message('No such room or player.')
                     return
 
-        if origin is not None:
-            origin.action(dict(act='teleport_character_away', actor=None,
-                                    character=s.player))
-
-        s.player.move(destination)
-
-        destination.action(dict(act='teleport_character_in', actor=None,
-                                    character=s.player))
+        player.teleport(destination)
 
 
 def cmd_summon(s, r):

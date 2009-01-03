@@ -152,7 +152,7 @@ class TZ(basic.LineReceiver):
                     self.factory._player_protocols[player_name] = self
 
                     wizard.cmd_teleport(self, {})
-                    reactor.callLater(0.2, actions.cmd_look, self,
+                    reactor.callLater(0.6, actions.cmd_look, self,
                                         dict(verb='look'))
                     print 'player', player.name, 'logged in'
                 else:
