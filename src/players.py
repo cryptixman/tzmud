@@ -422,10 +422,10 @@ class Player(Character):
                 self.message(appearer, 'appears.')
             elif container is self:
                 # it is in this player's inventory
-                self.message(appearer, 'in your inventory becomes visible.')
-            else:
+                self.message('The', appearer, 'in your inventory becomes visible.')
+            elif self in appearer.containers():
                 container = appearer.container
-                self.message(appearer, 'appears in the', container, '.')
+                self.message('The', appearer, 'in the', container, 'becomes visible.')
 
     def near_disappear(self, info):
         '''Something has disappeared near this player.
@@ -439,13 +439,22 @@ class Player(Character):
         '''
 
         disappearer = info['actor']
+        container = disappearer.container
+        room = disappearer.room
+
         if disappearer is not self:
-            if disappearer.container is None:
+            if container is None:
                 # The room disappeared... not sure what this means
                 pass
-            elif disappearer.container.container is None:
+            elif container.container is None:
                 # So, it is in the room, and not in a container
                 self.message(disappearer, 'disappears.')
+            elif container is self:
+                # it is in this player's inventory
+                self.message('The', disappearer, 'in your inventory becomes invisible.')
+            elif self in disappearer.containers():
+                container = disappearer.container
+                self.message('The', disappearer, 'in the', container, 'becomes invisible.')
 
     def near_teleport(self, info):
         wizard = info['actor']
