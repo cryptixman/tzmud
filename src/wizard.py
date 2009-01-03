@@ -232,32 +232,15 @@ def cmd_summon(s, r):
                 mobs.getname(objname) or mobs.get(objtzid)
 
     if char is not None:
-        origin = char.room
-        origin.action(dict(act='teleport_character_away',
-                            delay=0.2,
-                            actor=None,
-                            character=char))
-        reactor.callLater(0.4, char.move, room)
-        room.action(dict(act='teleport_character_in',
-                                    delay=0.6,
-                                    actor=s.player,
-                                    character=char))
+        char.teleport(room)
         s.message('You summon', char, '.')
 
     elif objname in mobs.classes():
-        cls = getattr(mobs, objname)
-        mob = cls()
-        mob.move(room)
-        mob.home = room
-        room.action(dict(act='clone_mob', actor=s.player, mob=mob))
+        mob = _clone_mob(s, objname, objtzid)
         s.message('You summon', mob, '.')
 
     else:
-        if objname:
-            iden = objname
-        else:
-            iden = '#%s' % objtzid
-
+        iden = objname if objname else '#%s' % objtzid
         s.message('Unable to summon', iden, '.')
 
 def cmd_dig(s, r):
@@ -413,7 +396,7 @@ def cmd_clone(s, r):
     name = objname or '#%s' % objtzid
     s.message('No', name, 'to clone.')
 
-def _clone_item(s, objname, objtzid, newname):
+def _clone_item(s, objname, objtzid, newname=''):
     # first try to clone an item
     # look first in the room or on the player
     # then at existing item objects
@@ -440,9 +423,9 @@ def _clone_item(s, objname, objtzid, newname):
         s.message(obj, 'created.')
         s.player.add(obj)
         s.room.action(dict(act='clone_item', actor=s.player, item=obj))
-        return True
+        return obj
 
-def _clone_mob(s, objname, objtzid, newname):
+def _clone_mob(s, objname, objtzid, newname=''):
     # next, try to clone a mob
     # look first in the room
     # then at existing mobs
@@ -468,9 +451,9 @@ def _clone_mob(s, objname, objtzid, newname):
         obj.move(s.room)
         obj.home = s.room
         s.room.action(dict(act='clone_mob', actor=s.player, mob=obj))
-        return True
+        return obj
 
-def _clone_room(s, objname, objtzid, newname):
+def _clone_room(s, objname, objtzid, newname=''):
     # next, try to clone a room
     # first look at existing rooms
     orig = rooms.getname(objname) or \
@@ -490,9 +473,9 @@ def _clone_room(s, objname, objtzid, newname):
         if newname:
             obj.name = newname
         s.message(obj, 'created.')
-        return True
+        return obj
 
-def _clone_exit(s, objname, objtzid, newname):
+def _clone_exit(s, objname, objtzid, newname=''):
     # Finally, try to clone an Exit
     # fist look at existing exits in this room
     orig = s.room.exitname(objname) or \
@@ -514,7 +497,7 @@ def _clone_exit(s, objname, objtzid, newname):
         s.room.addexit(obj)
         s.message(obj, 'created.')
         s.room.action(dict(act='clone_exit', actor=s.player, x=obj))
-        return True
+        return obj
 
 
 def cmd_study(s, r):
