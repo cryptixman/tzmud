@@ -813,7 +813,7 @@ class Exit(TZObj):
 
     name = 'proto exit'
     _link_exit_id = 0
-    self.settings = ['locked', 'weight',]
+    settings = ['locked', 'weight',]
 
 
     def __init__(self, name='', short='', long='', room=None, destination=None, return_name=''):
