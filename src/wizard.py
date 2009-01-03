@@ -437,6 +437,14 @@ def cmd_clone(s, r):
 
     newname = r.get('new', '')
 
+    for cloner in (_clone_item, _clone_mob, _clone_room, _clone_exit):
+        if cloner(s, objname, objtzid, newname):
+            return
+
+    name = objname or '#%s' % objtzid
+    s.message('No', name, 'to clone.')
+
+def _clone_item(s, objname, objtzid, newname):
     # first try to clone an item
     # look first in the room or on the player
     # then at existing item objects
@@ -463,8 +471,9 @@ def cmd_clone(s, r):
         s.message(obj, 'created.')
         s.player.add(obj)
         s.room.action(dict(act='clone_item', actor=s.player, item=obj))
-        return
+        return True
 
+def _clone_mob(s, objname, objtzid, newname):
     # next, try to clone a mob
     # look first in the room
     # then at existing mobs
@@ -490,8 +499,9 @@ def cmd_clone(s, r):
         obj.move(s.room)
         obj.home = s.room
         s.room.action(dict(act='clone_mob', actor=s.player, mob=obj))
-        return
+        return True
 
+def _clone_room(s, objname, objtzid, newname):
     # next, try to clone a room
     # first look at existing rooms
     orig = rooms.getname(objname) or \
@@ -511,8 +521,9 @@ def cmd_clone(s, r):
         if newname:
             obj.name = newname
         s.message(obj, 'created.')
-        return
+        return True
 
+def _clone_exit(s, objname, objtzid, newname):
     # Finally, try to clone an Exit
     # fist look at existing exits in this room
     orig = s.room.exitname(objname) or \
@@ -534,13 +545,7 @@ def cmd_clone(s, r):
         s.room.addexit(obj)
         s.message(obj, 'created.')
         s.room.action(dict(act='clone_exit', actor=s.player, x=obj))
-        return
-
-
-    else:
-        name = objname or '#%s' % objtzid
-        s.message('No', name, 'to clone.')
-        return
+        return True
 
 
 def cmd_study(s, r):
