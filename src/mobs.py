@@ -112,11 +112,6 @@ def nudge_all():
         mob.nudge(0)
 
 
-def register_mob(cls):
-    import mobs
-    register_plugin(mobs, cls)
-
-
 class Mob(Character):
     'Base class for all mob (mobile) objects in the MUD.'
 

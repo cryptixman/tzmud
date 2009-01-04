@@ -99,11 +99,6 @@ def isitem(obj):
     return obj in ls()
 
 
-def register_item(cls):
-    import items
-    register_plugin(items, cls)
-
-
 
 class Item(TZObj):
     'Base class for all items in the MUD.'

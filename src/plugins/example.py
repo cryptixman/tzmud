@@ -1,6 +1,7 @@
 import mobs
 import items
 import rooms
+from share import register_plugin
 
 
 class Bear(mobs.Mob):
@@ -9,7 +10,7 @@ class Bear(mobs.Mob):
     name = 'bear'
     short = 'A large brown bear.'
 
-mobs.register_mob(Bear)
+register_plugin(Bear)
 
 
 
@@ -20,7 +21,7 @@ class Boots(items.Item):
     short = 'An old pair of hiking boots.'
     wearable = True
 
-items.register_item(Boots)
+register_plugin(Boots)
 
 
 
@@ -38,11 +39,13 @@ class Library(rooms.Room):
         else:
             rooms.Room.action(self, info)
 
-rooms.register_room(Library)
+register_plugin(Library)
 
 
 
 class VaultRoom(rooms.Room):
+    'Room with a voice-activated door to another room.'
+
     name = 'vault room'
 
     def __init__(self, name=''):
@@ -66,4 +69,25 @@ class VaultRoom(rooms.Room):
             x.locked = True
             self.action(dict(act='lock', actor=None, door=x, key=None))
 
-rooms.register_room(VaultRoom)
+register_plugin(VaultRoom)
+
+
+from share import str_attr
+class PasswordDoor(rooms.Exit):
+    'A door with a voice-activated lock.'
+
+    name = 'pw door'
+    locked = True
+    password = str_attr('password', default='activate')
+    settings = ['password']
+
+    def near_say(self, info):
+        raw = info['raw']
+        if raw == self.password and self.locked:
+            self.locked = False
+            self.room.action(dict(act='unlock', actor=None, door=self, key=None))
+        elif raw == self.password and not self.locked:
+            self.locked = True
+            self.room.action(dict(act='lock', actor=None, door=self, key=None))
+
+register_plugin(PasswordDoor)

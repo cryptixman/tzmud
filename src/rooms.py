@@ -114,11 +114,6 @@ def nudge_all():
         room.nudge(0)
 
 
-def register_room(cls):
-    import rooms
-    register_plugin(rooms, cls)
-
-
 
 
 class Room(TZContainer):

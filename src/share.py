@@ -966,6 +966,14 @@ def module_as_string(obj, instance=True):
     modstr, clsstr = class_info(obj, instance)
     return modstr
 
+def class_mod(obj):
+    mods = {'Item': items,
+            'Mob': mobs,
+            'Room': rooms,
+            'Exit': rooms,
+            'Player': players}
+    return mods[obj._bse]
+
 
 def load_plugins():
     print 'loading plugins'
@@ -980,13 +988,20 @@ def load_plugins():
         mod = __import__(modname)
 
 
-def register_plugin(mod, cls):
+def register_plugin(cls):
+    mod = class_mod(cls)
     name = class_as_string(cls, instance=False)
     if hasattr(mod, name):
         print 'Warning: plugin class', name, 'conflicts.'
         print 'plugin NOT registered.'
     else:
-        mod.class_names.append(name)
+        if cls._bse != 'Exit':
+            classes = 'class_names'
+        else:
+            classes = 'exit_class_names'
+
+        classes_lst = getattr(mod, classes)
+        classes_lst.append(name)
         setattr(mod, name, cls)
         print 'plugin', name, 'registered.'
 
@@ -1127,6 +1142,7 @@ import players
 import rooms
 import mobs
 import wizard
+import items
 
 if conf.load_plugins:
     load_plugins()
