@@ -487,15 +487,27 @@ class Player(Character):
         'Something has been "teleport"ed away from near this player.'
 
         item = info['item']
-        if self.can_see(item):
+        container = info['container']
+        containers = container.containers()
+        if container is self.room and self.can_see(item):
             self.message(item, 'disappears.')
+        elif container is self:
+            self.message(item, 'disappears from your inventory.')
+        elif container is not self.room and self in containers:
+            self.message(item, 'disappears from the', container, 'in your inventory.')
 
     def near_teleport_item_in(self, info):
         'Something has been "teleport"ed in near this player.'
 
         item = info['item']
-        if self.can_see(item):
+        container = item.room
+        containers = container.containers()
+        if container is self.room and self.can_see(item):
             self.message(item, 'appears.')
+        elif container is self:
+            self.message(item, 'appears in your inventory.')
+        elif container is not self.room and self in containers:
+            self.message(item, 'appears in the', container, 'in your inventory.')
 
     def near_sleep(self, info):
         'Someone has gone to sleep near this player.'
