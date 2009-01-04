@@ -149,6 +149,8 @@ class Edit(pages_base.TZPage):
             return self.owner_widget(name, data), self.editlink_widget(data)
         elif name == 'room':
             return self.rooms_widget(name, data), self.editlink_widget(data)
+        elif name == 'container':
+            return self.rooms_widget(name, data), self.containerlink_widget(data)
         elif name == 'destination':
             return self.rooms_widget(name, data), self.editlink_widget(data)
         elif name == 'mobtype':
@@ -175,6 +177,12 @@ class Edit(pages_base.TZPage):
             link = ''
 
         return link
+
+    def container_widget(self, obj):
+        links = []
+        for o in obj.containers():
+            links.append(self.editlink_widget(o))
+        return T.span[links]
 
     def deletelink_widget(self, obj):
         if obj is None:
@@ -274,6 +282,11 @@ class Edit(pages_base.TZPage):
             if val is None:
                 val = getattr(self.obj, setting, None)
             inpt = T.td[self.get_setting_widget(setting, val)]
+            lines.append(T.tr[label, inpt])
+
+        if self.bse != 'Room' and self.obj.container != self.obj.room:
+            label = T.td(_class="textlabel")['container']
+            inpt = T.td[self.container_widget(self.obj)]
             lines.append(T.tr[label, inpt])
 
         empty = T.td(_class='empty')['']
