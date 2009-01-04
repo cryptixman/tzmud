@@ -75,7 +75,7 @@ class Edit(pages_base.TZPage):
                 if toroom is not room:
                     roomid = room.tzid
                     print 'teleport from', room.name, 'to', toroom.name
-
+                    self.obj.teleport(toroom)
 
 
         return ''
