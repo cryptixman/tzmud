@@ -152,11 +152,14 @@ class Item(TZObj):
         'Teleport this item to room.'
 
         room = self.room
-        room.remove(self)
-        destination.add(self)
+        container = self.container
+
         room.action(dict(act='teleport_item_away',
                             actor=None,
-                            item=self))
+                            item=self,
+                            container=container))
+        container.remove(self)
+        destination.add(self)
         destination.action(dict(act='teleport_item_in',
                                     delay=0.4,
                                     actor=None,
