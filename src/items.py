@@ -109,14 +109,13 @@ class Item(TZObj):
     'Base class for all items in the MUD.'
 
     name = 'proto item'
+    _bse = 'Item'
 
     def __init__(self, name='', short='', long='', owner=None):
         'Initialize this item, and add it to the item index.'
 
         TZObj.__init__(self, name, short, long, owner)
         add(self)
-
-        self._bse = 'Item'
 
     def destroy(self):
         'Get rid of this item and remove it from the index.'

@@ -126,6 +126,7 @@ class Room(TZContainer):
 
     name = 'proto room'
     period = int_attr('period') # seconds
+    _bse = 'Room'
 
     def __init__(self, name='', short='', long='', owner=None,
                     exits=None, items=None):
@@ -145,8 +146,6 @@ class Room(TZContainer):
         add(self)
 
         self.periodically()
-
-        self._bse = 'Room'
 
     def destroy(self):
         '''Get rid of this room and remove it from the index.
@@ -820,6 +819,7 @@ class Exit(TZObj):
     name = 'proto exit'
     _link_exit_id = 0
     settings = ['locked', 'weight',]
+    _bse = 'Exit'
 
 
     def __init__(self, name='', short='', long='', room=None, destination=None, return_name=''):
@@ -843,8 +843,6 @@ class Exit(TZObj):
             self.link(x)
 
         self._keys = PersistentList()
-
-        self._bse = 'Exit'
 
     def destroy(self):
         'Get rid of this exit.'

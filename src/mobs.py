@@ -123,6 +123,7 @@ class Mob(Character):
     name = 'proto mob'
     period = int_attr('period', default=10) # seconds
     settings = ['period']
+    _bse = 'Mob'
 
     def __init__(self, name='', short='', long=''):
         Character.__init__(self, name, short, long)
@@ -136,8 +137,6 @@ class Mob(Character):
         self.set_default_action_weights()
         self.set_action_weights(action_awake=500,
                                 action_move=0)
-
-        self._bse = 'Mob'
 
     def destroy(self):
         'Get rid of this mob and remove it from the mob index.'

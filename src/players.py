@@ -92,6 +92,7 @@ class Player(Character):
     'Base class for all players.'
 
     name = str_attr('name', blank_ok=False, setonce=True)
+    _bse = 'Player'
 
     def __init__(self, name, short='', long=''):
         Character.__init__(self, name, short, long)
@@ -104,8 +105,6 @@ class Player(Character):
         self.created = time.time()
         self.last = None
         self.active = None
-
-        self._bse = 'Player'
 
     def destroy(self):
         'Get rid of this player and remove it from the indexes.'
