@@ -100,8 +100,8 @@ if conf.web:
     site = appserver.NevowSite(pages_index.Index())
 
     if conf.web_local_only:
-        webserver = internet.TCPServer(8080, site, 1, '127.0.0.1')
+        webserver = internet.TCPServer(conf.web_port, site, 1, '127.0.0.1')
     else:
-        webserver = internet.TCPServer(8080, site)
+        webserver = internet.TCPServer(conf.web_port, site)
 
     webserver.setServiceParent(application)

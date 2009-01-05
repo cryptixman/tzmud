@@ -211,7 +211,9 @@ def start():
                 print output
 
             else:
-                print 'Server started'
+                print 'MUD server started on port', conf.port
+                if conf.web:
+                    print '        Web server on port', conf.web_port
     else:
         print 'Server is already running.'
 

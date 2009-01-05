@@ -48,6 +48,7 @@ home_id = 1
 svn = '/usr/bin/svn'
 
 web = False
+web_port = 8888
 web_local_only = True
 
 enable_cmd_py = False
