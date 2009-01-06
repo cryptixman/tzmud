@@ -43,7 +43,7 @@
 - allow players to set their own short and long descriptions
 - allow Spawner to spawn more than 1 of its mobtype in the room
 - make plugins rebuildable
+- fix getting coins leaves None in character inventory list
 
 # Web Server
 - Build MUD areas by web.
-- Some areas only available when logged in
