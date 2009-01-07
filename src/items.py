@@ -417,20 +417,20 @@ class Coin(Item):
             return coins
 
     def get(self, character):
-        coins = character.itemname('coins')
-        if coins is not None and coins is not self:
-            coins.add_coins(self._n_coins)
-            character.remove(self)
-            self.destroy()
+        other_coins = character.itemname('coins')
+        if other_coins is not None and other_coins is not self:
+            self.add_coins(other_coins._n_coins)
+            character.remove(other_coins)
+            other_coins.destroy()
 
         return True
 
     def put(self, character, container):
-        coins = container.itemname('coins')
-        if coins is not None and coins is not self:
-            coins.add_coins(self._n_coins)
-            container.remove(self)
-            self.destroy()
+        other_coins = container.itemname('coins')
+        if other_coins is not None and other_coins is not self:
+            self.add_coins(other_coins._n_coins)
+            container.remove(other_coins)
+            other_coins.destroy()
 
 
 class Hat(Item):
