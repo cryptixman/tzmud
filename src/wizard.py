@@ -251,6 +251,13 @@ def cmd_dig(s, r):
     Destination or exits can be existing objects, or if they do not
         yet exist, they will be created.
 
+    If the exit out name is one of the compass directions (ie north,
+        south, east, northeast, etc) and no return by exit name is
+        given, the return by exit will be created automatically with
+        the opposite direction name. (eg. if an exit out is dug to
+        the west, an exit in will also be added to the east from
+        the destination.)
+
     '''
 
     room = s.room
@@ -273,6 +280,18 @@ def cmd_dig(s, r):
 
     exitinname = r.get('exitinname', '')
     exitintzid = r.get('exitintzid', 0)
+    if not exitinname and not exitintzid:
+        autoreturnby = {'north': 'south',
+                        'south': 'north',
+                        'east': 'west',
+                        'west': 'east',
+                        'northeast': 'southwest',
+                        'northwest': 'southeast',
+                        'southeast': 'northwest',
+                        'southwest': 'northeast',}
+        if exitoutname in autoreturnby:
+            exitinname = autoreturnby[exitoutname]
+
     xi = destination.exitname(exitinname) or destination.exit(exitintzid)
     if xi is not None:
         exitinname = xi.name
