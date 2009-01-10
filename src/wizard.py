@@ -291,6 +291,8 @@ def cmd_dig(s, r):
                         'southwest': 'northeast',}
         if exitoutname in autoreturnby:
             exitinname = autoreturnby[exitoutname]
+        else:
+            exitinname = 'door'
 
     xi = destination.exitname(exitinname) or destination.exit(exitintzid)
     if xi is not None:
