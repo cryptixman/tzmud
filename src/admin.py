@@ -401,6 +401,8 @@ def cmd_rebuild(s, r=None):
                 import traceback
                 tb = traceback.format_exc()
                 print tb
+            else:
+                s.message(r, 'rebuilt.')
 
 def save_obj_settings(obj):
     save = {}
