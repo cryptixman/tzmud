@@ -49,9 +49,12 @@ from colors import blue, red, green, yellow, bold
 
 
 def cmd_look(s, r):
-    '''look [<item>|<player>|<mob>|<room>|<exit>]
+    '''look  [[at] <item>|<player>|<mob>|<room>|<exit>]
 
     Examine some object, player, room, etc more closely.
+
+    You can also say:   look [at] self | myself | me   or
+        look around | look about | look [at] the room
 
     Alternate: l
 
@@ -60,6 +63,13 @@ def cmd_look(s, r):
     player = s.player
     room = s.room
     obj = find(r, room, player, room)
+
+    if obj is None:
+        objname = r.get('objname', '')
+        if objname in ('self', 'myself', 'me'):
+            obj = player
+        elif objname in ('around', 'about', 'the room'):
+            obj = room
 
     if obj is not None and player.can_see(obj):
         s.message('You look at', obj, '.')
