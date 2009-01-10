@@ -624,6 +624,8 @@ def cmd_follow(s, r=None):
 
     Follow the give character.
 
+    To stop following, follow yourself.
+
     '''
 
     objname = r.get('objname', '')
