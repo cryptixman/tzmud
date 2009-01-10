@@ -793,13 +793,14 @@ Character (%s): %s
         x = info['tox']
         if leaver is not self and self.can_see(leaver):
             if self.following==leaver and self.awake:
-                reactor.callLater(0, self._follow, leaver, x)
+                reactor.callLater(0.3, self._follow, leaver, x)
 
     def _follow(self, leaver, x):
         'Follow along if this character is following someone who left.'
 
         try:
-            self.go(x)
+            if leaver not in self.room:
+                self.go(x)
         except:
             #print 'Character._follow ABORT'
             abort()

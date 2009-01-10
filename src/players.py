@@ -310,14 +310,17 @@ class Player(Character):
         if leaver is not self and self.can_see(leaver):
             self.message(leaver, 'leaves to', x, '.')
             if self.following == leaver:
-                self.message('You follow', leaver, '.')
-                reactor.callLater(0, self._follow, leaver, x)
+                reactor.callLater(0.3, self._follow, leaver, x)
 
     def _follow(self, leaver, x):
         'Override Character._follow to show room name when arriving.'
 
-        Character._follow(self, leaver, x)
-        self.message(self.room)
+        if leaver not in self.room:
+            self.message('You follow', leaver, '.')
+            Character._follow(self, leaver, x)
+            self.message(self.room)
+        else:
+            self.message('You started to follow, but', leaver, 'came right back.')
 
     def near_arrive(self, info):
         'Someone has "arrive"d near this player.'
