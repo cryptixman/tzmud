@@ -662,15 +662,21 @@ Character (%s): %s
         '''
 
         msgs = TZContainer.look(self, looker)
-        iis = filter(looker.can_see, self.items())
+        iis = set(filter(looker.can_see, self.items()))
         if iis:
-            msgs.append('')
-            msgs.append('Holding:')
-            for item in iis:
-                if self.is_wearing(item):
-                    msgs.append('    ' + str(item) + '*')
-                else:
+            worn = set(i for i in iis if self.is_wearing(i))
+            held = iis - worn
+            if held:
+                msgs.append('')
+                msgs.append('Holding:')
+                for item in held:
                     msgs.append('    ' + str(item))
+            if worn:
+                msgs.append('')
+                msgs.append('Wearing:')
+                for item in worn:
+                    msgs.append('    ' + str(item))
+
 
         return msgs
 
