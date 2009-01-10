@@ -16,7 +16,6 @@
 - expand the initial world
 - Die item -- magical attack
 - Human/Humanoid mob for subclassing
-- remove old-style password verification in v0.9
 - potion of see invisible things
     or SeeInvRing allows character to see invisible things
 - item exchanging (give, take, accept, steal)
