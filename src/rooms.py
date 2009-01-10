@@ -163,6 +163,20 @@ class Room(TZContainer):
         remove(self)
         TZContainer.destroy(self)
 
+    def __contains__(self, obj):
+        'Return True if the given object, mob, or player is in this container.'
+
+        tzid = obj.tzid
+
+        if tzid in self._item_ids:
+            return True
+        elif tzid in self._player_ids:
+            return True
+        elif tzid in self._mob_ids:
+            return True
+        else:
+            return False
+
     def periodically(self):
         '''Call self.periodic() every self.period seconds.
 
