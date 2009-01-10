@@ -270,6 +270,7 @@ def cmd_dig(s, r):
 
     if destination is None and destname:
         destination = rooms.Room(destname)
+        s.message(destination, 'created.')
     elif destination is None:
         s.message('#', desttzid, 'is not a room.')
         return
@@ -306,6 +307,7 @@ def cmd_dig(s, r):
             xi = rooms.Exit(exitinname, room=destination, destination=room)
             xo.link(xi)
             destination.action(dict(act='dig', actor=None, exit=xi))
+        s.message('You reconnect', xo, 'to', destination, '.')
 
     elif exitoutname:
         if exitinname or xi is None:
@@ -313,6 +315,7 @@ def cmd_dig(s, r):
             room.action(dict(act='dig', actor=s.player, exit=xo))
             xi = xo.get_linked_exit()
             destination.action(dict(act='dig', actor=None, exit=xi))
+            s.message('You dig', xo, 'to', destination, '.')
         else:
             s.message('#', exitintzid, 'is not an exit in', destination, '.')
             raise TypeError
