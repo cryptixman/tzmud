@@ -630,39 +630,53 @@ def cmd_unlock(s, r):
 
 
 def cmd_follow(s, r=None):
-    '''follow <player>|<mob>
+    '''follow [<player>|<mob>]
 
-    Follow the give character.
+    Follow the give character, or find out who you are following, if no one
+        is specified to follow.
 
-    To stop following, follow yourself.
+    To stop following, "follow none", "follow no one", or "follow nobody".
 
     '''
+
+    player = s.player
+    room = s.room
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
 
     if not objname and not objtzid:
-        if s.player.following is not None:
-            s.message('Following', s.player.following, '.')
+        if player.following is not None:
+            s.message('You are following', player.following, '.')
         else:
             s.message('Not following anyone.')
 
-    else:
-        character = s.room.playername(objname) or \
-                    s.room.player(objtzid) or \
-                    s.room.mobname(objname) or \
-                    s.room.mob(objtzid)
+        return
 
-        if character is not None:
-            s.player.following = character
-            if character == s.player:
-                s.message('You stop following.')
-            else:
-                s.message('You start following', character, '.')
-            s.room.action(dict(act='follow', actor=s.player, following=character))
+
+    character = room.playername(objname) or room.player(objtzid) or \
+                room.mobname(objname) or room.mob(objtzid)
+
+    if character is None and objname:
+        stoppers = ['none', 'nobody', 'no one']
+        if objname.lower() in stoppers:
+            player.following = None
+            s.message('You stop following.')
+            return
+
+    if character is None:
+        if objname:
+            s.message(objname, 'is not here.')
+        elif objtzid:
+            s.message('Object #', objtzid, 'is not here.')
+
+    else:
+        player.following = character
+        if character == player:
+            s.message('You stop following.')
         else:
-            identifier = objname or objtzid
-            s.message('Cannot follow', identifier, '.')
+            s.message('You start following', character, '.')
+            room.action(dict(act='follow', actor=player, following=character))
 
 
 def cmd_exits(s, r=None):
