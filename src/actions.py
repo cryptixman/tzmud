@@ -66,9 +66,9 @@ def cmd_look(s, r):
 
     if obj is None:
         objname = r.get('objname', '')
-        if objname in ('self', 'myself', 'me'):
+        if objname.lower() in ('self', 'myself', 'me'):
             obj = player
-        elif objname in ('around', 'about', 'the room'):
+        elif objname.lower() in ('around', 'about', 'the room'):
             obj = room
 
     if obj is not None and player.can_see(obj):
@@ -487,7 +487,7 @@ def cmd_go(s, r):
 
         if found:
             pass
-        elif (objname in alternates) or (not objname and not objtzid):
+        elif (objname.lower() in alternates) or (not objname and not objtzid):
             if len(xs)==1:
                 x = xs[0]
             else:
