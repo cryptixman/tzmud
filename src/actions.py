@@ -671,7 +671,7 @@ def cmd_follow(s, r=None):
             s.message('You stop following.')
             return
 
-    if character is None:
+    if character is None or not player.can_see(character):
         if objname:
             s.message(objname, 'is not here.')
         elif objtzid:
