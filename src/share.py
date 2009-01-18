@@ -167,10 +167,7 @@ class TZObj(Persistent):
         tzindex.remove(self)
 
     def __str__(self):
-        if self.visible:
-            return self.name
-        else:
-            return '(%s)' % self.name
+        return self.name
 
     def __copy__(self):
         new_item = self.__class__(self.name)
@@ -243,6 +240,8 @@ class TZObj(Persistent):
     def set_visible(self, v):
         was = self.visible
 
+        print 'vis', was, v
+
         if not v in (True, False):
             try:
                 norm = v.lower()
@@ -256,14 +255,15 @@ class TZObj(Persistent):
                 else:
                     return False
 
+        room = self.room
+
+        if room is not None and not v and was:
+            room.action(dict(act='disappear', actor=self))
+
         self.visible = v
 
-        room = self.room
-        if room is not None:
-            if v and not was:
-                room.action(dict(act='appear', actor=self))
-            elif not v and was:
-                room.action(dict(act='disappear', actor=self))
+        if room is not None and v and not was:
+            room.action(dict(act='appear', actor=self))
 
         return True
 
@@ -762,13 +762,15 @@ Character (%s): %s
         "Add the given item to this character's list of worn items."
 
         if not item in self or not item.wearable:
-            return
+            return False
         elif item.tzid in self._wearing_ids:
-            return
+            return False
         else:
-            self._wearing_ids.append(item.tzid)
-            item.wear(self)
+            success = item.wear(self)
+            if success:
+                self._wearing_ids.append(item.tzid)
             self.room.action(dict(act='wear', actor=self, item=item))
+            return success
 
     def wearing(self):
         'Return a list of the items this character is wearing.'
@@ -787,9 +789,13 @@ Character (%s): %s
         "Remove the given item from this character's list of worn items."
 
         if self.is_wearing(item):
-            self._wearing_ids.remove(item.tzid)
-            item.unwear(self)
+            success = item.unwear(self)
+            if success:
+                self._wearing_ids.remove(item.tzid)
             self.room.action(dict(act='unwear', actor=self, item=item))
+            return success
+        else:
+            return False
 
     # near actions
     def near_leave(self, info):

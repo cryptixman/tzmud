@@ -136,11 +136,28 @@ class Item(TZObj):
 
     def wear(self, character):
         'Character has put on this item.'
-        pass
+        return True
 
     def unwear(self, character):
         'Character has taken off this item.'
-        pass
+        return True
+
+    def wearer(self):
+        'return the character wearing this item, or None if no one is.'
+
+        if not self.wearable:
+            return None
+
+        for container in self.containers():
+            try:
+                wearing = container.is_wearing(self)
+            except AttributeError:
+                pass
+
+            if wearing:
+                return container
+
+        return None
 
     def teleport(self, destination):
         'Teleport this item to room.'
@@ -264,9 +281,11 @@ class WizRing(Item):
 
     def wear(self, character):
         wizard.add(character)
+        return True
 
     def unwear(self, character):
         wizard.remove(character)
+        return True
 
 class InvRing(Item):
     'A ring which makes the wearer invisible.'
@@ -276,20 +295,34 @@ class InvRing(Item):
     wearable = True
     name_aka = ['ring',]
 
+    def _set_visible(self, character, vis):
+        '''Set the visibility of the character.
+
+        Need to do this later on, so that others in the room will see
+            this player put the ring on and disappear, or see this
+            player appear but not see him remove the ring.
+
+        '''
+
+        character.setting('visible', vis)
+
     def wear(self, character):
-        for p in character.room.players():
-            if p is not character:
-                if p.can_see(character): # could already be invisible
-                    p.message(character, 'disappears.')
-        character.setting('visible', 'False')
+        reactor.callLater(0.4, self._set_visible, character, False)
+        return True
 
     def unwear(self, character):
-        pcantsee = [p for p in character.room.players() if not p.can_see(character)]
-        # EEE -- what if the character is wearing an InvRing
-        #       but is naturally invisible?
-        character.setting('visible', 'True')
-        for player in pcantsee:
-            player.message(character, 'appears.')
+        reactor.callLater(0.4, self._set_visible, character, True)
+        return True
+
+class CursedItem(Item):
+    'A wearable item which cannot be removed once worn'
+
+    name = 'accursed'
+    short = "You just can't seem to remove it."
+    wearable = True
+
+    def unwear(self, character):
+        return False
 
 class DetectInvisRing(Item):
     'A ring which allows the wearer to detect invisible objects.'
@@ -301,14 +334,8 @@ class DetectInvisRing(Item):
     name_aka = ['ring',]
     _wearerid = None
 
-    def wear(self, character):
-        self._wearerid = character.tzid
-
-    def unwear(self, character):
-        self._wearerid = None
-
     def near_look(self, info):
-        wearer = players.get(self._wearerid) or mobs.get(self._wearerid)
+        wearer = self.wearer()
         looker = info['actor']
         obj = info['actee']
         if looker is wearer:
@@ -577,7 +604,7 @@ class TreasureChest(ContainerItem):
 
 
 
-class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap', 'TreasureChest']
+class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap', 'TreasureChest', 'CursedItem']
 
 def classes():
     'Returns a list of the names of the clonable items.'

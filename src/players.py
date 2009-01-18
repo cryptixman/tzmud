@@ -263,16 +263,24 @@ class Player(Character):
 
         wearer = info['actor']
         item = info['item']
-        if wearer is not self and self.can_see(wearer):
-            self.message(wearer, 'wears', item, '.')
+        wearing = wearer.is_wearing(item)
+        if wearer is not self and self.can_see(wearer) and self.can_see(item):
+            if wearing:
+                self.message(wearer, 'wears', item, '.')
+            else:
+                self.message(wearer, 'tries to wear', item, "but can't.")
 
     def near_unwear(self, info):
         'Someone has "remove"d near this player.'
 
         wearer = info['actor']
         item = info['item']
-        if wearer is not self and self.can_see(wearer):
-            self.message(wearer, 'removes', item, '.')
+        wearing = wearer.is_wearing(item)
+        if wearer is not self and self.can_see(wearer) and self.can_see(item):
+            if not wearing:
+                self.message(wearer, 'removes', item, '.')
+            else:
+                self.message(wearer, 'tries to remove', item, "but can't.")
 
     def near_put(self, info):
         'Someone has "put" something in a container near this player.'

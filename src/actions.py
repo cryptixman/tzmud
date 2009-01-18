@@ -399,8 +399,10 @@ def cmd_wear(s, r):
     elif not item.wearable:
         s.message("You can't wear that.")
     else:
-        s.message('You wear', item, '.')
-        player.wear(item)
+        if player.wear(item):
+            s.message('You wear', item, '.')
+        else:
+            s.message('You try to wear', item, "but can't.")
 
 
 def cmd_remove(s, r):
@@ -410,6 +412,9 @@ def cmd_remove(s, r):
         remove some item from a container.
 
     '''
+
+    # Note that the code for removing an item from a container is
+    #   actually in cmd_take, not here.
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
@@ -423,8 +428,10 @@ def cmd_remove(s, r):
     if item is None or not player.is_wearing(item):
         s.message('You are not wearing that.')
     else:
-        s.message('You remove', item, '.')
-        player.unwear(item)
+        if player.unwear(item):
+            s.message('You remove', item, '.')
+        else:
+            s.message('You try to remove', item, "but can't.")
 
 
 def cmd_go(s, r):
