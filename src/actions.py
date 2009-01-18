@@ -400,9 +400,9 @@ def cmd_wear(s, r):
         s.message("You can't wear that.")
     else:
         if player.wear(item):
-            s.message('You wear', item, '.')
+            s.message('You wear the', item, '.')
         else:
-            s.message('You try to wear', item, "but can't.")
+            s.message('You try to wear the', item, "but can't.")
 
 
 def cmd_remove(s, r):
@@ -429,9 +429,9 @@ def cmd_remove(s, r):
         s.message('You are not wearing that.')
     else:
         if player.unwear(item):
-            s.message('You remove', item, '.')
+            s.message('You remove the', item, '.')
         else:
-            s.message('You try to remove', item, "but can't.")
+            s.message('You try to remove the', item, "but can't.")
 
 
 def cmd_go(s, r):
