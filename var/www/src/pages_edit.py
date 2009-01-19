@@ -148,7 +148,8 @@ class Edit(pages_base.TZPage):
         if name == 'owner':
             return self.owner_widget(name, data), self.editlink_widget(data)
         elif name == 'room':
-            return self.rooms_widget(name, data), self.editlink_widget(data)
+            return (self.rooms_widget(name, data, none_is_logged_out=True),
+                                         self.editlink_widget(data))
         elif name == 'home':
             return self.rooms_widget(name, data), self.editlink_widget(data)
         elif name == 'container':
@@ -218,7 +219,7 @@ class Edit(pages_base.TZPage):
 
         return self.render_form_select(info)
 
-    def rooms_widget(self, name, x):
+    def rooms_widget(self, name, x, none_is_logged_out=False):
         if x is None:
             tzid=None
         else:
@@ -227,12 +228,16 @@ class Edit(pages_base.TZPage):
         rs = rooms.ls()
         rs.sort(key=attrgetter('name'))
         choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
-        choices.insert(0, (None, 'None'))
+        if not none_is_logged_out:
+            choices.insert(0, (None, 'None'))
         info = dict(name=name,
                     choices=choices,
                     selected=tzid)
 
-        return self.render_form_select(info)
+        if none_is_logged_out and tzid is None:
+            return 'Not logged in.'
+        else:
+            return self.render_form_select(info)
 
     def str_widget(self, name, data, size=60):
         disabled = ''
