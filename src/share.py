@@ -578,7 +578,7 @@ class Character(TZContainer):
     stats_list = ['health', 'strength', ]
     health = int_attr('health')
     strength = int_attr('strength')
-    settings = stats_list
+    settings = ['home'] + stats_list
 
     def __init__(self, name='', short='', long=''):
         TZContainer.__init__(self, name, short, long)
@@ -701,6 +701,10 @@ Character (%s): %s
         'Getter for the home property.'
         return rooms.get(self._hid) or rooms.get(conf.home_id)
     home = property(_get_home, _set_home)
+
+    def set_home(self, discard):
+        self.home = self.room
+        return True
 
     def _get_following(self):
         '''Getter for the following property.

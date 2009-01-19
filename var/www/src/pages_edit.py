@@ -149,6 +149,8 @@ class Edit(pages_base.TZPage):
             return self.owner_widget(name, data), self.editlink_widget(data)
         elif name == 'room':
             return self.rooms_widget(name, data), self.editlink_widget(data)
+        elif name == 'home':
+            return self.rooms_widget(name, data), self.editlink_widget(data)
         elif name == 'container':
             return self.rooms_widget(name, data), self.containerlink_widget(data)
         elif name == 'destination':
