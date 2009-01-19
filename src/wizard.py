@@ -113,6 +113,7 @@ def cmd_set(s, r):
         s.message('Error:', e)
     else:
         if success:
+            value = obj.setting(setting)
             s.message('Set', setting, 'to', value, '.')
         else:
             s.message('Cannot set', setting, 'on', obj, '.')
