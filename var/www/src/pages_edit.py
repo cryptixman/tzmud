@@ -69,14 +69,21 @@ class Edit(pages_base.TZPage):
 
             toroomid = args.get('room', None)
             if toroomid is not None:
-                toroomid = int(toroomid)
-                toroom = tzindex.get(toroomid)
-                room = self.obj.room
-                if toroom is not room:
-                    roomid = room.tzid
-                    print 'teleport from', room.name, 'to', toroom.name
-                    self.obj.teleport(toroom)
-
+                room_orig = args.get('room_orig', None)
+                if room_orig is None or room_orig==toroomid:
+                    # do not teleport, since the setting was not
+                    # changed, but may be different from where the
+                    # character is right now.
+                    pass
+                else:
+                    toroomid = int(toroomid)
+                    toroom = tzindex.get(toroomid)
+                    room = self.obj.room
+                    if toroom is not room:
+                        roomid = room.tzid
+                        print 'teleport from', room.name, 'to', toroom.name
+                        self.obj.teleport(toroom)
+                        self._toroomid = toroomid
 
         return ''
 
@@ -149,7 +156,8 @@ class Edit(pages_base.TZPage):
             return self.owner_widget(name, data), self.editlink_widget(data)
         elif name == 'room':
             return (self.rooms_widget(name, data, none_is_logged_out=True),
-                                         self.editlink_widget(data))
+                                         self.editlink_widget(data),
+                                         self.orig_data_widget(name, data))
         elif name == 'home':
             return self.rooms_widget(name, data), self.editlink_widget(data)
         elif name == 'container':
@@ -220,7 +228,13 @@ class Edit(pages_base.TZPage):
         return self.render_form_select(info)
 
     def rooms_widget(self, name, x, none_is_logged_out=False):
-        if x is None:
+        if none_is_logged_out and hasattr(self, '_toroomid'):
+            # this is a character, and the character was teleported
+            # using the web interface on this page load. Need to use
+            # a saved value for the room, since the actual move will
+            # not take place until later.
+            tzid = self._toroomid
+        elif x is None:
             tzid=None
         else:
             tzid=x.tzid
@@ -238,6 +252,14 @@ class Edit(pages_base.TZPage):
             return 'Not logged in.'
         else:
             return self.render_form_select(info)
+
+    def orig_data_widget(self, name, data):
+        'save the value originally set in the widget in a hidden field'
+
+        if hasattr(data, 'tzid'):
+            data = data.tzid
+
+        return T.input(name='%s_orig'%name, _type='hidden', value=data)
 
     def str_widget(self, name, data, size=60):
         disabled = ''
