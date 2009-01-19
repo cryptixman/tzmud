@@ -702,9 +702,46 @@ Character (%s): %s
         return rooms.get(self._hid) or rooms.get(conf.home_id)
     home = property(_get_home, _set_home)
 
-    def set_home(self, discard):
-        self.home = self.room
-        return True
+    def set_home(self, iden):
+        '''iden can be either a room, or the name or id# of a room, or
+
+        if iden is 'True', set home to the room the character is
+            currently in, or
+
+        if iden is 0, None, 'None', False, or 'False', unset the home
+            (set it to None -- which essentially sets it back to the
+            default value set in conf.py).
+
+        '''
+
+        if iden == 'True':
+            self.home = self.room
+            return True
+
+        if iden in (0, None, 'None', False, 'False'):
+            self.home = None
+            return True
+
+        if hasattr(iden, 'tzid') and rooms.get(iden.tzid)==iden:
+            room = iden
+            self.home = room
+            return True
+
+        if hasattr(iden, 'isdigit'):
+            if iden.isdigit():
+                room = rooms.get(int(iden))
+                if room is not None:
+                    self.home = room
+                    return True
+                else:
+                    return False
+            else:
+                room = rooms.getname(iden)
+                if room is not None:
+                    self.home = room
+                    return True
+
+        return False
 
     def _get_following(self):
         '''Getter for the following property.
