@@ -115,8 +115,17 @@ class Item(TZObj):
     def destroy(self):
         'Get rid of this item and remove it from the index.'
 
+        container = self.container
+        room = self.room
+
+        if container is not None:
+            container.remove(self)
+
         remove(self)
         TZObj.destroy(self)
+
+        if room is not None:
+            room.action(dict(act='destroy_item', actor=None, item=self))
 
     def get(self, character):
         'Character has picked up this item. return True if successful, else False'
@@ -205,8 +214,17 @@ class ContainerItem(Item, TZContainer):
     def destroy(self):
         'Get rid of this item and remove it from the index.'
 
+        container = self.container
+        room = self.room
+
+        if container is not None:
+            container.remove(self)
+
         remove(self)
         TZContainer.destroy(self)
+
+        if room is not None:
+            room.action(dict(act='destroy_item', actor=None, item=self))
 
     def look(self, looker):
         '''Return a multiline message (list of strings) for a player looking

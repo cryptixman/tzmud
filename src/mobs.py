@@ -139,6 +139,8 @@ class Mob(Character):
         room = self.room
         if room is not None:
             room.rmmob(self)
+            room.action(dict(act='destroy_mob', actor=None, mob=self))
+
         remove(self)
         Character.destroy(self)
 

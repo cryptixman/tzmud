@@ -647,19 +647,10 @@ def cmd_destroy(s, r):
                 tzindex.get(objtzid)
 
     if obj is not None:
-        if obj in player:
-            player.remove(obj)
-        elif obj in room:
-            room.remove(obj)
-            s.room.action(dict(act='destroy_item', actor=s.player, item=obj))
-        elif obj in room.mobs():
-            s.room.action(dict(act='destroy_mob', actor=s.player, mob=obj))
-
+        s.message('You speak a word of power and ...')
+        s.room.action(dict(act="destroy", actor=player))
         obj.destroy()
-        try:
-            s.message(class_as_string(obj), obj, 'destroyed.')
-        except TypeError:
-            s.message('Destroyed.')
+
     else:
         s.message('Object not found.')
 

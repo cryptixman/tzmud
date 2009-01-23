@@ -36,7 +36,7 @@ dbroot = TZODB().root
 
 from colors import blue
 
-from share import Character, str_attr
+from share import Character, str_attr, class_as_string
 
 import actions
 
@@ -541,27 +541,50 @@ class Player(Character):
             if self.can_see(x):
                 self.message('An exit', x, 'has appeared.')
 
+    def near_destroy(self, info):
+        'Someone has "destroy"ed some object near this player.'
+
+        destroyer = info['actor']
+        if destroyer is not self and self.can_see(destroyer):
+            self.message(destroyer, "mumbles something you can't quite make out and ... ")
+
     def near_destroy_item(self, info):
         'Someone has "destroy"ed some item near this player.'
 
         destroyer = info['actor']
         item = info['item']
-        if destroyer is not self:
-            if self.can_see(destroyer):
-                self.message(destroyer, "mumbles something you can't quite make out and ... ")
-            if self.can_see(item):
-                self.message(item, 'disappears.')
+
+        name = item.name
+
+        try:
+            clsname = class_as_string(item)
+        except TypeError:
+            clsname = item.name
+
+        if destroyer is not self and self.can_see(item):
+            if name.lower() != clsname.lower():
+                self.message(clsname, item, 'is destroyed.')
+            else:
+                self.message(item, 'is destroyed.')
 
     def near_destroy_mob(self, info):
         'Someone has "destroy"ed some mob near this player.'
 
         destroyer = info['actor']
         mob = info['mob']
-        if destroyer is not self:
-            if self.can_see(destroyer):
-                self.message(destroyer, "mumbles something you can't quite make out and ... ")
-            if self.can_see(mob):
-                self.message(mob, 'disappears.')
+
+        name = mob.name
+
+        try:
+            clsname = class_as_string(mob)
+        except TypeError:
+            clsname = mob.name
+
+        if destroyer is not self and self.can_see(mob):
+            if name.lower() != clsname.lower():
+                self.message(clsname, mob, 'is destroyed.')
+            else:
+                self.message(mob, 'is destroyed.')
 
     def _near_lock(self, info):
         '''Someone has "lock"ed  or "unlock"ed a door near this player.
