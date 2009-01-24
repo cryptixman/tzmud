@@ -242,6 +242,7 @@ def cmd_put(s, r):
         player.unwear(item)
         item.unwear(player)
     player.remove(item)
+    room.remove(item)
     container.add(item)
 
     s.message('You put the', item, 'in the', container, '.')
