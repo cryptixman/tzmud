@@ -394,7 +394,17 @@ def cmd_wear(s, r):
 
     player = s.player
 
-    item = player.itemname(objname) or player.item(objtzid)
+    if objname:
+        iis = player.itemname(objname, all=True)
+        item = None
+        if iis is not None:
+            for i in iis:
+                item = i
+                if not player.is_wearing(i):
+                    break
+
+    else:
+        item = player.item(objtzid)
 
     if item is None:
         s.message('You do not have that.')
@@ -427,7 +437,17 @@ def cmd_remove(s, r):
 
     player = s.player
 
-    item = player.itemname(objname) or player.item(objtzid)
+    if objname:
+        iis = player.itemname(objname, all=True)
+        item = None
+        if iis is not None:
+            for i in iis:
+                item = i
+                if player.is_wearing(i):
+                    break
+
+    else:
+        item = player.item(objtzid)
 
     if item is None or not player.is_wearing(item):
         s.message('You are not wearing that.')
