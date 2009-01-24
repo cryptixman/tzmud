@@ -301,18 +301,19 @@ class TZ(basic.LineReceiver):
             abort()
             print 'lineReceived ABORTING TRANSACTION'
             if conf.debug:
-                self.message('Debug')
-                self.mlmessage(e)
+                self.simessage('Debug')
+                self.simlmessage(e)
                 import traceback
                 print traceback.format_exc()
             try:
-                if self.room.tzid != self.player._rid:
-                    print 'WARNING: Room mismatch. Trying to correct.'
-                    room = tzindex.get(self.player._rid)
-                    if self.player not in room.players():
-                        room.addplayer(self.player)
-                    self.player._rid = room.tzid
-                    self.room = room
+                if self.logged_in:
+                    if self.room.tzid != self.player._rid:
+                        print 'WARNING: Room mismatch. Trying to correct.'
+                        room = tzindex.get(self.player._rid)
+                        if self.player not in room.players():
+                            room.addplayer(self.player)
+                        self.player._rid = room.tzid
+                        self.room = room
             except:
                 print 'Cannot recover from error.'
                 raise
@@ -347,10 +348,10 @@ class TZ(basic.LineReceiver):
                 func(self, rest)
             else:
                 func(self)
-        except:
+        except Exception, e:
             import traceback
             traceback.print_exc()
-            self.message('Not sure I understand.')
+            self.message('I am having trouble with that command.')
             if section==wizard:
                 prefix = '@'
             elif section==admin:
@@ -358,6 +359,11 @@ class TZ(basic.LineReceiver):
             else:
                 prefix = ''
             self.message('Try "%shelp %s"' % (prefix, cmd))
+
+            if conf.debug:
+                self.simessage('Debug')
+                self.simlmessage(e)
+
             #raise
             #self.dispatch(section, 'help', {'topic':cmd})
 
@@ -403,6 +409,10 @@ class TZ(basic.LineReceiver):
 
         for line in lines:
             self.message(line, indent=indent, color=color)
+
+    def simlmessage(self, lines):
+        for line in lines:
+            self.simessage(line)
 
     def broadcast(self, msg='', indent=0, color=True):
         'Send a message to all connected clients.'
