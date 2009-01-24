@@ -72,7 +72,10 @@ def cmd_look(s, r):
             obj = room
 
     if obj is not None and player.can_see(obj):
-        s.message('You look at', obj, '.')
+        if obj is not player:
+            s.message('You look at the', obj, '.')
+        else:
+            s.message('You look at yourself.')
         msg = player.look_at(obj)
         if msg:
             s.mlmessage(msg)
