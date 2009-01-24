@@ -480,15 +480,16 @@ def cmd_go(s, r):
 
                 dest = x.destination
 
-                if dest.name == objname:
-                    found = True
-                    break
+                if dest is not None:
+                    if dest.name == objname:
+                        found = True
+                        break
 
-                if hasattr(dest, 'name_aka'):
-                    for aka in item.name_aka:
-                        if aka == objname:
-                            found = True
-                            break
+                    if hasattr(dest, 'name_aka'):
+                        for aka in item.name_aka:
+                            if aka == objname:
+                                found = True
+                                break
 
         alternates = ['out', 'exit', 'leave']
 
