@@ -166,6 +166,26 @@ class TZObj(Persistent):
 
         tzindex.remove(self)
 
+    def exists(self):
+        '''Return True if this object is still an existing object.
+
+        This is used by the action framework to make sure that a mob
+        has not been destroyed since the last time the action method
+        was called since the twisted reactor will continue to hold
+        a reference to the mob object.
+
+        Also used by get/ drop/ put/ take just in case the object
+        gets destroyed somewhere along the line, to make sure that
+        a non-existent object is not put in to some room, character,
+        or container.
+
+        '''
+
+        if tzindex.get(self.tzid):
+            return True
+        else:
+            return False
+
     def __str__(self):
         return self.name
 
@@ -791,7 +811,8 @@ Character (%s): %s
 
         if item.get(self):
             room.remove(item)
-            self.add(item)
+            if self.exists():
+                self.add(item)
             room.action(dict(act='get', actor=self, item=item))
             return True
         else:
@@ -803,10 +824,11 @@ Character (%s): %s
         if self.is_wearing(item):
             self.unwear(item)
             item.unwear(self)
+        item.drop(self)
         self.remove(item)
         room = self.room
-        room.add(item)
-        item.drop(self)
+        if item.exists():
+            room.add(item)
         room.action(dict(act='drop', actor=self, item=item))
 
     def wear(self, item):

@@ -125,7 +125,7 @@ class Item(TZObj):
         TZObj.destroy(self)
 
         if room is not None:
-            room.action(dict(act='destroy_item', actor=None, item=self))
+            room.action(dict(act='destroy_item', delay=0.4, actor=None, item=self))
 
     def get(self, character):
         'Character has picked up this item. return True if successful, else False'
@@ -478,6 +478,16 @@ class Coin(Item):
             other_coins.destroy()
 
 
+class FragileItem(Item):
+    'An item that gets destroyed by dropping it.'
+
+    name = 'vase'
+
+    def drop(self, character):
+        self.destroy()
+        return True
+
+
 class Hat(Item):
     'Headgear'
 
@@ -622,7 +632,7 @@ class TreasureChest(ContainerItem):
 
 
 
-class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap', 'TreasureChest', 'CursedItem']
+class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap', 'TreasureChest', 'CursedItem', 'FragileItem']
 
 def classes():
     'Returns a list of the names of the clonable items.'

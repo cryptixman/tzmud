@@ -246,10 +246,11 @@ def cmd_put(s, r):
         item.unwear(player)
     player.remove(item)
     room.remove(item)
-    container.add(item)
 
     s.message('You put the', item, 'in the', container, '.')
     item.put(player, container)
+    if item.exists():
+        container.add(item)
     room.action(dict(act='put', actor=player, item=item, container=container))
 
 
@@ -300,10 +301,11 @@ def cmd_take(s, r):
                     s.message('You cannot split that item.')
 
             container.remove(item)
-            player.add(item)
 
             s.message('You take the', item, 'from the', container, '.')
             item.take(player, container)
+            if item.exists():
+                player.add(item)
             room.action(dict(act='take', actor=player, item=item,
                                 container=container))
 

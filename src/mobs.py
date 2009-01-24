@@ -144,21 +144,6 @@ class Mob(Character):
         remove(self)
         Character.destroy(self)
 
-    def exists(self):
-        '''Return True if this mob is still an existing object
-
-        This is used by the action framework to make sure that a mob
-        has not been destroyed since the last time the action method
-        was called since the twisted reactor will continue to hold
-        a reference to the mob object.
-
-        '''
-
-        if get(self.tzid):
-            return True
-        else:
-            return False
-
     def __str__(self):
         'Return the colorized name of this mob.'
 
