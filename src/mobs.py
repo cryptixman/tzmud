@@ -509,6 +509,17 @@ class Photographer(Mob):
             self.add(pic)
             self.drop_item(pic)
 
+    def near_say(self, info):
+        speaker = info['actor']
+        if speaker is not self:
+            msg = info['raw']
+            m = msg.lower()
+            if m.startswith('hello'):
+                self.room.action(dict(act='say',
+                                        verb='respond',
+                                        actor=self,
+                                        raw='Hi there!'))
+
 
 class Spawner(Mob):
     '''Periodically creates a mob. Only spawns when there is not a
