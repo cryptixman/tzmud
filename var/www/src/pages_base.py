@@ -197,8 +197,8 @@ class TZPage(rend.Page):
 
 
     def child_rebuild(self, ctx):
-        import pages
-        rebuild(pages)
+        import pages_base
+        rebuild(pages_base)
         import pages_index
         rebuild(pages_index)
         import pages_rooms
