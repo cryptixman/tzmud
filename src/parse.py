@@ -67,7 +67,7 @@ time = time_verb + LineEnd()
 
 get_verb = oneOf('get take', caseless=True)('verb')
 get_verb.setParseAction(replaceWith('get'))
-get = get_verb + Optional('the') + objref + LineEnd()
+get = get_verb + objref + LineEnd()
 
 
 drop_verb = CaselessLiteral('drop')('verb')
@@ -78,7 +78,7 @@ in_ = Suppress(CaselessLiteral('in '))
 thingname = Combine(OneOrMore(~in_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
 put_verb = CaselessLiteral('put')('verb')
-put = put_verb + Optional('the') + (thingname|objtzidref) + in_ + Optional('the') + obj2ref
+put = put_verb + (thingname|objtzidref) + in_ + obj2ref
 
 
 from_ = Suppress(CaselessLiteral('from '))
@@ -86,7 +86,7 @@ thingname = Combine(OneOrMore(~from_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
 take_verb = oneOf('take remove', caseless=True)('verb')
 take_verb.setParseAction(replaceWith('take'))
-take = take_verb + Optional(Optional(number)('number') + Optional('the')) + (thingname|objtzidref) + from_ + Optional('the') + obj2ref
+take = take_verb + Optional(Optional(number)('number')) + (thingname|objtzidref) + from_ + obj2ref
 
 
 inventory_verb = oneOf('inventory inv i')('verb')

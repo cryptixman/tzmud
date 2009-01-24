@@ -510,6 +510,9 @@ class TZContainer(TZObj):
         '''Return the item with the given name if it is in this container,
             or None if no such item is in this container.
 
+        If no item has exactly the name given, items with a name_aka list
+            will be checked to see if the name is another name for the item.
+
         Since item names are not unique, itemname returns the first item found
             with the given name. Pass in the parameter all=True to get a list
             of all items in this container with the given name instead.
@@ -525,7 +528,8 @@ class TZContainer(TZObj):
                     if item not in result:
                         result.append(item)
 
-            elif hasattr(item, 'name_aka'):
+        for item in self.items():
+            if hasattr(item, 'name_aka'):
                 for aka in item.name_aka:
                     if aka == name:
                         if not all:
@@ -533,6 +537,12 @@ class TZContainer(TZObj):
                         else:
                             if item not in result:
                                 result.append(item)
+
+        for article in ('a ', 'an ', 'the '):
+            if name.startswith(article):
+                l = len(article)
+                aname = name[l:]
+                return self.itemname(aname, all)
 
         if result:
             return result

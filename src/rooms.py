@@ -365,6 +365,9 @@ class Room(TZContainer):
         '''Return the mob with the given name if it is in this room, or None
             if no mob by that name is in this room.
 
+        If no mob has exactly the name given, mobs with a name_aka list
+            will be checked to see if the name is another name for the mob.
+
         Since mob names are not necessarily unique, mobnames will return the
             first mob found with the given name. If you want a list of all of
             the mobs by that name in this room, pass all=True.
@@ -379,13 +382,20 @@ class Room(TZContainer):
                 else:
                     result.append(mob)
 
-            elif hasattr(mob, 'name_aka'):
+        for mob in self.mobs():
+            if hasattr(mob, 'name_aka'):
                 for aka in mob.name_aka:
                     if aka == name:
                         if not all:
                             return mob
                         else:
                             result.append(mob)
+
+        for article in ('a ', 'an ', 'the '):
+            if name.startswith(article):
+                l = len(article)
+                aname = name[l:]
+                return self.mobname(aname, all)
 
         if result:
             return result
@@ -447,6 +457,13 @@ class Room(TZContainer):
                     return x
                 else:
                     result.append(x)
+
+        for article in ('a ', 'an ', 'the '):
+            if name.startswith(article):
+                l = len(article)
+                aname = name[l:]
+                return self.exitname(aname, all)
+
         if result:
             return result
         else:
