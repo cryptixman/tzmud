@@ -188,11 +188,13 @@ def start():
         system = platform.system()
 
         if system != 'Linux':
-            cmd = '%s -y %s -l %s' % (conf.twistd,
+            cmd = '%s %s -y %s -l %s' % (conf.python,
+                                        conf.twistd,
                                         conf.tztac,
                                         conf.twistdlog)
         else:
-            cmd = '%s -y %s --pidfile %s -l %s' % (conf.twistd,
+            cmd = '%s %s -y %s --pidfile %s -l %s' % (conf.python,
+                                        conf.twistd,
                                         conf.tztac,
                                         conf.twistdpid,
                                         conf.twistdlog)
