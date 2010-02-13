@@ -25,7 +25,14 @@ parser will be for given inputs.
 
 '''
 
-from pyparsing import Word, alphas, nums, alphanums, printables, oneOf, OneOrMore, Optional, CaselessLiteral, ParseException, LineEnd, replaceWith, Suppress, Combine, Empty, restOfLine, SkipTo, FollowedBy
+from pyparsing import Word, alphas, nums, alphanums, printables, oneOf, OneOrMore, Optional, CaselessLiteral, ParseException, LineEnd, replaceWith, Suppress, Combine, Empty, restOfLine, SkipTo, FollowedBy, alphas8bit
+
+import conf
+if conf.allow_utf8:
+    alphas = alphas + alphas8bit
+    alphanums = alphanums + alphas8bit
+    printables = printables + alphas8bit
+
 
 def toint(s, l, t):
     return int(t[0])

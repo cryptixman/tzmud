@@ -52,3 +52,5 @@ web_port = 8888
 web_local_only = True
 
 enable_cmd_py = False
+
+allow_utf8 = False
