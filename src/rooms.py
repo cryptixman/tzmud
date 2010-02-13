@@ -146,15 +146,14 @@ class Room(TZContainer):
         '''Get rid of this room and remove it from the index.
 
         All outgoing exits will also be destroyed.
-        Any mob in the room will be moved to its home. If this room
+        Any mob in the room will be teleported to its home. If this room
             is its home, the mob will be destroyed.
-        Any player in the room will be moved to its home.
+        Any player in the room will be teleported to its home.
 
         As with a TZContainer, any item in the room will be destroyed.
 
         '''
 
-        print 'must destroy', self
         for x in self.exits():
             x.destroy()
         for mob in self.mobs():
@@ -163,7 +162,7 @@ class Room(TZContainer):
             else:
                 mob.teleport(mob.home)
         for player in self.players():
-            player.move(player.home)
+            player.teleport(player.home)
         remove(self)
         TZContainer.destroy(self)
 
