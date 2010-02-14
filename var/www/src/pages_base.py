@@ -38,6 +38,7 @@ from mobs import Mob
 from players import Player
 
 from share import module_as_string, class_as_string
+import conf
 
 from db import TZIndex
 tzindex = TZIndex()
@@ -95,6 +96,8 @@ class TZPage(rend.Page):
 
     def render_head(self, ctx, data):
         request = ctx.locate(inevow.IRequest)
+        if conf.allow_utf8:
+            request.setHeader('Content-Type', 'text/html; charset=UTF-8')
         return xmlf('head.html')
 
     def render_title(self, ctx, data):
