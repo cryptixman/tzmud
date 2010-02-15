@@ -23,7 +23,7 @@ probably only be done after deleting any current database first.
 
 '''
 
-from ZODB import FileStorage, DB
+from ZODB import FileStorage, DB, serialize
 import transaction
 from persistent.dict import PersistentDict
 from persistent.list import PersistentList
@@ -99,7 +99,7 @@ class TZODB(object):
         'Pack the DB to remove old versions, like vacuum.'
 
         import time
-        self.storage.pack(time.time(), None)
+        self.storage.pack(time.time(), serialize.referencesf)
         print 'DB Packed'
 
     def pack_regularly(self):

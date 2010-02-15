@@ -8,13 +8,13 @@ INSTALLING
 
 First install the requirements:
     Python (http://www.python.org/)
-        [tested with Python-2.5.2]
+        [tested with Python-2.6.4]
     Twisted (http://twistedmatrix.com/)
-        [tested with Twisted-8.1.0]
+        [tested with Twisted-8.2.0]
     ZODB3 (http://pypi.python.org/pypi/ZODB3/)
-        [tested with ZODB3-3.7.0b3]
+        [tested with ZODB3-3.9.0]
     Pyparsing (http://pyparsing.wikispaces.com/)
-        [tested with Pyparsing-1.5.0]
+        [tested with Pyparsing-1.5.2]
 
     If you want to run the (optional) web server,
         you will also need:
