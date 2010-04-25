@@ -29,10 +29,11 @@ from pyparsing import Word, alphas, nums, alphanums, printables, oneOf, OneOrMor
 
 import conf
 if conf.allow_utf8:
-    all_alphas = u''.join(unichr(c) for c in xrange(256)
-                                        if unichr(c).isalpha())
-    utf8_alphas_keep = all_alphas[55:]
-    alphas = alphas + utf8_alphas_keep
+    low_unicode = u''.join(unichr(c) for c in xrange(256)
+                                        if not unichr(c).isspace())
+    low_unicode = low_unicode.replace('@', '')
+    low_unicode = low_unicode.replace('#', '')
+    alphas = low_unicode
     alphanums = alphas + nums
     printables = u''.join(unichr(c) for c in xrange(65536)
                                         if not unichr(c).isspace())
