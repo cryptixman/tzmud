@@ -370,7 +370,7 @@ class TZ(basic.LineReceiver):
     def simessage(self, msg=''):
         'Send simple line to client. Used before player has logged in.'
 
-        self.transport.write(msg + '\n')
+        self.transport.write(msg + '\r\n')
 
     def message(self, *args, **kw):
         'Send line to client, possibly indented and colorized.'
@@ -400,9 +400,9 @@ class TZ(basic.LineReceiver):
 
         if wrapped:
             for line in wrapped:
-                self.transport.write(' '*indent + line + '\n')
+                self.transport.write(' '*indent + line + '\r\n')
         else:
-            self.transport.write('\n')
+            self.transport.write('\r\n')
 
     def mlmessage(self, lines, indent=0, color=True):
         'Send a multi-line message.'
