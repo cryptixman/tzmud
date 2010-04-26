@@ -494,6 +494,7 @@ class Hat(Item):
     name = 'hat'
     short = 'An old top hat.'
     wearable = True
+    name_aka = ['hat']
 
 
 class Camera(Item):
