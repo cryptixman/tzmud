@@ -16,8 +16,6 @@ Source code is available online at:
     http://code.google.com/p/tzmud/
 
 
-Log in with
-    login <name> <password>
-
-Create a new character with
-    create <name> <password>
+Log in :                login <name> <password>
+Create a new account :  create <name> <password>
+Disconnect :            quit

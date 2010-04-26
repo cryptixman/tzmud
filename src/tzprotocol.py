@@ -170,6 +170,8 @@ class TZ(basic.LineReceiver):
             existing = players.getname(player_name)
             if existing:
                 self.simessage('Name already in use.')
+            elif player_name=='quit':
+                self.simessage('Cannot use the name "quit"')
             else:
                 player = players.Player(player_name)
                 player.set_password(pwtext)
@@ -241,7 +243,9 @@ class TZ(basic.LineReceiver):
             return
 
         try:
-            if not self.logged_in and line.startswith('login '):
+            if not self.logged_in and line=='quit':
+                self.transport.loseConnection()
+            elif not self.logged_in and line.startswith('login '):
                 self.login(line[6:])
 
             elif not self.logged_in and line.startswith('create '):
