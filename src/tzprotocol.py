@@ -105,6 +105,7 @@ class TZ(basic.LineReceiver):
     def __init__(self):
         zodb = TZODB()
         self.dbroot = zodb.root
+        self.login_failures = 0
 
     def connectionMade(self):
         'A new connection. Send out the MOTD.'
@@ -135,6 +136,7 @@ class TZ(basic.LineReceiver):
             player = players.getname(player_name)
             if player is None:
                 self.simessage('Incorrect user name or password.')
+                self.login_failures += 1
                 print 'player', player_name, 'does not exist'
             elif player.logged_in:
                 if player.check_password(pwtext):
@@ -158,6 +160,10 @@ class TZ(basic.LineReceiver):
                 else:
                     self.simessage('Incorrect user name or password.')
                     print 'player', player.name, 'wrong password'
+                    self.login_failures += 1
+
+            if self.login_failures >= 3:
+                self.transport.loseConnection()
 
     def create(self, r):
         'Create a new account.'
