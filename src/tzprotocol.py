@@ -273,7 +273,8 @@ class TZ(basic.LineReceiver):
 
                 cmd = '##nocmd'
                 rest = ''
-                if line[0] == '!':
+                firstchar = line[0]
+                if firstchar == '!':
                     if admin.verify(self.player):
                         section = admin
                         line = line[1:]
@@ -282,6 +283,14 @@ class TZ(basic.LineReceiver):
                         return
 
                 else:
+                    speechmode = self.player.user_settings.get('speech',
+                                                    conf.speechmode_default)
+                    if speechmode and firstchar != '@':
+                        if firstchar == '.':
+                            line = line[1:]
+                        else:
+                            line = "say " + line
+
                     try:
                         result = parse.full_parser.parseString(line)
                     except parse.ParseException:

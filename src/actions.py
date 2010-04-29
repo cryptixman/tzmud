@@ -841,7 +841,8 @@ def cmd_set(s, r=None):
     Set the given variable to the specified value, or True.
 
     Variables available for setting:
-        ansi
+        ansi        -- send ANSI color codes
+        speech      -- turn on/off speech mode
 
     '''
 
@@ -849,15 +850,24 @@ def cmd_set(s, r=None):
     val = r.get('val', True)
 
     if var is not None:
-        if val == 'True':
+        try:
+            lowerval = val.lower()
+        except AttributeError:
+            lowerval = None
+
+        if lowerval == 'true':
             val = True
-        elif val == 'False':
+        elif lowerval == 'false':
             val = False
 
-        if val:
+        if val or lowerval=='false':
+            # if loverval is 'false' user specified 'false'
+            # if using unset then val will actually be False
             s.player.user_settings[var] = val
-        else:
+        elif var in s.player.user_settings:
             del s.player.user_settings[var]
+        else:
+            s.player.user_settings[var] = val
 
     else:
         if s.player.user_settings:
