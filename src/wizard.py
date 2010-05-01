@@ -357,7 +357,7 @@ def cmd_lock(s, r):
 
 
 def cmd_list(s, r):
-    '''list |players|items|rooms|mobs|
+    '''list |players|items|rooms|mobs|exits|
 
     List all objects of the given type.
 
@@ -377,7 +377,10 @@ def cmd_list(s, r):
     elif listing == 'mobs':
         objs = mobs.ls()
         classes = mobs.classes()
-
+    elif listing == 'exits':
+        objs = rooms.ls_exits()
+        classes = rooms.exit_classes()
+    print 'info objs', objs
     if objs:
         s.message('Existing objects:')
         objs.sort(key=operator.attrgetter('tzid'))

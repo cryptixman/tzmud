@@ -262,7 +262,7 @@ dig_ = dig_verb + dig_out + to_ + dig_dest + dig_in
 
 
 list_verb = CaselessLiteral('list')('verb')
-list_type = oneOf('players items rooms mobs')('type')
+list_type = oneOf('players items rooms mobs exits')('type')
 list_ = list_verb + list_type
 
 

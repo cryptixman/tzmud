@@ -538,6 +538,10 @@ class TZContainer(TZObj):
             with the given name. Pass in the parameter all=True to get a list
             of all items in this container with the given name instead.
 
+        Also searches for item names after removing any included article.
+            For instance, if the player says "get the hat" itemname()
+            will first look for "the hat" and then for "hat".
+
         '''
 
         result = []
@@ -563,7 +567,12 @@ class TZContainer(TZObj):
             if name.startswith(article):
                 l = len(article)
                 aname = name[l:]
-                return self.itemname(aname, all)
+                with_article = self.itemname(aname, all)
+                if with_article is not None:
+                    if not all:
+                        return with_article
+                    else:
+                        result.append(with_article)
 
         if result:
             return result

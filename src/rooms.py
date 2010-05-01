@@ -371,6 +371,10 @@ class Room(TZContainer):
             first mob found with the given name. If you want a list of all of
             the mobs by that name in this room, pass all=True.
 
+        Also searches for mob names after removing any included article.
+            For instance, if the player says "look at the dog" mobname()
+            will first look for "the dog" and then for "dog".
+
         '''
 
         result = []
@@ -394,7 +398,12 @@ class Room(TZContainer):
             if name.startswith(article):
                 l = len(article)
                 aname = name[l:]
-                return self.mobname(aname, all)
+                with_article = self.mobname(aname, all)
+                if with_article is not None:
+                    if not all:
+                        return with_article
+                    else:
+                        result.append(with_article)
 
         if result:
             return result
@@ -447,6 +456,10 @@ class Room(TZContainer):
             found with the given name. To instead get a list of all the exits
             with a given name, pass the parameter all=True.
 
+        Also searches for exit names after removing any included article.
+            For instance, if the player says "go to the east" exitname()
+            will first look for "the east" and then for "east".
+
         '''
 
         result = []
@@ -461,7 +474,12 @@ class Room(TZContainer):
             if name.startswith(article):
                 l = len(article)
                 aname = name[l:]
-                return self.exitname(aname, all)
+                with_article = self.exitname(aname, all)
+                if with_article is not None:
+                    if not all:
+                        return with_article
+                    else:
+                        result.append(with_article)
 
         if result:
             return result
@@ -1054,3 +1072,10 @@ exit_class_names = ['Exit', 'PlayersOnly', ]
 
 def exit_classes():
     return exit_class_names
+
+def ls_exits():
+    'return a list of all exits in the database.'
+    all_exits = []
+    for room in ls():
+        all_exits.extend(room.exits())
+    return all_exits
