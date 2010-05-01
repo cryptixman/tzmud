@@ -443,7 +443,8 @@ class TZObj(Persistent):
 
         '''
 
-        lines = ['%s (%s) %s' % (self.name, self.tzid, class_as_string(self))]
+        lines = ['%s (%s) %s from module %s' % (self.name, self.tzid,
+                            class_as_string(self), module_as_string(self))]
         lines.append('Settings:')
         for var in self.settings:
             lines.append('    %s: %s' % (var, self.setting(var)))
