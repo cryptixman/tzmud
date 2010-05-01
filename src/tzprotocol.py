@@ -64,6 +64,7 @@ class Wrapper(TextWrapper):
             return len(re.sub('\x1b.*?m', '', chunk))
 
 ansiwrapper = Wrapper()
+ansiwrapper.width = 79
 ansiwrapper.replace_whitespace = False
 ansiwrapper.subsequent_indent = '    '
 ansiwrap = ansiwrapper.wrap
