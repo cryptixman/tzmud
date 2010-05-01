@@ -631,6 +631,20 @@ class TreasureChest(ContainerItem):
             self.add(i)
 
 
+class NewStyle(Item):
+    'Prototype new method of registering actions.'
+
+    name = 'newstyle'
+
+    def register(self, method):
+        self.methods.append(method)
+
+    def connect(self):
+        def a_method(self, info):
+            actor = info['actor']
+
+        players.Player.register(a_method)
+
 
 
 class_names = ['Item', 'ContainerItem', 'Rose', 'Cup', 'Bag', 'Mirror', 'WizRing', 'Key', 'SkeletonKey', 'Coin', 'Hat', 'Camera', 'Photograph', 'InvRing', 'GetTrap', 'GetTimeTrap', 'DetectInvisRing', 'LeadBox', 'VoiceTrap', 'VoiceTimeTrap', 'TreasureChest', 'CursedItem', 'FragileItem']
