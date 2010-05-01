@@ -393,7 +393,7 @@ class Player(Character):
             not about materializing from nowhere.
 
         If you are looking for some kind of materialization, it
-            might be near_teleport_in, near_clone, near_dig
+            might be near_teleport_*_in, near_clone, near_dig
             or some new near action that you design.
 
         '''
