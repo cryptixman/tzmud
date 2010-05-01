@@ -19,7 +19,6 @@
 - potion of see invisible things
     or SeeInvRing allows character to see invisible things
 - item exchanging (give, take, accept, steal)
-- better info output so people can tell which object is which
 - Group items with the same name in the inventory (ie. 2 roses)
 - fix tzcontrol to work properly on windows
 - set ownership for cloned objects

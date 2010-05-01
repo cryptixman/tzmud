@@ -433,7 +433,9 @@ class TZObj(Persistent):
 
         '''
 
-        return ['%s (%s)' % (self.name, self.tzid)]
+        containers = self.containers()
+        cstr = ':'.join(str(c) for c in containers)
+        return ['%s (%s) [%s]' % (self.name, self.tzid, cstr)]
 
     def wizinfo(self):
         '''Return a multiline message (list of strings) with more details
