@@ -380,7 +380,7 @@ def cmd_list(s, r):
     elif listing == 'exits':
         objs = rooms.ls_exits()
         classes = rooms.exit_classes()
-    print 'info objs', objs
+
     if objs:
         s.message('Existing objects:')
         objs.sort(key=operator.attrgetter('tzid'))
