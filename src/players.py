@@ -341,6 +341,9 @@ class Player(Character):
             else:
                 self.message(arriver, 'arrives as if from nowhere.')
 
+            if self.following == arriver:
+                self.message('You are following', arriver, '.')
+
     def near_say(self, info):
         'Someone has "say"ed near this player.'
 

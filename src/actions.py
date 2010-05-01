@@ -542,10 +542,14 @@ def cmd_go(s, r):
         for player in ps:
             if player != s.player:
                 s.message(player, 'is here.')
+                if player.following == player:
+                    s.message('You are following', player, '.')
 
         ms = filter(s.player.can_see, s.room.mobs())
         for mob in ms:
             s.message(mob, 'is here.')
+            if player.following == mob:
+                s.message('You are following', mob, '.')
 
     else:
         s.message(msg)
