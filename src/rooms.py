@@ -688,22 +688,31 @@ class TeleTrap(TimedTrap):
         if name not in self._targets:
             self._targets.append(name)
 
+    def near_teleport_character_in(self, info):
+        self.near_arrive(info)
+
     def spring_trap(self):
         try:
             TimedTrap.spring_trap(self)
 
             if not self._targets:
                 rms = ls()
+                rms.remove(self)
             else:
                 rms = [getattr(rooms, name) for name in self._targets]
 
-            p = self.players()
-            m = self.mobs()
-            characters = p + m
-            for c in characters:
-                c.message('Click.')
-                room = random.choice(rms)
-                c.teleport(room)
+            if rms:
+                p = self.players()
+                m = self.mobs()
+                characters = p + m
+                for c in characters:
+                    c.message('Click.')
+                    room = random.choice(rms)
+                    c.teleport(room)
+            else:
+                # Misfire. No room selected to teleport to...
+                for c in p:
+                    c.message('Nothing happens...')
 
         except:
             abort()
