@@ -703,7 +703,7 @@ class TeleTrap(TimedTrap):
             for c in characters:
                 c.message('Click.')
                 room = random.choice(rms)
-                c.move(room)
+                c.teleport(room)
 
         except:
             abort()
