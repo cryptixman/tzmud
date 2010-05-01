@@ -43,6 +43,9 @@
 - allow Spawner to spawn more than 1 of its mobtype in the room
 - make plugins rebuildable
 - fix getting coins leaves None in character inventory list
+- make help strings single line (use backslash?) so that player
+    can set own line wrap width and still have lines be nicely
+    formatted.
 
 # Web Server
 - Build MUD areas by web.
