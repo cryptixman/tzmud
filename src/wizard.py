@@ -36,6 +36,7 @@ import conf
 import admin
 import players
 import rooms
+import exits
 import items
 import mobs
 import colors
@@ -305,14 +306,14 @@ def cmd_dig(s, r):
         if xi is not None:
             xi.destination = room
         else:
-            xi = rooms.Exit(exitinname, room=destination, destination=room)
+            xi = exits.Exit(exitinname, room=destination, destination=room)
             xo.link(xi)
             destination.action(dict(act='dig', actor=None, exit=xi))
-        s.message('You reconnect', xo, 'to', destination, '.')
+        s.message('You connect', xo, 'to', destination, '.')
 
     elif exitoutname:
         if exitinname or xi is None:
-            xo = rooms.Exit(exitoutname, room=room, destination=destination, return_name=exitinname)
+            xo = exits.Exit(exitoutname, room=room, destination=destination, return_name=exitinname)
             room.action(dict(act='dig', actor=s.player, exit=xo))
             xi = xo.get_linked_exit()
             destination.action(dict(act='dig', actor=None, exit=xi))
@@ -378,8 +379,8 @@ def cmd_list(s, r):
         objs = mobs.ls()
         classes = mobs.classes()
     elif listing == 'exits':
-        objs = rooms.ls_exits()
-        classes = rooms.exit_classes()
+        objs = exits.ls()
+        classes = exits.classes()
 
     if objs:
         s.message('Existing objects:')
@@ -511,8 +512,8 @@ def _clone_exit(s, objname, objtzid, newname=''):
 
     # if it is not there, it might be an Exit class
     if orig is None:
-        if objname in rooms.exit_classes():
-            cls = getattr(rooms, objname)
+        if objname in exits.classes():
+            cls = getattr(exits, objname)
             obj = cls()
         else:
             obj = None

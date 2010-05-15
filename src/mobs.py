@@ -40,6 +40,7 @@ commit = zodb.commit
 import tzprotocol
 
 import rooms
+import exits
 import items
 
 from share import TZContainer, Character, class_as_string, int_attr, str_attr
@@ -436,7 +437,7 @@ class PackRat(Mob):
 
     def _dig_home(self):
         home = rooms.Room('rat nest', "The rat's nest.")
-        x = rooms.Exit('hole', 'A roughly dug hole.',
+        x = exits.Exit('hole', 'A roughly dug hole.',
                         room=self.room,
                         destination=home, return_name='exit')
         self.home = home

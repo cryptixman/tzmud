@@ -21,7 +21,7 @@ tzindex = TZIndex()
 
 from nevow import inevow
 
-import rooms
+import exits
 
 from pages_base import TZPage, xmlf, normalize_args
 
@@ -57,11 +57,11 @@ class AddExit(TZPage):
             destid = int(destid)
         dest = tzindex.get(destid)
 
-        if xname and xclass in rooms.exit_classes():
-            xcls = getattr(rooms, xclass)
-            if bxname and bxclass in rooms.exit_classes():
-                bxcls = getattr(rooms, xclass)
-                bx = bxcls(xname, room=dest)
+        if xname and xclass in exits.classes():
+            xcls = getattr(exits, xclass)
+            if bxname and bxclass in exits.classes():
+                bxcls = getattr(exits, xclass)
+                bx = bxcls(bxname, room=dest)
                 x = xcls(xname, room=room, destination=dest, return_name=bxname)
             else:
                 x = xcls(xname, room=room, destination=dest)

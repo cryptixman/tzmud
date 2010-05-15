@@ -49,6 +49,22 @@ def create_conf():
     f.write('\n')
     f.close()
 
+
+try:
+    import conf
+except ImportError:
+    create_conf()
+    print 'etc/conf.py created'
+    print
+    print 'Please check configuration before starting server:'
+    print '  python tzcontrol.py -c'
+    print
+    import conf
+    check_db()
+    sys.exit(0)
+
+
+
 def check_db():
     if not os.path.exists(conf.datafs):
         print
@@ -65,20 +81,27 @@ def check_db():
         print
         return False
     else:
-        return True
+        src = os.path.abspath(conf.src)
+        sys.path.append(src)
 
-try:
-    import conf
-except ImportError:
-    create_conf()
-    print 'etc/conf.py created'
-    print
-    print 'Please check configuration before starting server:'
-    print '  python tzcontrol.py -c'
-    print
-    import conf
-    check_db()
-    sys.exit(0)
+        import db
+        zodb = db.TZODB()
+        if zodb.check_version():
+            version_ok = True
+        else:
+            print
+            print 'Database version mismatch.'
+            print 'Must upgrade database before starting server.'
+            print
+            print 'Database version:', zodb.version()
+            print 'Upgrade to version:', db.DB_VERSION
+            print
+            print 'Back up your current database first, then try:'
+            print 'python db.py', zodb.version(), db.DB_VERSION
+            version_ok = False
+        zodb.close()
+
+        return version_ok
 
 
 def verify_config():

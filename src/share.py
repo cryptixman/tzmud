@@ -49,6 +49,11 @@ tzindex = TZIndex()
 
 
 
+class Deprecated(Exception):
+    'raised for code that should no longer be used at all.'
+    pass
+
+
 def int_attr(name, default=0):
     'An attribute that will always hold an integer'
 
@@ -1068,7 +1073,7 @@ def class_mod(obj):
     mods = {'Item': items,
             'Mob': mobs,
             'Room': rooms,
-            'Exit': rooms,
+            'Exit': exits,
             'Player': players}
     return mods[obj._bse]
 
@@ -1093,10 +1098,7 @@ def register_plugin(cls):
         print 'Warning: plugin class', name, 'conflicts.'
         print 'plugin NOT registered.'
     else:
-        if cls._bse != 'Exit':
-            classes = 'class_names'
-        else:
-            classes = 'exit_class_names'
+        classes = 'class_names'
 
         classes_lst = getattr(mod, classes)
         classes_lst.append(name)
@@ -1104,9 +1106,14 @@ def register_plugin(cls):
         print 'plugin', name, 'registered.'
 
 
-def upgrade(obj):
+def upgrade(obj, newcls=None):
     '''Use this function to upgrade objects any time they need
         to change (ie. if it needs to grow a new property.)
+
+    If the upgrade involves converting to an entirely new class,
+        pass in the class object as newlcs. This was used, for
+        example, when moving the Exit class from the rooms module
+        to the new exits module.
 
     '''
 
@@ -1119,7 +1126,9 @@ def upgrade(obj):
     import types
 
     updatedname = obj.name+'____updated____'
-    updated = obj.__class__(updatedname)
+    if newcls is None:
+        newcls = obj.__class__
+    updated = newcls(updatedname)
     module = __import__(updated.__module__)
 
     try:
@@ -1212,6 +1221,8 @@ def upgrade(obj):
 
     commit()
 
+    return updated
+
 
 def upgradeall():
     'Upgrade every object in the database.'
@@ -1238,6 +1249,7 @@ def upgradeall():
 # Delay these imports due to circular dependencies
 import players
 import rooms
+import exits
 import mobs
 import wizard
 import items

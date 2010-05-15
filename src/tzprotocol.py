@@ -94,7 +94,7 @@ import players
 import rooms
 
 import parse
-
+import share
 
 
 
@@ -368,7 +368,14 @@ class TZ(basic.LineReceiver):
                 func(self, rest)
             else:
                 func(self)
+        except share.Deprecated:
+            abort()
+            import traceback
+            traceback.print_exc()
+            self.message('Attempting to use deprecated code.')
+            self.message('Check error log for details.')
         except Exception, e:
+            abort()
             import traceback
             traceback.print_exc()
             self.message('I am having trouble with that command.')

@@ -32,7 +32,8 @@ import rooms
 import mobs
 import items
 
-from rooms import Room, Exit
+from rooms import Room
+from exits import Exit
 from items import Item
 from mobs import Mob
 from players import Player

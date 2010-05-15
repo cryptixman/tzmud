@@ -29,10 +29,12 @@ from twisted.python.rebuild import rebuild
 
 import players
 import rooms
+import exits
 import mobs
 import items
 
-from rooms import Room, Exit
+from rooms import Room
+from exits import Exit
 from items import Item
 from mobs import Mob
 from players import Player
@@ -101,7 +103,7 @@ class Edit(pages_base.TZPage):
             self.cls    --> name of the object's class (a string)
             self.base   --> the most important base class of the object
                                 one of ...  rooms.Room
-                                            rooms.Exit
+                                            exits.Exit
                                             items.Item
                                             mobs.Mob
                                             players.Player
@@ -364,7 +366,7 @@ class Edit(pages_base.TZPage):
         tzid = self.tzid # to know which room to add the exit to
         action = '/exits/add/'
         lines = [T.h2['Add Exit']]
-        exitclasses = rooms.exit_classes()
+        exitclasses = exits.classes()
         exitclasses.sort()
         choices = [(cls, cls) for cls in exitclasses]
         xinfo = dict(name='xclass',

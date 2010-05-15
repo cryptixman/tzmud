@@ -866,9 +866,10 @@ def classes():
     return class_names
 
 
-
-
-
+# class rooms.Exit is deprecated. Use exits.Exit
+# This needs to stay here until after database is
+# upgraded from version 0 to version 1
+# then it can be removed.
 class Exit(TZObj):
     'A way to move from one room to another.'
 
@@ -879,6 +880,10 @@ class Exit(TZObj):
 
 
     def __init__(self, name='', short='', long='', room=None, destination=None, return_name=''):
+
+        from share import Deprecated
+        raise Deprecated
+
         TZObj.__init__(self, name, short, long)
         self._rid = None
         self.room = room
@@ -899,6 +904,8 @@ class Exit(TZObj):
             self.link(x)
 
         self._keys = PersistentList()
+
+        add(self)
 
     def destroy(self):
         'Get rid of this exit.'
@@ -1062,29 +1069,3 @@ class Exit(TZObj):
 
         self.room.rmexit(self)
         destination.addexit(self)
-
-
-
-class PlayersOnly(Exit):
-    'An Exit that only players can pass through. No mobs allowed!'
-
-    def go(self, character):
-        '''character is trying to go through this exit.'''
-
-        if players.isplayer(character):
-            return Exit.go(self, character)
-        else:
-            return (False, 'Exit is for players only.')
-
-
-exit_class_names = ['Exit', 'PlayersOnly', ]
-
-def exit_classes():
-    return exit_class_names
-
-def ls_exits():
-    'return a list of all exits in the database.'
-    all_exits = []
-    for room in ls():
-        all_exits.extend(room.exits())
-    return all_exits

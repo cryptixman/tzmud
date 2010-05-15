@@ -23,6 +23,8 @@ probably only be done after deleting any current database first.
 
 '''
 
+DB_VERSION = 1
+
 from ZODB import FileStorage, DB, serialize
 import transaction
 from persistent.dict import PersistentDict
@@ -77,6 +79,14 @@ class TZODB(object):
         self.db.close()
         self.storage.close()
         del self.storage
+
+    def version(self):
+        'return the version number stored in the database.'
+
+        return dbroot.get('DB_VERSION', 0)
+
+    def check_version(self):
+        return self.version() == DB_VERSION
 
     def begin(self):
         'Start a new database transaction.'
@@ -189,12 +199,16 @@ def db_init():
     dbroot['rooms'] = TZDict()
     zodb.commit()
 
+    dbroot['exits'] = TZDict()
+    zodb.commit()
+
 
     import rooms
+    import exits
     void = rooms.Room('void', 'A very dark darkness')
     house = rooms.Room('house', 'A nice little house.')
 
-    north = rooms.Exit('the light', room=void,
+    north = exits.Exit('the light', room=void,
                         destination=house)
 
 
@@ -215,16 +229,19 @@ def db_init():
 
     zodb.commit()
 
-def db_upgrade():
+def db_upgrade(from_version, to_version):
     print 'upgrading ZODB'
 
-    for mod in 'players', 'mobs', 'items', 'rooms':
+    for mod in 'players', 'mobs', 'items', 'rooms', 'exits':
         module = __import__(mod)
         if hasattr(module, 'upgrade'):
-            module.upgrade()
+            module.upgrade(from_version, to_version)
 
     zodb = TZODB()
     dbroot = zodb.root
+
+    dbroot['DB_VERSION'] = to_version
+    zodb.commit()
 
 def db_upgradeall():
     import share
@@ -314,7 +331,9 @@ else:
     if len(sys.argv) > 1 and sys.argv[1] == 'init':
         db_init()
     elif len(sys.argv) > 1 and sys.argv[1] == 'upgrade':
-        db_upgrade()
+        from_version = int(sys.argv[2])
+        to_version = int(sys.argv[3])
+        db_upgrade(from_version, to_version)
     elif len(sys.argv) > 1 and sys.argv[1] == 'upgradeall':
         db_upgradeall()
     elif len(sys.argv) > 1 and sys.argv[1] == 'pack':

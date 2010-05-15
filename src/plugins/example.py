@@ -1,6 +1,7 @@
 import mobs
 import items
 import rooms
+import exits
 from share import register_plugin
 
 
@@ -54,7 +55,7 @@ class VaultRoom(rooms.Room):
 
     def make_vault(self):
         vault = rooms.Room('vault')
-        x = rooms.Exit('the vault', room=self, destination=vault,
+        x = exits.Exit('the vault', room=self, destination=vault,
                                                     return_name='exit')
         x.locked = True
         self.the_vault_exit = x
@@ -73,7 +74,7 @@ register_plugin(VaultRoom)
 
 
 from share import str_attr
-class PasswordDoor(rooms.Exit):
+class PasswordDoor(exits.Exit):
     'A door with a voice-activated lock.'
 
     name = 'pw door'
