@@ -22,19 +22,34 @@ from nevow import tags as T
 import pages_base
 from pages_base import xmlf
 
+import wizard
+import admin
+
+class Dummy(object):
+    pass
+
 class Index(pages_base.TZPage):
     docFactory = xmlf('index.html')
     title = 'TZMud Web Interace'
 
     def render_index_players(self, ctx, data):
-        lines = []
+        data.sort(key=attrgetter('name'))
+        dataupdated = []
         for player in data:
             name = player.name
+            if admin.verify(player):
+                name += '!'
+            elif wizard.verify(player):
+                name += '@'
+
             if player.logged_in:
                 room = player.room.name
                 name += ' [%s]' % room
-            lines.append(T.li[name])
-        return T.ul[lines]
+            p = Dummy()
+            p.tzid = player.tzid
+            p.name = name
+            dataupdated.append(p)
+        return self.render_idtable(ctx, dataupdated)
 
     def render_index_rooms(self, ctx, data):
         lines = []
