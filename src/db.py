@@ -187,6 +187,8 @@ def db_init():
     zodb = TZODB()
     dbroot = zodb.root
 
+    dbroot['DB_VERSION'] = DB_VERSION
+
 
     dbroot['_index'] = TZDict()
 
