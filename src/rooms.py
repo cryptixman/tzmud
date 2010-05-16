@@ -589,7 +589,7 @@ class Room(TZContainer):
         c = Room(self.name, self.short, self.long, self.owner)
 
         for x in self.exits():
-            new_x = Exit(x.name, x.short, x.long,
+            new_x = exits.Exit(x.name, x.short, x.long,
                             room=c, destination=x.destination)
             c.addexit(new_x)
 
@@ -837,16 +837,16 @@ class Zoo(Room):
         key = self.itemname('key')
 
         outside = Room('outside the %s cage' % mcl)
-        x = Exit('see the %s' % mcl)
-        bx = Exit('zoo')
+        x = exits.Exit('see the %s' % mcl)
+        bx = exits.Exit('zoo')
         self.addexit(x)
         x.destination = outside
         bx.destination = self
         outside.addexit(bx)
 
         cage = Room('%s cage' % mcl)
-        x = Exit('door')
-        bx = Exit('exit')
+        x = exits.Exit('door')
+        bx = exits.Exit('exit')
         x.link(bx)
         x.add_key(key)
         x.lock(key)
@@ -1069,3 +1069,6 @@ class Exit(TZObj):
 
         self.room.rmexit(self)
         destination.addexit(self)
+
+
+import exits
