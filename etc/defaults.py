@@ -56,3 +56,4 @@ enable_cmd_py = False
 allow_utf8 = False
 
 speechmode_default = False
+talkmode = False # True: all players can use talk command. False: wizards only.

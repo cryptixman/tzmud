@@ -215,6 +215,11 @@ def cmd_teleport(s, r=None):
         player.teleport(destination)
 
 
+if not conf.talkmode:
+    import share
+    cmd_tell = share.cmd_tell
+
+
 def cmd_summon(s, r):
     '''summon <character>|<mob class>
 

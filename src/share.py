@@ -926,6 +926,40 @@ Character (%s): %s
                                         character=self))
 
 
+def cmd_tell(s, r):
+    '''tell <player name> <text>
+
+    Tell player something. Player need not be in the same room.
+
+    '''
+
+    rest = r['message']
+
+    wordslist = rest.split()
+    trynameparts = []
+    for word in wordslist:
+        trynameparts.append(word)
+        tryname = ' '.join(trynameparts)
+        player = players.getname(tryname)
+        if player is not None:
+            break
+
+    if player is None:
+        s.message('No player by that name.')
+        return
+    else:
+        messagewords = wordslist[len(trynameparts):]
+        message = ' '.join(messagewords)
+
+    if player.logged_in:
+        quoted = '"' + message + '"'
+        s.message('You tell', player, quoted)
+        player.message(player, 'tells you', quoted)
+    else:
+        s.message(player, 'is not logged in.')
+
+
+
 def find(r, room, player=None, default=None, all=False):
     '''Utility function for finding an object in various places it
         might be located.

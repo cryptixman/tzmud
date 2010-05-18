@@ -154,6 +154,12 @@ words = Combine(OneOrMore(Word(printables)),
 say = say_verb + words
 
 
+tell_verb = CaselessLiteral('tell')('verb')
+words = Combine(OneOrMore(Word(printables)),
+                        joinString=' ', adjacent=False)('message')
+tell = tell_verb + words
+
+
 to_ = Suppress(CaselessLiteral('to '))
 words_without_to = Combine(OneOrMore(~to_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
@@ -215,8 +221,10 @@ catchall = objnameref('verb')
 section = Empty()('section')
 section.setParseAction(replaceWith('actions'))
 
-actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | stats | set | unset | password | xyzzy | help | go | catchall)
-
+if conf.talkmode:
+    actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | tell | shout | emote | quit_ | who | stats | set | unset | password | xyzzy | help | go | catchall)
+else:
+    actions_parser = section + (info | time | take | get | drop | put | inventory | wear | remove | use | lock | listen | look | unlock | follow | exits | say | shout | emote | quit_ | who | stats | set | unset | password | xyzzy | help | go | catchall)
 
 
 wiz = CaselessLiteral('@')('section')
@@ -309,7 +317,10 @@ destroy_verb = CaselessLiteral('destroy')('verb')
 destroy = destroy_verb + objref
 
 
-wizard_parser = wiz + (info | teleport | summon | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | wizunset | help | catchall)
+if not conf.talkmode:
+    wizard_parser = wiz + (info | teleport | summon | dig_ | lock1 | list_ | clone | study | tell | rename | short | long_ | destroy | wizset | wizunset | help | catchall)
+else:
+    wizard_parser = wiz + (info | teleport | summon | dig_ | lock1 | list_ | clone | study | rename | short | long_ | destroy | wizset | wizunset | help | catchall)
 
 
 full_parser = actions_parser | wizard_parser

@@ -47,6 +47,8 @@ from share import find
 
 from colors import blue, red, green, yellow, bold
 
+import conf
+
 
 def cmd_look(s, r):
     '''look  [[at] <item>|<player>|<mob>|<room>|<exit>]
@@ -754,6 +756,11 @@ def cmd_say(s, r):
     quoted = '"' + words + '"'
     s.message('You', verb+',', quoted)
     s.room.action(dict(act='say', actor=s.player, verb=verb, raw=words))
+
+
+if conf.talkmode:
+    import share
+    cmd_tell = share.cmd_tell
 
 
 def cmd_listen(s, r):
