@@ -954,7 +954,7 @@ def cmd_tell(s, r):
     if player.logged_in:
         quoted = '"' + message + '"'
         s.message('You tell', player, quoted)
-        player.message(player, 'tells you', quoted)
+        player.message(s.player, 'tells you', quoted)
     else:
         s.message(player, 'is not logged in.')
 
