@@ -272,20 +272,24 @@ class TZ(basic.LineReceiver):
                 # normal command dispatch
                 section = actions
 
+                speechmode = self.player.user_settings.get('speech',
+                                                    conf.speechmode_default)
+
                 cmd = '##nocmd'
                 rest = ''
                 firstchar = line[0]
-                if firstchar == '!':
+                if firstchar=='!' or (speechmode and line.startswith('.!')):
                     if admin.verify(self.player):
                         section = admin
-                        line = line[1:]
+                        if firstchar=='!':
+                            line = line[1:]
+                        else:
+                            line = line[2:]
                     else:
                         self.message('Admin only.')
                         return
 
                 else:
-                    speechmode = self.player.user_settings.get('speech',
-                                                    conf.speechmode_default)
                     if speechmode and firstchar != '@':
                         if firstchar == '.':
                             line = line[1:]
