@@ -872,7 +872,7 @@ def cmd_set(s, r=None):
             val = False
 
         if val or lowerval=='false':
-            # if loverval is 'false' user specified 'false'
+            # if lowerval is 'false' user specified 'false'
             # if using unset then val will actually be False
             s.player.user_settings[var] = val
         elif var in s.player.user_settings:
@@ -887,6 +887,23 @@ def cmd_set(s, r=None):
                 s.message('%s = %s' % (k, v), indent=4)
         else:
             s.message('You have not set anything yet.')
+
+
+def cmd_unset(s, r):
+    '''unset <var>
+
+    Equivalent to using: set <var>=False
+
+    If the setting has previously been set (even if set to False),
+        removes the setting. Otherwise, sets the given variable to False.
+
+    '''
+
+    var = r.get('var')
+    r['verb'] = 'set'
+    r['var'] = var
+    r['val'] = False
+    cmd_set(s, r)
 
 
 def cmd_stats(s, r=None):
@@ -904,20 +921,6 @@ def cmd_stats(s, r=None):
         v = s.player.setting(k)
         spaces = maxlen - len(k)
         s.message('    ', k, ' '*spaces, ':', '%4d'%v)
-
-
-def cmd_unset(s, r):
-    '''unset <var>
-
-    Set the given variable to False.
-
-    '''
-
-    var = r.get('var')
-    r['verb'] = 'set'
-    r['var'] = var
-    r['val'] = False
-    cmd_set(s, r)
 
 
 def cmd_password(s, r):
