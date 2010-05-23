@@ -196,7 +196,7 @@ set1_verb.setParseAction(replaceWith('set'))
 set_var = Word(alphas)('var')
 set_val = Word(alphas)('val')
 set0 = set0_verb + LineEnd()
-set1 = set1_verb + set_var + Optional(Optional('=' + set_val)) + LineEnd()
+set1 = set1_verb + set_var + Optional('=' + set_val) + LineEnd()
 set = set0 | set1
 
 unset_verb = CaselessLiteral('unset')('verb')
