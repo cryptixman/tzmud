@@ -33,6 +33,7 @@ if conf.allow_utf8:
                                         if not unichr(c).isspace())
     low_unicode = low_unicode.replace('@', '')
     low_unicode = low_unicode.replace('#', '')
+    low_unicode = low_unicode.replace('=', '')
     alphas = low_unicode
     alphanums = alphas + nums
     printables = u''.join(unichr(c) for c in xrange(65536)
