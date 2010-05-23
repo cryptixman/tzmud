@@ -126,7 +126,10 @@ class Player(Character):
 
         leaving = rooms.get(self._rid)
         if leaving is not None:
-            leaving.rmplayer(self)
+            try:
+                leaving.rmplayer(self)
+            except ValueError:
+                print 'Tried to move from', leaving, 'but failed.'
 
         room.addplayer(self)
         self._rid = room.tzid
