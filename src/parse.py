@@ -29,7 +29,7 @@ from pyparsing import Word, alphas, nums, alphanums, printables, oneOf, OneOrMor
 
 import conf
 if conf.allow_utf8:
-    low_unicode = u''.join(unichr(c) for c in xrange(256)
+    low_unicode = u''.join(unichr(c) for c in xrange(1024)
                                         if not unichr(c).isspace())
     low_unicode = low_unicode.replace('@', '')
     low_unicode = low_unicode.replace('#', '')

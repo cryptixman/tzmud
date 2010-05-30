@@ -99,7 +99,7 @@ def cmd_py(s, r):
         return
 
     try:
-        s.message(str(eval(r)))
+        s.message(unicode(eval(r)))
     except Exception, e:
         s.message('ERROR')
         for line in e:
@@ -134,7 +134,7 @@ def cmd_db(s, r=None):
         try:
             s.mlmessage(obj.__repr__().split('\n'), indent=4)
         except AttributeError:
-            s.mlmessage(str(obj).split('\n'), indent=4)
+            s.mlmessage(unicode(obj).split('\n'), indent=4)
         s.message('')
 
 
@@ -183,7 +183,7 @@ def cmd_restart(s, r=None):
         delay = int(r) # seconds
 
     s.broadcast('WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!')
-    s.broadcast('TZMud will restart in ' + str(delay) + ' seconds!')
+    s.broadcast('TZMud will restart in ' + unicode(delay) + ' seconds!')
 
     from twisted.internet import reactor
     reactor.callLater(delay, restart, s)
@@ -215,7 +215,7 @@ def cmd_shutdown(s, r=None):
         delay = int(r) # seconds
 
     s.broadcast('WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!')
-    s.broadcast('TZMud will shut down in ' + str(delay) + ' seconds!')
+    s.broadcast('TZMud will shut down in ' + unicode(delay) + ' seconds!')
 
     from twisted.internet import reactor
     reactor.callLater(delay, shutdown, s)

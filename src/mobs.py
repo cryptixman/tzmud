@@ -152,7 +152,7 @@ class Mob(Character):
         return magenta(name)
 
     def __repr__(self):
-        return '''\
+        return u'''\
 Mob: %s (%s) [in room %s]: %s
 ''' % (self.name, self.tzid, self._rid, self.short)
 
@@ -311,7 +311,7 @@ class Cat(Mob):
 
         msgs = Mob.look(self, looker)
         if not self.awake:
-            msgs.append('    ' + str(self) + ' is sleeping.... Aww. So cute.')
+            msgs.append('    ' + unicode(self) + ' is sleeping.... Aww. So cute.')
         return msgs
 
     def near_say(self, info):
@@ -488,7 +488,7 @@ class Photographer(Mob):
             x = r.exits()
             choices = i or m or p or x or [r]
             obj = random.choice(choices)
-            photoname = 'photo of %s' % obj.name
+            photoname = u'photo of %s' % obj.name
             have_one_already = bag.itemname(photoname)
 
             if have_one_already is None:

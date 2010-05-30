@@ -144,7 +144,7 @@ class Exit(TZObj):
         '''
 
         if self.destination is None:
-            return (False, 'Exit %s is broken....'%self)
+            return (False, u'Exit %s is broken....'%self)
         if self.locked:
             return (False, 'The door is locked.')
         elif self.weight:
@@ -208,9 +208,9 @@ class Exit(TZObj):
                 msgs.append('Broken exit.')
             else:
                 if not self.locked:
-                    msgs.append('Exit %s to %s.' % (str(self), self.destination))
+                    msgs.append(u'Exit %s to %s.' % (unicode(self), self.destination))
                 else:
-                    msgs.append('The exit %s is locked.' % self)
+                    msgs.append(u'The exit %s is locked.' % self)
 
         return msgs
 
@@ -232,7 +232,7 @@ class Exit(TZObj):
         return yellow(name)
 
     def __repr__(self):
-        return '%s --> %s' % (self.name, self.destination)
+        return u'%s --> %s' % (self.name, self.destination)
 
     def _set_room(self, room):
         'Setter for the room property.'

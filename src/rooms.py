@@ -513,7 +513,7 @@ class Room(TZContainer):
         if xs:
             msgs.append('')
             msgs.append('Exits: ')
-            msgs.append('    ' + ', '.join(map(str, xs)))
+            msgs.append('    ' + ', '.join(map(unicode, xs)))
             #print msgs
 
         iis = filter(looker.can_see, self.items())
@@ -525,20 +525,20 @@ class Room(TZContainer):
                 msgs.append('You see something here:')
 
             for item in iis:
-                msgs.append('    ' + str(item))
+                msgs.append('    ' + unicode(item))
 
         ps = filter(looker.can_see, self.players())
         if len(ps) > 1:
             msgs.append('')
             for player in ps:
                 if player != looker:
-                    msgs.append(str(player) + ' is here.')
+                    msgs.append(unicode(player) + ' is here.')
 
         ms = filter(looker.can_see, self.mobs())
         if ms:
             msgs.append('')
             for mob in ms:
-                msgs.append(str(mob) + ' is here.')
+                msgs.append(unicode(mob) + ' is here.')
 
         return msgs
 
@@ -576,7 +576,7 @@ class Room(TZContainer):
                     #for mob in self.mobs()])
 
     def __repr__(self):
-        return '[Room] %s (%s)' % (self.name, self.tzid)
+        return u'[Room] %s (%s)' % (self.name, self.tzid)
 
     def __copy__(self):
         '''A copy of a room will have everything the same except...
@@ -807,7 +807,7 @@ class Zoo(Room):
         for mobclass in mobs.classes():
             exists = False
             for x in self.exits():
-                if x.name == 'see the %s' % mobclass.lower():
+                if x.name == u'see the %s' % mobclass.lower():
                     exists = True
                     self.respawn(x.destination, mobclass)
 
@@ -848,15 +848,15 @@ class Zoo(Room):
 
         key = self.itemname('key')
 
-        outside = Room('outside the %s cage' % mcl)
-        x = exits.Exit('see the %s' % mcl)
+        outside = Room(u'outside the %s cage' % mcl)
+        x = exits.Exit(u'see the %s' % mcl)
         bx = exits.Exit('zoo')
         self.addexit(x)
         x.destination = outside
         bx.destination = self
         outside.addexit(bx)
 
-        cage = Room('%s cage' % mcl)
+        cage = Room(u'%s cage' % mcl)
         x = exits.Exit('door')
         bx = exits.Exit('exit')
         x.link(bx)
@@ -935,7 +935,7 @@ class Exit(TZObj):
         '''
 
         if self.destination is None:
-            return (False, 'Exit %s is broken....'%self)
+            return (False, u'Exit %s is broken....'%self)
         if self.locked:
             return (False, 'The door is locked.')
         elif self.weight:
@@ -999,9 +999,9 @@ class Exit(TZObj):
                 msgs.append('Broken exit.')
             else:
                 if not self.locked:
-                    msgs.append('Exit %s to %s.' % (str(self), self.destination))
+                    msgs.append(u'Exit %s to %s.' % (unicode(self), self.destination))
                 else:
-                    msgs.append('The exit %s is locked.' % self)
+                    msgs.append(u'The exit %s is locked.' % self)
 
         return msgs
 
@@ -1023,7 +1023,7 @@ class Exit(TZObj):
         return yellow(name)
 
     def __repr__(self):
-        return '%s --> %s' % (self.name, self.destination)
+        return u'%s --> %s' % (self.name, self.destination)
 
     def _set_room(self, room):
         'Setter for the room property.'

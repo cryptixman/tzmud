@@ -193,7 +193,7 @@ class Item(TZObj):
         return green(name)
 
     def __repr__(self):
-        return '''\
+        return u'''\
 Item (%s): %s
     %s
     %s
@@ -238,12 +238,12 @@ class ContainerItem(Item, TZContainer):
             msgs.append('')
             msgs.append('Holding:')
             for item in items:
-                msgs.append('    ' + str(item))
+                msgs.append('    ' + unicode(item))
 
         return msgs
 
     def __repr__(self):
-        return '''\
+        return u'''\
 Item (%s): %s
     %s
     %s
@@ -429,7 +429,7 @@ class Coin(Item):
     def _get_name(self):
         n = self._n_coins
         if n>1 or n==0:
-            return '%s coins' % self._n_coins
+            return u'%s coins' % self._n_coins
         else:
             return '1 coin'
     def _set_name(self, unused):
@@ -515,7 +515,7 @@ class Camera(Item):
         picture = '\n'.join(msgs)
 
         photo = Photograph()
-        photo.name = 'photo of %s' % obj.name
+        photo.name = u'photo of %s' % obj.name
         photo.long = picture
 
         actor.message('That looks like a good one...')

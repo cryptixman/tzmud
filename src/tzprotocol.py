@@ -244,6 +244,11 @@ class TZ(basic.LineReceiver):
 
         '''
 
+        try:
+            line = line.decode('utf-8')
+        except UnicodeEncodeError:
+            print 'Cannot decode as utf-8'
+
         line = line.strip()
         #print "received", repr(line)
         if not line:
@@ -360,7 +365,7 @@ class TZ(basic.LineReceiver):
             func_name = 'cmd_%s' % cmd
             func = getattr(section, func_name)
 
-        except AttributeError:
+        except (AttributeError, UnicodeEncodeError):
             if section==actions:
                 actions.cmd_go(self, dict(objname=cmd))
             else:
@@ -389,7 +394,7 @@ class TZ(basic.LineReceiver):
                 prefix = '!'
             else:
                 prefix = ''
-            self.message('Try "%shelp %s"' % (prefix, cmd))
+            self.message(u'Try "%shelp %s"' % (prefix, cmd))
 
             if conf.debug:
                 self.simessage('Debug')
@@ -401,6 +406,11 @@ class TZ(basic.LineReceiver):
     def simessage(self, msg=''):
         'Send simple line to client. Used before player has logged in.'
 
+        try:
+            msg = unicode(msg)
+            msg = msg.encode('utf-8')
+        except UnicodeDecodeError:
+            msg = '??UDE??'
         self.transport.write(msg + '\r\n')
 
     def message(self, *args, **kw):
@@ -409,7 +419,13 @@ class TZ(basic.LineReceiver):
         indent = kw.get('indent', 0)
         color = kw.get('color', True)
 
-        strs = map(str, args)
+        strs = []
+        for arg in args:
+            try:
+                ustr = unicode(arg)
+            except UnicodeDecodeError:
+                ustr = '?UDE?'
+            strs.append(ustr)
 
         if strs and strs[-1] in ('.', '?', '!'):
             punctuation = strs.pop()
@@ -431,6 +447,7 @@ class TZ(basic.LineReceiver):
 
         if wrapped:
             for line in wrapped:
+                line = line.encode('utf-8')
                 self.transport.write(' '*indent + line + '\r\n')
         else:
             self.transport.write('\r\n')

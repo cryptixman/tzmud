@@ -376,9 +376,9 @@ def cmd_inventory(s, r=None):
         s.message('You are holding:')
         for item in s.player.items():
             if s.player.is_wearing(item):
-                msg = str(item) + '*'
+                msg = unicode(item) + '*'
             else:
-                msg = str(item)
+                msg = unicode(item)
             s.message(msg, indent=4)
     else:
         s.message('You have nothing.')
@@ -730,7 +730,7 @@ def cmd_exits(s, r=None):
         s.message('Exits:')
         xs = s.room.exits()
         xs = filter(s.player.can_see, xs)
-        exits = ', '.join(str(x) for x in xs)
+        exits = ', '.join(unicode(x) for x in xs)
         s.message(exits, indent=4)
     else:
         s.message('You see no obvious exits.')
@@ -819,7 +819,7 @@ def cmd_emote(s, r):
 
     words = r['message']
 
-    msg = '(%s %s)' % (s.player, words)
+    msg = u'(%s %s)' % (s.player, words)
     s.message(msg)
     s.room.action(dict(act='emote', actor=s.player, raw=words))
 
@@ -884,7 +884,7 @@ def cmd_set(s, r=None):
         if s.player.user_settings:
             s.message('Settings:')
             for k, v in s.player.user_settings.items():
-                s.message('%s = %s' % (k, v), indent=4)
+                s.message(u'%s = %s' % (k, v), indent=4)
         else:
             s.message('You have not set anything yet.')
 

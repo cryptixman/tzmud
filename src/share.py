@@ -88,7 +88,7 @@ def str_attr(name, default='', blank_ok=True, setonce=False):
         def setter(self, val, var=varname):
             if val=='' and not blank_ok:
                 raise ValueError, 'Blank string not allowed.'
-            val = str(val)
+            val = unicode(val)
             setattr(self, var, val)
     else:
         def setter(self, val, var=varname):
@@ -471,8 +471,8 @@ class TZObj(Persistent):
         '''
 
         containers = self.containers()
-        cstr = ':'.join(str(c) for c in containers)
-        return ['%s (%s) [%s]' % (self.name, self.tzid, cstr)]
+        cstr = ':'.join(unicode(c) for c in containers)
+        return [u'%s (%s) [%s]' % (self.name, self.tzid, cstr)]
 
     def wizinfo(self):
         '''Return a multiline message (list of strings) with more details
@@ -482,11 +482,11 @@ class TZObj(Persistent):
 
         '''
 
-        lines = ['%s (%s) %s from module %s' % (self.name, self.tzid,
+        lines = [u'%s (%s) %s from module %s' % (self.name, self.tzid,
                             class_as_string(self), module_as_string(self))]
         lines.append('Settings:')
         for var in self.settings:
-            lines.append('    %s: %s' % (var, self.setting(var)))
+            lines.append(u'    %s: %s' % (var, self.setting(var)))
         return lines
 
     def near_listen(self, info):
@@ -676,7 +676,7 @@ class Character(TZContainer):
         self.following = None
 
     def __repr__(self):
-        return '''
+        return u'''
 Character (%s): %s
 ''' % (self.tzid, self.short)
 
@@ -749,12 +749,12 @@ Character (%s): %s
                 msgs.append('')
                 msgs.append('Holding:')
                 for item in held:
-                    msgs.append('    ' + str(item))
+                    msgs.append('    ' + unicode(item))
             if worn:
                 msgs.append('')
                 msgs.append('Wearing:')
                 for item in worn:
-                    msgs.append('    ' + str(item))
+                    msgs.append('    ' + unicode(item))
 
 
         return msgs

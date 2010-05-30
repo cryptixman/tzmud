@@ -49,8 +49,9 @@ import tzprotocol
 class PlayerIndex(TZIndex):
     'Player names are unique, so create a 2nd index by player name.'
 
-    def index(self):
-        return dbroot['players']['_index']
+    def idx(self):
+        dbrp = dbroot['players']
+        return dbrp['_index']
 
 playerindex = PlayerIndex()
 get = playerindex.get
@@ -174,7 +175,7 @@ class Player(Character):
             status = 'Not logged in'
         else:
             status = 'Currently logged in'
-        msg.append('Player ' + self.name + ' (' + str(self.tzid) + ')'
+        msg.append('Player ' + self.name + ' (' + unicode(self.tzid) + ')'
                         + '  [' + status + ']')
 
         created = time.ctime(self.created)
@@ -221,7 +222,7 @@ class Player(Character):
             #self.home)
 
     def __repr__(self):
-        return '[Player] %s (%s)' % (self.name, self.tzid)
+        return u'[Player] %s (%s)' % (self.name, self.tzid)
 
     # Near actions
     def near_look(self, info):
@@ -369,9 +370,9 @@ class Player(Character):
             if x is None:
                 if not self.can_see(shouter):
                     shouter = 'Someone'
-                msg = str(shouter) + ' shouts, "' + raw + '"'
+                msg = unicode(shouter) + ' shouts, "' + raw + '"'
             else:
-                msg = 'You hear a shout from ' + str(x) + '.'
+                msg = 'You hear a shout from ' + unicode(x) + '.'
             self.message(msg)
 
     def near_emote(self, info):
@@ -607,7 +608,7 @@ class Player(Character):
         if locker is not self:
             if self.can_see(locker) and self.can_see(door):
                 if self.can_see(key):
-                    keyphrase = 'with %s.' % key
+                    keyphrase = u'with %s.' % key
                 else:
                     keyphrase = '.'
 
