@@ -122,6 +122,16 @@ class TZODB(object):
         pack_interval = 600 #seconds (10 minutes)
         reactor.callLater(pack_interval, self.pack_regularly)
 
+    def __str__(self):
+        items = {}
+        for k, v in self.root.items():
+            try:
+                uk = unicode(k)
+                items[uk] = unicode(v)
+            except:
+                raise
+        return unicode(items)
+
 
 class TZDict(PersistentDict):
     'Customized persistent dictionary.'
@@ -130,9 +140,9 @@ class TZDict(PersistentDict):
         items = []
         for k, v in self.items():
             try:
-                items.append('%s: %s' % (k, v.name))
+                items.append(u'%s: %s' % (k, v.name))
             except AttributeError:
-                items.append(str(k))
+                items.append(unicode(k))
         return '{' + ', '.join(items) + '}'
 
 
@@ -151,7 +161,7 @@ class TZIndex(object):
             zodb = db.TZODB()
             self.dbroot = zodb.root
 
-    def index(self):
+    def idx(self):
         '''Return the root of this index.
         Should reference a TZDict or a PersistentDict.
 
@@ -162,46 +172,48 @@ class TZIndex(object):
     def add(self, tzobj):
         'Insert an entry in to the index.'
 
-        self.index()[tzobj.tzid] = tzobj
+        self.idx()[tzobj.tzid] = tzobj
 
     def remove(self, tzobj):
         'Delete the given entry from the index.'
 
-        del self.index()[tzobj.tzid]
+        del self.idx()[tzobj.tzid]
 
     def get(self, tzid):
         'Return the entry with the given id number.'
 
-        i = self.index()
+        i = self.idx()
         return i.get(tzid, None)
 
     def ls(self):
         'Return a list of the objects referenced by the index.'
 
-        return self.index().values()
+        idx = self.idx()
+        return idx.values()
 
 
 def db_init():
     print 'initializing ZODB'
 
-    zodb = TZODB()
+    import db
+    zodb = db.TZODB()
     dbroot = zodb.root
 
     dbroot['DB_VERSION'] = DB_VERSION
 
 
-    dbroot['_index'] = TZDict()
+    dbroot['_index'] = db.TZDict()
 
 
-    dbroot['share'] = TZDict()
+    dbroot['share'] = db.TZDict()
     dbroot['share']['tzid'] = 0
     zodb.commit()
 
 
-    dbroot['rooms'] = TZDict()
+    dbroot['rooms'] = db.TZDict()
     zodb.commit()
 
-    dbroot['exits'] = TZDict()
+    dbroot['exits'] = db.TZDict()
     zodb.commit()
 
 
@@ -214,11 +226,11 @@ def db_init():
                         destination=house)
 
 
-    dbroot['players'] = TZDict()
-    dbroot['players']['_index'] = TZDict()
+    dbroot['players'] = db.TZDict()
+    dbroot['players']['_index'] = db.TZDict()
+    zodb.commit()
 
-
-    dbroot['items'] = TZDict()
+    dbroot['items'] = db.TZDict()
     import items
     rose = items.Rose()
     house.add(rose)
@@ -227,7 +239,7 @@ def db_init():
     dbroot['admin'] = PersistentList()
     dbroot['wizard'] = PersistentList()
 
-    dbroot['mobs'] = TZDict()
+    dbroot['mobs'] = db.TZDict()
 
     zodb.commit()
 
@@ -328,8 +340,7 @@ def db_depopulate():
 def db_display(fname=None):
     import db
     zodb = db.TZODB(fname, read_only=True)
-    dbroot = zodb.root
-    print dbroot
+    print zodb
 
 
 if __name__ == '__main__':
