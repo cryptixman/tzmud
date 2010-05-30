@@ -91,12 +91,16 @@ def cmd_info(s, r):
 
 
 def cmd_set(s, r):
-    '''set <setting> on <object> [to <value>]
+    '''set <setting> on <object> [to|=|+=|-= <value>]
 
     Change the setting on the object. Value defaults to True if
         not specified.
 
     For a list of available settings, use @info <object>
+
+    For list settings (with [square brackets]) setting a value will
+        add the given value to the list. You can also use += to add
+        an item to the list or -= to remove an item.
 
     '''
 
@@ -107,8 +111,13 @@ def cmd_set(s, r):
 
     setting = r['setting']
     value = r.get('value', "True")
+    setop = r.get('setop', '=')
+    if setop=='to':
+        setop = '='
 
     try:
+        if setop == '-=':
+            value = '-DEL-' + value
         success = obj.setting(setting, value)
     except ValueError, e:
         s.message('Error:', e)

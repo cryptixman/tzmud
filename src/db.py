@@ -23,7 +23,7 @@ probably only be done after deleting any current database first.
 
 '''
 
-DB_VERSION = 1
+DB_VERSION = 2
 
 from ZODB import FileStorage, DB, serialize
 import transaction
@@ -49,15 +49,18 @@ class TZODB(object):
 
     _state = {}
     def __new__(cls, *p, **k):
-        self = object.__new__(cls, *p, **k)
+        self = object.__new__(cls)
         self.__dict__ = cls._state
         return self
 
-    def __init__(self, fname=None):
+    def __init__(self, fname=None, read_only=False):
         if fname is None:
             fname = datafs
         else:
             fname = '%s/%s' % (backupdir, fname)
+
+        if not hasattr(self, 'read_only'):
+            self.read_only = read_only
 
         if not hasattr(self, 'storage'):
             self.open(fname)
@@ -66,7 +69,7 @@ class TZODB(object):
     def open(self, fname):
         'Open connection to the database.'
 
-        self.storage = FileStorage.FileStorage(fname)
+        self.storage = FileStorage.FileStorage(fname, read_only=self.read_only)
         self.db = DB(self.storage)
         self.conn = self.db.open()
         self.root = self.conn.root()
@@ -83,7 +86,7 @@ class TZODB(object):
     def version(self):
         'return the version number stored in the database.'
 
-        return dbroot.get('DB_VERSION', 0)
+        return self.root.get('DB_VERSION', 0)
 
     def check_version(self):
         return self.version() == DB_VERSION
@@ -133,15 +136,6 @@ class TZDict(PersistentDict):
         return '{' + ', '.join(items) + '}'
 
 
-def tzid():
-    'Increment the id counter and return the next available id number.'
-
-    previd = dbroot['share']['tzid']
-    nextid = previd + 1
-    dbroot['share']['tzid'] = nextid
-    return nextid
-
-
 class TZIndex(object):
     'Index of all MUD objects. A Borg object with shared state.'
 
@@ -151,13 +145,19 @@ class TZIndex(object):
         self.__dict__ = cls._state
         return self
 
+    def __init__(self):
+        if not hasattr(self, 'dbroot'):
+            import db
+            zodb = db.TZODB()
+            self.dbroot = zodb.root
+
     def index(self):
         '''Return the root of this index.
         Should reference a TZDict or a PersistentDict.
 
         '''
 
-        return dbroot['_index']
+        return self.dbroot['_index']
 
     def add(self, tzobj):
         'Insert an entry in to the index.'
@@ -234,12 +234,28 @@ def db_init():
 def db_upgrade(from_version, to_version):
     print 'upgrading ZODB'
 
+    if to_version > from_version + 1 or to_version <= from_version:
+        print '  Must upgrade 1 version at a time.'
+        return
+
+    import db
+    import zc
+    try:
+        zodb = db.TZODB()
+    except zc.lockfile.LockError:
+        print '  DB locked. Shut down server before upgrading'
+        return
+
+    version = zodb.version()
+    if version != from_version:
+        print '  Current version:', version
+        print '  Must upgrade from current version.'
+        return
+
     for mod in 'players', 'mobs', 'items', 'rooms', 'exits':
         module = __import__(mod)
         if hasattr(module, 'upgrade'):
             module.upgrade(from_version, to_version)
-
-    zodb = TZODB()
     dbroot = zodb.root
 
     dbroot['DB_VERSION'] = to_version
@@ -310,26 +326,13 @@ def db_depopulate():
         os.remove(pth)
 
 def db_display(fname=None):
-    zodb = TZODB(fname)
+    import db
+    zodb = db.TZODB(fname, read_only=True)
     dbroot = zodb.root
     print dbroot
 
 
-if __name__ != '__main__':
-    try:
-        zodb = TZODB()
-        dbroot = zodb.root
-        commit = zodb.commit
-    except:
-        # If the main database is in use, this will fail,
-        # In that case, reinitializing with a different name
-        # should allow access to the other database.
-        pass
-
-else:
-    from db import TZODB
-    from db import TZDict
-
+if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'init':
         db_init()
     elif len(sys.argv) > 1 and sys.argv[1] == 'upgrade':

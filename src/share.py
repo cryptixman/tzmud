@@ -38,7 +38,7 @@ from persistent.list import PersistentList
 from persistent.dict import PersistentDict
 
 import conf
-from db import TZODB, TZIndex, tzid
+from db import TZODB, TZIndex
 zodb = TZODB()
 dbroot = zodb.root
 abort = zodb.abort
@@ -102,6 +102,38 @@ def str_attr(name, default='', blank_ok=True, setonce=False):
                 raise ValueError, 'Cannot be changed once set.'
 
     return property(getter, setter)
+
+def str_list_attr(name, default=None):
+    'An attribute that will always hold a list of strings.'
+
+    varname = '_%s' % name
+    slist = PersistentList()
+    if default is not None:
+        slist.append(default)
+    def getter(self, var=varname):
+        return getattr(self, var, slist)
+    def setter(self, val, var=varname):
+        sl = getattr(self, var, slist)
+        if not val.startswith('-DEL-'):
+            if val not in sl:
+                sl.append(val)
+        else:
+            val = val[5:]
+            if val in sl:
+                sl.remove(val)
+        setattr(self, var, sl)
+        commit()
+
+    return property(getter, setter)
+
+
+def tzid():
+    'Increment the id counter and return the next available id number.'
+
+    previd = dbroot['share']['tzid']
+    nextid = previd + 1
+    dbroot['share']['tzid'] = nextid
+    return nextid
 
 
 class MetaTZObj(type):
@@ -1145,7 +1177,7 @@ def upgrade(obj, newcls=None):
         to change (ie. if it needs to grow a new property.)
 
     If the upgrade involves converting to an entirely new class,
-        pass in the class object as newlcs. This was used, for
+        pass in the class object as newcls. This was used, for
         example, when moving the Exit class from the rooms module
         to the new exits module.
 

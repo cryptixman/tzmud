@@ -34,6 +34,8 @@ if conf.allow_utf8:
     low_unicode = low_unicode.replace('@', '')
     low_unicode = low_unicode.replace('#', '')
     low_unicode = low_unicode.replace('=', '')
+    low_unicode = low_unicode.replace('+', '')
+    low_unicode = low_unicode.replace('-', '')
     alphas = low_unicode
     alphanums = alphas + nums
     printables = u''.join(unichr(c) for c in xrange(65536)
@@ -161,7 +163,9 @@ words = Combine(OneOrMore(Word(printables)),
 tell = tell_verb + words
 
 
-to_ = Suppress(CaselessLiteral('to '))
+to_to_ = CaselessLiteral('to ')
+to_to_.setParseAction(replaceWith('to'))
+to_ = Suppress(to_to_)
 words_without_to = Combine(OneOrMore(~to_ + Word(alphanums)),
                              joinString=' ', adjacent=False)('objname')
 listen_verb = CaselessLiteral('listen')('verb')
@@ -309,7 +313,10 @@ long_verb = CaselessLiteral('long')('verb')
 long_ = long_verb + for_ + Optional(obj_name|objtzidref) + is_ + new_desc
 
 
-wizset = set1_verb + words_without_on('setting') + on_ + (words_without_to|objtzidref) + Optional(to_ + words('value'))
+_setop = oneOf('= += -=')
+setop = (to_to_ | _setop)('setop')
+
+wizset = set1_verb + words_without_on('setting') + on_ + (words_without_to|objtzidref) + Optional(setop + words('value'))
 
 wizunset = unset_verb + words_without_on('setting') + on_ + (words_without_to|objtzidref)
 

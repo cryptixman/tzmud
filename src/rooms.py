@@ -42,7 +42,7 @@ import conf
 import mobs
 import items
 import players
-from share import TZContainer, TZObj, class_as_string, int_attr
+from share import TZContainer, TZObj, class_as_string, int_attr, str_list_attr
 from share import register_plugin
 from colors import green, yellow, red
 
@@ -190,8 +190,8 @@ class Room(TZContainer):
         '''
 
         if self.period:
-            self._last_periodic = time.time()
             self.periodic()
+            self._last_periodic = time.time()
             reactor.callLater(self.period, self.periodically)
 
     def periodic(self):
@@ -659,10 +659,18 @@ class TimedTrap(Room):
     timer = int_attr('timer', default=5) # seconds
     settings = ['timer']
     _springing = False
+    period = 60
+
+    def periodic(self):
+        # probably not needed in production, but during development
+        # the trap has sometimes got stuck. This unsticks it.
+        springing = self._springing
+        if springing and springing < time.time()-self.period:
+            self._springing = False
 
     def near_arrive(self, info):
         if not self._springing:
-            self._springing = True
+            self._springing = time.time()
             reactor.callLater(self.timer, self.spring_trap)
 
     def spring_trap(self):
@@ -679,10 +687,11 @@ class TeleTrap(TimedTrap):
     '''
 
     name = 'room'
+    targets = str_list_attr('targets')
+    settings = ['targets']
 
     def __init__(self, name=''):
         TimedTrap.__init__(self)
-        self._targets = PersistentList()
 
     def addtarget(self, name):
         if name not in self._targets:
@@ -695,14 +704,17 @@ class TeleTrap(TimedTrap):
         try:
             TimedTrap.spring_trap(self)
 
-            if not self._targets:
+            targets = self.setting('targets')
+            if not targets:
                 rms = ls()
                 rms.remove(self)
             else:
-                rms = [getattr(rooms, name) for name in self._targets]
+                rms = []
+                for name in targets:
+                    rms.extend(getname(name, all=True))
 
+            p = self.players()
             if rms:
-                p = self.players()
                 m = self.mobs()
                 characters = p + m
                 for c in characters:
@@ -1072,3 +1084,18 @@ class Exit(TZObj):
 
 
 import exits
+
+
+
+
+def upgrade(from_version, to_version):
+    from share import upgrade
+    if from_version==1 and to_version==2:
+        import rooms
+        for room in rooms.ls():
+            cls = class_as_string(room)
+            if cls == 'TeleTrap':
+                print 'upgrading', room, cls
+                updated = upgrade(room)
+
+        commit()
