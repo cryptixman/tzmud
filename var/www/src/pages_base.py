@@ -72,6 +72,14 @@ def normalize_args(args, preserve='', remove='errmsg'):
             del args[k]
     return args
 
+def utf8_decode_args(args):
+    for k in args.keys():
+        print 'try', k
+        vlist = args[k]
+        dvlist = []
+        for i in vlist:
+            dvlist.append(i.decode('utf-8'))
+            args[k] = dvlist
 
 class xmlf(loaders.xmlfile):
     templateDir = 'var/www/templates'
@@ -99,6 +107,8 @@ class TZPage(rend.Page):
         request = ctx.locate(inevow.IRequest)
         if conf.allow_utf8:
             request.setHeader('Content-Type', 'text/html; charset=UTF-8')
+            utf8_decode_args(request.args)
+
         return xmlf('head.html')
 
     def render_title(self, ctx, data):
