@@ -270,7 +270,7 @@ class Edit(pages_base.TZPage):
                 disabled = 'disabled'
 
         if len(data) < 50:
-            size = str(size)
+            size = unicode(size)
             if disabled:
                 return T.input(name=name, value=data, size=size, disabled=disabled)
             else:

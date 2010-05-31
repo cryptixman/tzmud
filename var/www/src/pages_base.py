@@ -142,19 +142,19 @@ class TZPage(rend.Page):
         r = []
         for option in options:
             if option == selected:
-                r.append(T.option(value=str(option), selected="selected")[str(option)])
+                r.append(T.option(value=unicode(option), selected="selected")[unicode(option)])
             else:
-                r.append(T.option(value=str(option))[str(option)])
+                r.append(T.option(value=unicode(option))[unicode(option)])
 
         return r
 
     def form_options2(self, options, selected=None):
-        selected = str(selected)
+        selected = unicode(selected)
 
         r = []
         for option_id, option_text in options:
-            option_id = str(option_id)
-            option_text = str(option_text)
+            option_id = unicode(option_id)
+            option_text = unicode(option_text)
 
             if option_id == selected:
                 r.append(T.option(value=option_id, selected="selected")[option_text])
