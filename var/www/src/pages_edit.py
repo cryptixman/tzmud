@@ -68,6 +68,9 @@ class Edit(pages_base.TZPage):
 
                 self.obj.setting(s, val)
 
+            newname = args.get('name', '')
+            if newname and newname != self.obj.name:
+                self.obj.name = newname
 
             toroomid = args.get('room', None)
             if toroomid is not None:
