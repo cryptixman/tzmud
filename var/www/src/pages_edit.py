@@ -171,7 +171,7 @@ class Edit(pages_base.TZPage):
             return self.rooms_widget(name, data), self.editlink_widget(data)
         elif name == 'mobtype':
             return self.mobtypes_widget(name, data)
-        elif isinstance(data, str):
+        elif isinstance(data, basestring):
             return self.str_widget(name, data)
         elif isinstance(data, bool):
             return self.bool_widget(name, data)
