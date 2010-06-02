@@ -133,6 +133,7 @@ class Exit(TZObj):
 
         if self.room is not None:
             self.room.rmexit(self)
+        remove(self)
         TZObj.destroy(self)
 
     def go(self, character):
