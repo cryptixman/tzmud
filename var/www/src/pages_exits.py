@@ -21,6 +21,7 @@ tzindex = TZIndex()
 
 from nevow import inevow
 
+import rooms
 import exits
 
 from pages_base import TZPage, xmlf, normalize_args
@@ -42,20 +43,43 @@ class AddExit(TZPage):
 
     def render_process(self, ctx, data):
         request = ctx.locate(inevow.IRequest)
+        args = normalize_args(request.args)
 
-        roomid = int(ctx.arg('roomid'))
+        roomid = int(args['roomid'])
         room = tzindex.get(roomid)
 
-        xname = ctx.arg('xname')
-        xclass = ctx.arg('xclass')
+        xname = args['xname']
+        xclass = args['xclass']
 
-        bxname = ctx.arg('bxname')
-        bxclass = ctx.arg('bxclass')
+        bxname = args['bxname']
+        bxclass = args['bxclass']
 
-        destid = ctx.arg('dest')
-        if destid is not None:
+        destid = args['dest']
+        if destid != 'None':
             destid = int(destid)
-        dest = tzindex.get(destid)
+            dest = tzindex.get(destid)
+        else:
+            dest = None
+
+        newroomcls = args['newroom']
+        if newroomcls == 'None':
+            newroomcls = None
+
+        if dest is None and newroomcls is None:
+            self.goback(request, 'Choose existing room, or room type to clone.')
+            return
+        elif dest is not None and newroomcls is not None:
+            self.goback(request, 'Choose only one target room: Existing room or New room.')
+            return
+        elif newroomcls and newroomcls in rooms.classes():
+            cls = getattr(rooms, newroomcls)
+            newroomname = args['newroomname']
+            if newroomname:
+                newroom = cls(newroomname)
+            else:
+                newroom = cls()
+            dest = newroom
+            print 'NR', dest, dest.name
 
         if xname and xclass in exits.classes():
             xcls = getattr(exits, xclass)

@@ -248,7 +248,7 @@ class Edit(pages_base.TZPage):
         rs.sort(key=attrgetter('name'))
         choices = [(r.tzid, '%s (%s)' % (r.name, r.tzid)) for r in rs]
         if not none_is_logged_out:
-            choices.insert(0, (None, 'None'))
+            choices.insert(0, (None, 'Existing room ...'))
         info = dict(name=name,
                     choices=choices,
                     selected=tzid)
@@ -257,6 +257,15 @@ class Edit(pages_base.TZPage):
             return 'Not logged in.'
         else:
             return self.render_form_select(info)
+
+    def new_room_widget(self, name):
+        rclss = rooms.classes()
+        choices = [(rcls, rcls) for rcls in rclss]
+        choices.insert(0, (None, 'New room ...'))
+        info = dict(name=name,
+                    choices=choices,
+                    selected='')
+        return self.render_form_select(info)
 
     def orig_data_widget(self, name, data):
         'save the value originally set in the widget in a hidden field'
@@ -368,7 +377,7 @@ class Edit(pages_base.TZPage):
 
         tzid = self.tzid # to know which room to add the exit to
         action = '/exits/add/'
-        lines = [T.h2['Add Exit']]
+        lines = [T.h2['Add Exit to Room']]
         exitclasses = exits.classes()
         exitclasses.sort()
         choices = [(cls, cls) for cls in exitclasses]
@@ -381,7 +390,10 @@ class Edit(pages_base.TZPage):
         row = T.tr[T.td[self.render_form_select(xinfo)],
                     T.td[T.input(name='xname')],
                     T.td['-->'],
-                    T.td[self.rooms_widget('dest', None)],
+                    T.td(align="center")[self.rooms_widget('dest', None),
+                            T.br, 'or', T.br,
+                            self.new_room_widget('newroom'), T.br,
+                            T.input(name='newroomname')],
                     T.td['<--'],
                     T.td[T.input(name='bxname')],
                     T.td[self.render_form_select(bxinfo)],
