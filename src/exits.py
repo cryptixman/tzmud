@@ -116,6 +116,9 @@ class Exit(TZObj):
             room.addexit(self)
         self.destination = destination
 
+        if not return_name:
+            return_name = self.autoreturn()
+
         if return_name and destination is not None:
             x = destination.exitname(return_name)
             if x is not None:
@@ -127,6 +130,20 @@ class Exit(TZObj):
         self._keys = PersistentList()
 
         add(self)
+
+    def autoreturn(self):
+        opposite = {'north': 'south',
+                    'south': 'north',
+                    'east': 'west',
+                    'west': 'east',
+                    'northeast': 'southwest',
+                    'northwest': 'southeast',
+                    'southeast': 'northwest',
+                    'southwest': 'northeast',}
+        if self.name in opposite:
+            return opposite[self.name]
+        else:
+            return ''
 
     def destroy(self):
         'Get rid of this exit.'

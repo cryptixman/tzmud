@@ -297,19 +297,8 @@ def cmd_dig(s, r):
 
     exitinname = r.get('exitinname', '')
     exitintzid = r.get('exitintzid', 0)
-    if not exitinname and not exitintzid:
-        autoreturnby = {'north': 'south',
-                        'south': 'north',
-                        'east': 'west',
-                        'west': 'east',
-                        'northeast': 'southwest',
-                        'northwest': 'southeast',
-                        'southeast': 'northwest',
-                        'southwest': 'northeast',}
-        if exitoutname in autoreturnby:
-            exitinname = autoreturnby[exitoutname]
-        else:
-            exitinname = 'door'
+    if not exitinname and not exitintzid and xo is not None:
+        exitinname = xo.autoreturn()
 
     xi = destination.exitname(exitinname) or destination.exit(exitintzid)
     if xi is not None:
@@ -320,6 +309,7 @@ def cmd_dig(s, r):
         if xi is not None:
             xi.destination = room
         else:
+            exitinname = exitinname or 'door'
             xi = exits.Exit(exitinname, room=destination, destination=room)
             xo.link(xi)
             destination.action(dict(act='dig', actor=None, exit=xi))
@@ -330,6 +320,9 @@ def cmd_dig(s, r):
             xo = exits.Exit(exitoutname, room=room, destination=destination, return_name=exitinname)
             room.action(dict(act='dig', actor=s.player, exit=xo))
             xi = xo.get_linked_exit()
+            if xi is None:
+                exitinname = 'door'
+                xi = exits.Exit(exitinname, room=destination, destination=room)
             destination.action(dict(act='dig', actor=None, exit=xi))
             s.message('You dig', xo, 'to', destination, '.')
         else:
