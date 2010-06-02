@@ -387,16 +387,20 @@ class Edit(pages_base.TZPage):
         bxinfo = dict(name='bxclass',
                             choices=choices,
                             selected='Exit')
-        row = T.tr[T.td[self.render_form_select(xinfo)],
-                    T.td[T.input(name='xname')],
-                    T.td['-->'],
+        row = T.tr[T.td['Exit type...', T.br,
+                            self.render_form_select(xinfo)],
+                    T.td['named...', T.br, T.input(name='xname')],
+                    T.td['to...', T.br, '-->'],
                     T.td(align="center")[self.rooms_widget('dest', None),
                             T.br, 'or', T.br,
                             self.new_room_widget('newroom'), T.br,
-                            T.input(name='newroomname')],
-                    T.td['<--'],
-                    T.td[T.input(name='bxname')],
-                    T.td[self.render_form_select(bxinfo)],
+                            T.input(name='newroomname'), T.br,
+                            T.input(type='submit', value=' Add ')],
+                    T.td[T.br, '<--'],
+                    T.td['return by...', T.br,
+                            T.input(name='bxname')],
+                    T.td['Exit type...', T.br,
+                            self.render_form_select(bxinfo)],
                     T.td[T.input(type='submit', value=' Add ')]]
         tbl = T.table(_class="center")[row]
         lines.append(tbl)

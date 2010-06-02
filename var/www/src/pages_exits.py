@@ -62,7 +62,10 @@ class AddExit(TZPage):
             dest = None
 
         newroomcls = args['newroom']
-        if newroomcls == 'None':
+        newroomname = args['newroomname']
+        if newroomcls == 'None' and newroomname:
+            newroomcls = 'Room'
+        elif newroomcls == 'None':
             newroomcls = None
 
         if dest is None and newroomcls is None:
