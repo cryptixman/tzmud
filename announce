@@ -14,21 +14,36 @@ libraries to facilitate rapid development:
 
 TZMud is released under GPLv3.
 
-Changes in TZMud-0.8:
-    - web access to database
-    - better cross-platform operation
-    - added configuration file verifcation tool
-    - more readable and natural messages and commands
-    - improved handling of object attributes
-    - Exit can now be subclassed and cloned
-    - objects can now be invisible
-    - objects can now have a weight
-    - rudimentary plugin framework
-    - more teleportation commands
-    - more secure password storage
-    - xyzzy
-    - new items/ mobs/ exits:
-        - ring of invisibility
-        - traps
-        - spawner
-        - players only exit
+Changes in TZMud-0.9:
+    + Configuration changes
+        - improved handling of utf-8 text (see conf and defaults)
+        - added "speech mode" configuration option
+
+    + MUD interface changes
+        - better automated creation of exits when digging
+        - improved messages
+            - digging
+            - wear and remove
+            - settings
+        - improved following
+        - show things worn separate from other things in inventory
+        - character home is now a setting
+        - allow "a", "an", or "the" in front of any object
+
+    + API changes
+        - moved Exit to separate exits module
+        - allow for <character> in room and <mob> in room
+
+    + Wizard changes
+        - show which module is defined in for @info <object>
+        - show which containers an object is in for @info <object>
+        - make exits @list able
+        - added @tell command (talkmode setting allows any player to tell)
+        - fixed problem destroying some objects
+
+    + Web interface
+        - fixed spurious teleport when using stale page
+        - update room widget after teleport
+        - show wiz/admin and current room for player list on front page
+        - allow changing object names from the web
+        - allow creating new room when building an exit
