@@ -32,10 +32,10 @@ Changes in TZMud-0.9:
 
     + API changes
         - moved Exit to separate exits module
-        - allow for <character> in room and <mob> in room
+        - allow for "<character> in room" and "<mob> in room"
 
     + Wizard changes
-        - show which module is defined in for @info <object>
+        - show which module an object is defined in for @info <object>
         - show which containers an object is in for @info <object>
         - make exits @list able
         - added @tell command (talkmode setting allows any player to tell)
