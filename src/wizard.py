@@ -83,11 +83,16 @@ def cmd_info(s, r):
 
     objs = find(r, s.room, s.player, s.player, all=True)
 
+    if not objs:
+        # Try to find the object close by, but if nothing is
+        #   found, try the search globally.
+        objs = find(r, s.room, s.player, s.player, all=True, g=True)
+
     if objs:
         for obj in objs:
             s.mlmessage(obj.wizinfo())
     else:
-        s.message('You do not see that here.')
+        s.message('That does not exist.')
 
 
 def cmd_set(s, r):
