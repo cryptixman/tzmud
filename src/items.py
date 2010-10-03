@@ -67,16 +67,16 @@ def getname(name, all=False):
 
     '''
 
-    result = []
+    result = set()
     for item in ls():
-        if item.name == name:
+        if item.name == name or name in item.name_aka:
             if not all:
                 return item
             else:
-                result.append(item)
+                result.add(item)
 
     if all:
-        return result
+        return list(result)
     else:
         return None
 
