@@ -173,10 +173,11 @@ class TZObj(Persistent):
 
     __metaclass__ = MetaTZObj
     name = str_attr('name', default='proto obj', blank_ok=False)
+    name_aka = str_list_attr('name_aka')
     short = str_attr('short')
     long = str_attr('long')
 
-    settings = ['name', 'short', 'long', 'owner', 'visible']
+    settings = ['name', 'name_aka', 'short', 'long', 'owner', 'visible']
 
     gettable = True
     wearable = False

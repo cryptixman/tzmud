@@ -46,7 +46,6 @@
     can set own line wrap width and still have lines be nicely
     formatted.
 - plain @info should show something more useful
-- name_aka should be a str_list_attr setting
 
 # Web Server
 - Build MUD areas by web.
