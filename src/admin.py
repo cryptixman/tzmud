@@ -75,14 +75,34 @@ def cmd_wizard(s, r):
 
     Create a new wizard.
 
+    To rovoke wizard status, see: unwizard
     '''
 
     player = players.getname(r)
-    if player is not None:
+    if player is None:
+        s.message('No such player.')
+    elif wizard.verify(player):
+        s.message(player, 'is already a wizard.')
+    else:
         wizard.add(player)
         s.message(player, 'is now a wizard.')
-    else:
+
+
+def cmd_unwizard(s, r):
+    '''unwizard <player>
+
+    Revoke wizard status from player.
+
+    '''
+
+    player = players.getname(r)
+    if player is None:
         s.message('No such player.')
+    elif not wizard.verify(player):
+        s.message(player, 'is not a wizard.')
+    else:
+        wizard.remove(player)
+        s.message('Wizard status revoked from', player, '.')
 
 
 def cmd_py(s, r):
