@@ -992,7 +992,7 @@ def cmd_tell(s, r):
 
 
 
-def find(r, room, player=None, default=None, all=False):
+def find(r, room, player=None, default=None, all=False, g=False):
     '''Utility function for finding an object in various places it
         might be located.
 
@@ -1014,6 +1014,9 @@ def find(r, room, player=None, default=None, all=False):
         but can return all possible matches if the parameter all=True
         is passed in.
 
+    If g (global search) is True, also search everywhere possible
+        to find a match.
+
     '''
 
     objname = r.get('objname', '')
@@ -1026,32 +1029,50 @@ def find(r, room, player=None, default=None, all=False):
                 obj = room
             else:
                 obj = [room]
+            searchers = None
         elif player is not None:
-            obj = findname(objname, (room.itemname,
-                                        player.itemname,
-                                        room.playername,
-                                        room.mobname,
-                                        room.exitname,), all=all)
+            searchers = [room.itemname,
+                            player.itemname,
+                            room.playername,
+                            room.mobname,
+                            room.exitname,]
         else:
-            obj = findname(objname, (room.itemname,
-                                        room.playername,
-                                        room.mobname,
-                                        room.exitname,), all=all)
+            searchers = [room.itemname,
+                            room.playername,
+                            room.mobname,
+                            room.exitname,]
+        if searchers:
+            if g:
+                searchers.extend([rooms.getname,
+                                    items.getname,
+                                    exits.getname,
+                                    mobs.getname,
+                                    players.getname])
+            obj = findname(objname, searchers, all=all)
 
     elif objtzid:
         if objtzid == room.tzid:
             obj = room
+            searchers = None
         elif player is not None:
-            obj = findtzid(objtzid, (room.item,
-                                        player.item,
-                                        room.player,
-                                        room.mob,
-                                        room.exit,))
+            searchers = [room.item,
+                            player.item,
+                            room.player,
+                            room.mob,
+                            room.exit,]
         else:
-            obj = findtzid(objtzid, (room.item,
-                                        room.player,
-                                        room.mob,
-                                        room.exit,))
+            searchers = [room.item,
+                            room.player,
+                            room.mob,
+                            room.exit,]
+        if g:
+            searchers.extend([rooms.get,
+                                items.get,
+                                exits.get,
+                                mobs.get,
+                                players.get])
+        if searchers:
+            obj = findtzid(objtzid, searchers)
         if all:
             if obj:
                 obj = [obj]

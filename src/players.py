@@ -68,10 +68,17 @@ def remove(player):
     del dbroot['players'][player.name]
     playerindex.remove(player)
 
-def getname(name):
+def getname(name, all=False):
     'Return the player with the given name.'
 
-    return dbroot['players'].get(name, None)
+    p = dbroot['players'].get(name, None)
+    if all:
+        if p is not None:
+            return [p]
+        else:
+            return []
+    else:
+        return p
 
 def ls():
     'Return a list of all the players.'
