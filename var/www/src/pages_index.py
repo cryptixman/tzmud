@@ -34,22 +34,36 @@ class Index(pages_base.TZPage):
 
     def render_index_players(self, ctx, data):
         data.sort(key=attrgetter('name'))
-        dataupdated = []
+        lines = []
         for player in data:
+            line = []
             name = player.name
+            tzid = player.tzid
+            tzidcell = T.td(_class="objtzid")[tzid, ':']
+            line.append(tzidcell)
+
+
             if admin.verify(player):
-                name += '!'
+                line.append(T.td['!'])
             elif wizard.verify(player):
-                name += '@'
+                line.append(T.td['@'])
+            else:
+                line.append(T.td)
+
+            editlink = T.a(href="/edit/%s" % tzid)[name]
+            line.append(T.td(_class="objname")[editlink])
 
             if player.logged_in:
-                room = player.room.name
-                name += ' [%s]' % room
-            p = Dummy()
-            p.tzid = player.tzid
-            p.name = name
-            dataupdated.append(p)
-        return self.render_idtable(ctx, dataupdated)
+                room = player.room
+                editlink = "/edit/%s" % room.tzid
+                link = T.a(href=editlink)[T.span(_class="editlink")[room.name]]
+                line.append(T.td[link])
+            else:
+                line.append(T.td)
+
+            lines.append(T.tr[line])
+
+        return T.table[lines]
 
     def render_index_rooms(self, ctx, data):
         lines = []
