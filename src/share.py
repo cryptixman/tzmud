@@ -241,6 +241,20 @@ class TZObj(Persistent):
         else:
             return True
 
+    def set_name_aka(self, val):
+        if '\n' not in val:
+            self.name_aka = val
+        else:
+            ovals = self.name_aka
+            for v in ovals[:]:
+                rv = '-DEL-'+v
+                self.name_aka = rv
+            for v in val.split('\n'):
+                vs = v.strip()
+                if vs:
+                    self.name_aka = vs
+        return True
+
     def _set_owner(self, owner):
         'Setter for the owner property.'
         if owner is not None:

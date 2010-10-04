@@ -209,6 +209,27 @@ class TZPage(rend.Page):
 
         return select
 
+    def render_lines_input(self, data):
+        '''Use to automatically render a textarea for lines of input
+
+        Pass in a dictionary with keys:
+
+        name: name of the textarea
+        lines: list of default content lines
+        editmode: False if the element should be disabled
+        '''
+
+        name = data['name']
+        _id = name
+        lines = '\n'.join(data['lines'])
+        editmode = data.get('editmode', True)
+
+        if editmode:
+            area = T.textarea(name=name, _id=_id)[lines]
+        else:
+            area = T.textarea(name=name, _id=_id, disabled='disabled')[lines]
+
+        return area
 
     def child_rebuild(self, ctx):
         import pages_base

@@ -159,6 +159,8 @@ class Edit(pages_base.TZPage):
     def get_setting_widget(self, name, data):
         if name == 'owner':
             return self.owner_widget(name, data), self.editlink_widget(data)
+        elif name == 'name_aka':
+            return self.aka_widget(name, data)
         elif name == 'room':
             return (self.rooms_widget(name, data, none_is_logged_out=True),
                                          self.editlink_widget(data),
@@ -179,6 +181,9 @@ class Edit(pages_base.TZPage):
             return self.int_widget(name, data)
         else:
             return self.input_widget(name, data)
+
+    def aka_widget(self, name, data):
+        return self.render_lines_input(dict(name=name, lines=data))
 
     def editlink_widget(self, obj):
         if obj is None:
