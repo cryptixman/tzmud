@@ -33,6 +33,7 @@ Changes in TZMud-0.9:
     + API changes
         - moved Exit to separate exits module
         - allow for "<character> in room" and "<mob> in room"
+        - all objects now have a name_aka attribute
 
     + Wizard changes
         - show which module an object is defined in for @info <object>

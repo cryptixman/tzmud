@@ -23,7 +23,7 @@ probably only be done after deleting any current database first.
 
 '''
 
-DB_VERSION = 2
+DB_VERSION = 3
 
 from ZODB import FileStorage, DB, serialize
 import transaction
@@ -272,6 +272,8 @@ def db_upgrade(from_version, to_version):
 
     dbroot['DB_VERSION'] = to_version
     zodb.commit()
+
+    db_upgradeall()
 
 def db_upgradeall():
     import share

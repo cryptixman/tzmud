@@ -78,6 +78,9 @@ def bool_attr(name, default=False):
         setattr(self, var, val)
     return property(getter, setter)
 
+class SetOnceError(ValueError):
+    pass
+
 def str_attr(name, default='', blank_ok=True, setonce=False):
     'An attribute that will always hold a string.'
 
@@ -99,7 +102,7 @@ def str_attr(name, default='', blank_ok=True, setonce=False):
                 val = str(val)
                 setattr(self, var, val)
             else:
-                raise ValueError, 'Cannot be changed once set.'
+                raise SetOnceError, 'Cannot be changed once set.'
 
     return property(getter, setter)
 
@@ -1315,7 +1318,10 @@ def upgrade(obj, newcls=None):
     tzindex.remove(obj)
 
     updated.tzid = obj.tzid
-    updated.name = obj.name
+    try:
+        updated.name = obj.name
+    except SetOnceError:
+        updated._name = obj.name
 
     if addtomodindex:
         module.add(updated)
