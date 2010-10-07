@@ -97,7 +97,8 @@ def check_db():
             print 'Upgrade to version:', db.DB_VERSION
             print
             print 'Back up your current database first, then try:'
-            print 'python src/db.py upgrade', zodb.version(), db.DB_VERSION
+            v = zodb.version()
+            print 'python src/db.py upgrade', v, v+1
             version_ok = False
         zodb.close()
 
