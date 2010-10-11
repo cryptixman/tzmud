@@ -23,7 +23,7 @@ probably only be done after deleting any current database first.
 
 '''
 
-DB_VERSION = 3
+DB_VERSION = 4
 
 from ZODB import FileStorage, DB, serialize
 import transaction

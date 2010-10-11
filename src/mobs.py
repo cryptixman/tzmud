@@ -117,6 +117,7 @@ class Mob(Character):
     'Base class for all mob (mobile) objects in the MUD.'
 
     name = 'proto mob'
+    name_aka = ['mob', 'creature']
     period = int_attr('period', default=10) # seconds
     settings = ['period']
     _bse = 'Mob'
@@ -300,6 +301,7 @@ class Cat(Mob):
     'Miaw!'
 
     name = 'cat'
+    name_aka = ['cat']
     short = 'A frisky little kitty cat.'
 
     def __init__(self, name='', short='', long=''):

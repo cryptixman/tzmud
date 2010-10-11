@@ -99,6 +99,7 @@ class Exit(TZObj):
     'A way to move from one room to another.'
 
     name = 'proto exit'
+    name_aka = ['exit']
     _link_exit_id = 0
     settings = ['locked', 'weight',]
     _bse = 'Exit'

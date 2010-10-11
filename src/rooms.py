@@ -76,7 +76,7 @@ def getname(name, all=False):
 
     result = []
     for room in ls():
-        if room.name == name:
+        if room.name == name or name in room.name_aka:
             if not all:
                 return room
             else:
@@ -120,6 +120,7 @@ class Room(TZContainer):
     'Base class for all rooms in the MUD.'
 
     name = 'proto room'
+    name_aka = ['room']
     period = int_attr('period') # seconds
     _bse = 'Room'
 
@@ -377,13 +378,13 @@ class Room(TZContainer):
 
         '''
 
-        result = []
+        result = set()
         for mob in self.mobs():
             if mob.name == name:
                 if not all:
                     return mob
                 else:
-                    result.append(mob)
+                    result.add(mob)
 
         for mob in self.mobs():
             if hasattr(mob, 'name_aka'):
@@ -392,7 +393,7 @@ class Room(TZContainer):
                         if not all:
                             return mob
                         else:
-                            result.append(mob)
+                            result.add(mob)
 
         for article in ('a ', 'an ', 'the '):
             if name.startswith(article):
@@ -403,10 +404,10 @@ class Room(TZContainer):
                     if not all:
                         return with_article
                     else:
-                        result.append(with_article)
+                        result.add(with_article)
 
         if result:
-            return result
+            return list(result)
         else:
             return None
 
@@ -462,13 +463,22 @@ class Room(TZContainer):
 
         '''
 
-        result = []
+        result = set()
         for x in self.exits():
             if x.name == name:
                 if not all:
                     return x
                 else:
-                    result.append(x)
+                    result.add(x)
+
+        for x in self.exits():
+            if hasattr(x, 'name_aka'):
+                for aka in x.name_aka:
+                    if aka == name:
+                        if not all:
+                            return x
+                        else:
+                            result.add(x)
 
         for article in ('a ', 'an ', 'the '):
             if name.startswith(article):
@@ -479,10 +489,10 @@ class Room(TZContainer):
                     if not all:
                         return with_article
                     else:
-                        result.append(with_article)
+                        result.add(with_article)
 
         if result:
-            return result
+            return list(result)
         else:
             return None
 

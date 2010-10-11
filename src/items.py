@@ -104,6 +104,7 @@ class Item(TZObj):
     'Base class for all items in the MUD.'
 
     name = 'proto item'
+    name_aka = ['item']
     _bse = 'Item'
 
     def __init__(self, name='', short='', long='', owner=None):
@@ -204,6 +205,7 @@ class ContainerItem(Item, TZContainer):
     'Base class for all items that can contain other items.'
 
     name = 'container'
+    name_aka = ['container']
 
     def __init__(self, name='', short='', long='', owner=None):
         TZContainer.__init__(self, name, short, long, owner)
@@ -289,13 +291,17 @@ class Mirror(Item):
             looker.message('In the mirror you see ...')
             looker.mlmessage(looker.look(looker))
 
-class WizRing(Item):
+class Ring(Item):
+    name = 'ring'
+    name_aka = ['ring']
+    wearable = True
+
+class WizRing(Ring):
     'A ring which makes the wearer a wizard.'
 
     name = 'gold ring'
     short = 'A plain band of gold.'
-    wearable = True
-    name_aka = ['ring', 'precious']
+    name_aka = ['precious']
 
     def wear(self, character):
         wizard.add(character)
@@ -305,13 +311,11 @@ class WizRing(Item):
         wizard.remove(character)
         return True
 
-class InvRing(Item):
+class InvRing(Ring):
     'A ring which makes the wearer invisible.'
 
     name = 'silver ring'
     short = 'A thin band of silver.'
-    wearable = True
-    name_aka = ['ring',]
 
     def _set_visible(self, character, vis):
         '''Set the visibility of the character.
@@ -342,14 +346,12 @@ class CursedItem(Item):
     def unwear(self, character):
         return False
 
-class DetectInvisRing(Item):
+class DetectInvisRing(Ring):
     'A ring which allows the wearer to detect invisible objects.'
 
 
     name = 'pearl ring'
     short = 'A ring set with a large pearl.'
-    wearable = True
-    name_aka = ['ring',]
     _wearerid = None
 
     def near_look(self, info):
@@ -550,6 +552,8 @@ class Trap(Item):
         or for nearby characters.
 
     '''
+
+    name_aka = ['trap']
 
     def activate(self):
         self.spring()

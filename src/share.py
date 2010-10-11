@@ -106,17 +106,24 @@ def str_attr(name, default='', blank_ok=True, setonce=False):
 
     return property(getter, setter)
 
-def str_list_attr(name, default=None):
+def str_list_attr(name):
     'An attribute that will always hold a list of strings.'
 
     varname = '_%s' % name
-    slist = PersistentList()
-    if default is not None:
-        slist.append(default)
     def getter(self, var=varname):
-        return getattr(self, var, slist)
+        val = getattr(self, var, None)
+        if val is not None:
+            return val
+        else:
+            sl = PersistentList()
+            setattr(self, var, sl)
+            return sl
     def setter(self, val, var=varname):
-        sl = getattr(self, var, slist)
+        sl = getattr(self, var, None)
+        if sl is None:
+            sl = PersistentList()
+            setattr(self, var, sl)
+
         if not val.startswith('-DEL-'):
             if val not in sl:
                 sl.append(val)
@@ -124,7 +131,7 @@ def str_list_attr(name, default=None):
             val = val[5:]
             if val in sl:
                 sl.remove(val)
-        setattr(self, var, sl)
+
         commit()
 
     return property(getter, setter)
@@ -140,35 +147,92 @@ def tzid():
 
 
 class MetaTZObj(type):
-    def __new__(mcs, name, bases, dict):
-        settings = []
-        for base in bases:
-            if hasattr(base, 'settings'):
-                for stg in base.settings:
-                    if stg not in settings:
-                        settings.append(stg)
-        if 'settings' in dict:
-            for stg in dict['settings']:
-                if stg not in settings:
-                    settings.append(stg)
-        dict['settings'] = settings
+    '''metaclass used for all of the TZObj based objects.
 
+    '''
+
+    def __new__(mcls, name, bases, dict):
+        '''return a new instance of this metaclass.
+
+        mcls is this class (MetaTZObj)
+        name is the name of the new TZObj subclass
+        bases is a tuple of the superclasses given in the
+            TZObj subclass class statement. eg:
+
+            class Foo(TZObj):
+            will give bases (TZObj,)
+
+            class Bar(Item, Mob):
+            will give bases (Item, Mob)
+
+        dict is all of the attributes defined on the new TZObj
+            subclass.
+
+        '''
+
+        # collect settings from base classes
+        settings = set()
+        for base in bases:
+            if 'settings' in base.__dict__:
+                settings.update(base.__dict__['settings'])
+
+        # check for additional settings on new class
+        if 'settings' in dict:
+            ds = dict['settings']
+            settings.update(ds)
+
+        dict['settings'] = list(settings)
+
+        # if either this new class or one of its bases is using
+        #   a property for a setting, the new class needs to use
+        #   a property for the setting.
+        #
+        # but if the new class has a plain value, it needs to be
+        #   remembered so that it can be set after any new instance
+        #   has been created.
+        #
+        # if the new value is str, bool, or int then it will
+        #   override any value from base classes.
+        # if it is a list, the new value should be added to the
+        #   list from base classes.
+        remember = {}
         for stg in settings:
-            origattr = dict.get(stg, None)
-            if type(origattr) is property:
-                attr = origattr
-                origattr = None
+            makeprop = False
+            currentattr = dict.get(stg, None)
+            if type(currentattr) is property:
+                makeprop = True
+                prop = currentattr
             else:
                 for base in bases:
-                    attr = getattr(base, stg, None)
-                    if type(attr) is property:
-                        break
-            if type(attr) is property:
-                dict[stg] = attr
-                if origattr is not None:
-                    dict['_%s' % stg] = origattr
+                    baseattr = getattr(base, stg, None)
+                    if not makeprop and type(baseattr) is property:
+                        makeprop = True
+                        prop = baseattr
 
-        return type.__new__(mcs, name, bases, dict)
+                    if hasattr(base, '_remember_settings'):
+                        baseattr = base._remember_settings.get(stg, None)
+                        if baseattr is None:
+                            pass
+                        elif type(baseattr) == type([]):
+                            remember.setdefault(stg, []).extend(baseattr)
+                        else:
+                            remember[stg] = baseattr
+
+            if currentattr is None:
+                pass
+            elif type(currentattr) == type([]):
+                remember.setdefault(stg, []).extend(currentattr)
+            elif type(currentattr) is property:
+                pass
+            else:
+                remember[stg] = currentattr
+
+            if makeprop:
+                dict[stg] = prop
+
+        newcls = type.__new__(mcls, name, bases, dict)
+        newcls._remember_settings = remember
+        return newcls
 
 
 class TZObj(Persistent):
@@ -186,16 +250,32 @@ class TZObj(Persistent):
     wearable = False
     visible = bool_attr('visible', default=True)
 
+    def _set_remembered_class_settings(self):
+        '''settings remembered from superclasses during class construction
+
+            _remember_settings is set by the metaclass MetaTZObj
+
+        '''
+
+        for stg, val in self._remember_settings.items():
+            if type(val) == type([]):
+                for v in val:
+                    self.setting(stg, v)
+            else:
+                self.setting(stg, val)
+
     def __init__(self, name='', short='', long='', owner=None, container=None):
+        settings = PersistentList()
+        settings += self.settings
+        self.settings = settings
+
+        self._set_remembered_class_settings()
+
         self.tzid = tzid()
 
         self.name = name if name else self.name
         self.short = short if short else self.short
         self.long = long if long else self.long
-
-        settings = PersistentList()
-        settings += self.settings
-        self.settings = settings
 
         self.owner = owner
         self.container = container
@@ -601,14 +681,14 @@ class TZContainer(TZObj):
 
         '''
 
-        result = []
+        result = set()
         for item in self.items():
             if item.name == name:
                 if not all:
                     return item
                 else:
                     if item not in result:
-                        result.append(item)
+                        result.add(item)
 
         for item in self.items():
             if hasattr(item, 'name_aka'):
@@ -618,7 +698,7 @@ class TZContainer(TZObj):
                             return item
                         else:
                             if item not in result:
-                                result.append(item)
+                                result.add(item)
 
         for article in ('a ', 'an ', 'the '):
             if name.startswith(article):
@@ -629,10 +709,10 @@ class TZContainer(TZObj):
                     if not all:
                         return with_article
                     else:
-                        result.append(with_article)
+                        result.add(with_article)
 
         if result:
-            return result
+            return list(result)
         else:
             return None
 
@@ -678,9 +758,10 @@ class Character(TZContainer):
     settings = ['home'] + stats_list
 
     def __init__(self, name='', short='', long=''):
+        self._rid = None
+
         TZContainer.__init__(self, name, short, long)
 
-        self._rid = None
         self._hid = None
         self._follow_id = None
 
@@ -1067,6 +1148,12 @@ def find(r, room, player=None, default=None, all=False, g=False):
                                     mobs.getname,
                                     players.getname])
             obj = findname(objname, searchers, all=all)
+
+            if obj is None and objname in room.name_aka:
+                if not all:
+                    obj = room
+                else:
+                    obj = [room]
 
     elif objtzid:
         if objtzid == room.tzid:
