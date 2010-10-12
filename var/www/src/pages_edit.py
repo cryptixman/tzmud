@@ -59,8 +59,22 @@ class Edit(pages_base.TZPage):
 
         if args:
             for s in self.obj.settings:
-                val = args.get(s, None)
-                if val is None:
+                currval = self.obj.setting(s)
+                if currval in (True, False):
+                    # could be a bool, but could also be an int 0
+                    # bool False *unchecked* will not be in args
+                    val = args.get(s, False)
+                    if val == 'on':
+                        val = True
+                    elif val == '':
+                        # line input was left blank
+                        val = currval
+                    else:
+                        val = int(val)
+                else:
+                    val = args.get(s, None)
+
+                if val is None or val==currval:
                     continue
 
                 if s == 'owner' and val != 'None':
@@ -299,7 +313,11 @@ class Edit(pages_base.TZPage):
         info = dict(name=name,
                     choices=[(True, 'True'), (False, 'False')],
                     selected=data)
-        return self.render_form_select(info)
+
+        if data:
+            return T.input(name=name, _type='checkbox', checked='checked')
+        else:
+            return T.input(name=name, _type='checkbox')
 
     def int_widget(self, name, data):
         return T.input(name=name, value=data, size="5")
