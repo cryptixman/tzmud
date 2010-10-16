@@ -18,6 +18,7 @@
 - Human/Humanoid mob for subclassing
 - potion of see invisible things
     or SeeInvRing allows character to see invisible things
+- Power class? So different items can be given the same power
 - item exchanging (give, take, accept, steal)
 - Group items with the same name in the inventory (ie. 2 roses)
 - fix tzcontrol to work properly on windows
