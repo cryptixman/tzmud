@@ -34,6 +34,13 @@ Changes in TZMud-0.9:
         - moved Exit to separate exits module
         - allow for "<character> in room" and "<mob> in room"
         - all objects now have a name_aka attribute
+        - items.getname now looks at name_aka
+        - extensive rework of TZObj metaclass
+
+    + DB changes
+        - run upgradeall during any version upgrade
+        - set player name separately during upgrade
+        - version bumped
 
     + Wizard changes
         - show which module an object is defined in for @info <object>
@@ -48,3 +55,5 @@ Changes in TZMud-0.9:
         - show wiz/admin and current room for player list on front page
         - allow changing object names from the web
         - allow creating new room when building an exit
+        - allow changing name_aka from the web
+        - switch to checkboxes for boolean attributes
