@@ -47,6 +47,7 @@
     can set own line wrap width and still have lines be nicely
     formatted.
 - plain @info should show something more useful
+- mobs should not have "the" placed in front of their names
 
 # Web Server
 - Build MUD areas by web.
