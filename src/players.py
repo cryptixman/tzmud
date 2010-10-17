@@ -441,6 +441,7 @@ class Player(Character):
         disappearer = info['actor']
         container = disappearer.container
         room = disappearer.room
+        bname = info['bname'] # name before object disappeared
 
         if disappearer is not self:
             if container is None:
@@ -448,13 +449,13 @@ class Player(Character):
                 pass
             elif container.container is None:
                 # So, it is in the room, and not in a container
-                self.message(disappearer, 'disappears.')
+                self.message(bname, 'disappears.')
             elif container is self:
                 # it is in this player's inventory
-                self.message('The', disappearer, 'in your inventory becomes invisible.')
+                self.message('The', bname, 'in your inventory becomes invisible.')
             elif self in disappearer.containers():
                 container = disappearer.container
-                self.message('The', disappearer, 'in the', container, 'becomes invisible.')
+                self.message('The', bname, 'in the', container, 'becomes invisible.')
 
     def near_teleport(self, info):
         wizard = info['actor']

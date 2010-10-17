@@ -308,7 +308,10 @@ class TZObj(Persistent):
             return False
 
     def __str__(self):
-        return self.name
+        if self.visible:
+            return self.name
+        else:
+            return '(%s)' % self.name
 
     def __copy__(self):
         new_item = self.__class__(self.name)
@@ -413,7 +416,8 @@ class TZObj(Persistent):
         room = self.room
 
         if room is not None and not v and was:
-            room.action(dict(act='disappear', actor=self))
+            bname = str(self) # name as it appears before becoming invisible
+            room.action(dict(act='disappear', actor=self, bname=bname))
 
         self.visible = v
 
