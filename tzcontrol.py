@@ -49,22 +49,6 @@ def create_conf():
     f.write('\n')
     f.close()
 
-
-try:
-    import conf
-except ImportError:
-    create_conf()
-    print 'etc/conf.py created'
-    print
-    print 'Please check configuration before starting server:'
-    print '  python tzcontrol.py -c'
-    print
-    import conf
-    check_db()
-    sys.exit(0)
-
-
-
 def check_db():
     if not os.path.exists(conf.datafs):
         print
@@ -103,6 +87,22 @@ def check_db():
         zodb.close()
 
         return version_ok
+
+
+
+try:
+    import conf
+except ImportError:
+    create_conf()
+    print 'etc/conf.py created'
+    print
+    print 'Please check configuration before starting server:'
+    print '  python tzcontrol.py -c'
+    print
+    import conf
+    check_db()
+    sys.exit(0)
+
 
 
 def verify_config():
