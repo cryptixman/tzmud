@@ -167,9 +167,9 @@ def cmd_unset(s, r):
 
 
 def cmd_teleport(s, r=None):
-    '''teleport [to [<room>|<player>]] OR teleport <object> to <room>
+    '''teleport [to [<room>|<character>]] OR teleport <object> to <room>
 
-    Teleport self to the named room or player, or if no name is given
+    Teleport self to the named room or character, or if no name is given
         teleport self to home, OR
 
     Teleport the object to the room.
@@ -223,8 +223,14 @@ def cmd_teleport(s, r=None):
                     s.message('Player is not logged in.')
                     return
             else:
-                s.message('No such room or player.')
-                return
+                tomob = mobs.getname(destname) or \
+                        mobs.get(desttzid)
+
+                if tomob is not None:
+                    destination = tomob.room
+                else:
+                    s.message('No such room or character.')
+                    return
 
         player.teleport(destination)
 
