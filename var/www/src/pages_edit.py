@@ -41,8 +41,12 @@ from players import Player
 
 from share import module_as_string, class_as_string
 
-from db import TZIndex
+from db import TZIndex, TZODB
 tzindex = TZIndex()
+zodb = TZODB()
+dbroot = zodb.root
+commit = zodb.commit
+abort = zodb.abort
 
 import pages_base
 from pages_base import xmlf, normalize_args
@@ -56,6 +60,7 @@ class Edit(pages_base.TZPage):
         args = normalize_args(request.args)
 
         print 'args:', args
+        self.args = args
 
         if args:
             for s in self.obj.settings:
@@ -69,8 +74,7 @@ class Edit(pages_base.TZPage):
                     elif val == '':
                         # line input was left blank
                         val = currval
-                    else:
-                        val = int(val)
+
                 else:
                     val = args.get(s, None)
 
@@ -80,7 +84,10 @@ class Edit(pages_base.TZPage):
                 if s == 'owner' and val != 'None':
                     val = '#%s' % val
 
-                self.obj.setting(s, val)
+                try:
+                    self.obj.setting(s, val)
+                except ValueError:
+                    args['_%s__error'%s] = val
 
             newname = args.get('name', '')
             if newname and newname != self.obj.name:
@@ -320,7 +327,13 @@ class Edit(pages_base.TZPage):
             return T.input(name=name, _type='checkbox')
 
     def int_widget(self, name, data):
-        return T.input(name=name, value=data, size="5")
+        error = self.args.get('_%s__error' % name, False)
+        if error:
+            cls = 'error'
+            data = error
+        else:
+            cls = 'good'
+        return T.input(name=name, _class=cls, value=data, size="5")
 
     def input_widget(self, name, data):
         return T.input(name=name, value=data)
@@ -343,7 +356,12 @@ class Edit(pages_base.TZPage):
 
         lines = []
         for setting in settings:
-            label = T.td(_class="textlabel")[setting]
+            error = self.args.get('_%s__error' % setting, False)
+            if error:
+                cls = 'textlabel_error'
+            else:
+                cls = 'textlabel'
+            label = T.td(_class=cls)[setting]
             val = self.obj.setting(setting)
             if val is None:
                 val = getattr(self.obj, setting, None)

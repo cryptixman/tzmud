@@ -218,3 +218,12 @@ a span.editlink{
 a:hover span.editlink{
     color: #0D571C;
 }
+
+input.error{
+    background-color: #ffbbbb;
+}
+td.textlabel_error{
+    text-align:right;
+    padding-right: 1em;
+    color: red;
+}
