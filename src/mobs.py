@@ -75,7 +75,7 @@ def getname(name, all=False):
 
     result = []
     for mob in ls():
-        if mob.name == name:
+        if mob.name == name or name in mob.name_aka:
             if not all:
                 return mob
             else:
