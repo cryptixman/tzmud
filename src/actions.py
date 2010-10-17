@@ -514,7 +514,7 @@ def cmd_go(s, r):
                         break
 
                     if hasattr(dest, 'name_aka'):
-                        for aka in item.name_aka:
+                        for aka in dest.name_aka:
                             if aka == objname:
                                 found = True
                                 break
