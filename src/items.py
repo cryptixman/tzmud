@@ -275,6 +275,7 @@ class Bag(ContainerItem):
     'A possibly magical bag which can hold other items.'
 
     name = 'bag'
+    name_aka = ['bag']
     short = 'A surprisingly spacious sack.'
 
 
