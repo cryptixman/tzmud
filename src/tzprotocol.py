@@ -437,7 +437,7 @@ class TZ(basic.LineReceiver):
         if punctuation:
             msg += punctuation
 
-        cset = self.player.user_settings.get('ansi', False)
+        cset = self.player.user_settings.get('ansi', conf.ansi_color_default)
         if color and cset:
             msg = msg % colors.yes
             wrapped = ansiwrap(msg)
