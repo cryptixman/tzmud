@@ -319,10 +319,7 @@ class TZ(basic.LineReceiver):
                 if cmd == '##nocmd':
                     parts = line.split()
                     cmd = parts[0]
-                    try:
-                        rest = ' '.join(parts[1:])
-                    except IndexError:
-                        rest = None
+                    rest = ' '.join(parts[1:])
 
                 self.dispatch(section, cmd, rest)
 
@@ -361,16 +358,54 @@ class TZ(basic.LineReceiver):
 
         '''
 
+        if section == admin:
+            first = '!'
+        elif section == wizard:
+            first = '@'
+        else:
+            first = ''
+
         try:
             func_name = 'cmd_%s' % cmd
             func = getattr(section, func_name)
 
         except (AttributeError, UnicodeEncodeError):
-            if section==actions:
-                actions.cmd_go(self, dict(objname=cmd))
+            try:
+                restline = rest.get('rest', '')
+            except AttributeError:
+                restline = rest
+
+            if restline:
+                line = cmd + ' ' + restline
             else:
-                self.message("What's that?")
-            return
+                line = cmd
+
+            if section==actions and actions.cmd_go(self,
+                                        dict(objname=line, implied=True)):
+                return
+            else:
+                funcs = share.nearest_cmd(section, cmd, all=True)
+                if len(funcs) == 1:
+                    if section == admin:
+                        return self.dispatch(section, funcs[0], restline)
+
+                    cmd = first + funcs[0]
+                    line = cmd + ' ' + restline
+
+                    try:
+                        result = parse.full_parser.parseString(line)
+                    except parse.ParseException:
+                        cmd = '##parseproblem'
+                    else:
+                        cmd = result.asDict().get('verb', '##noverb')
+                        rest = result.asDict()
+                        return self.dispatch(section, cmd, rest)
+
+                else:
+                    func = None
+
+        else:
+            funcs = []
 
         try:
             if rest:
@@ -387,18 +422,20 @@ class TZ(basic.LineReceiver):
             abort()
             import traceback
             traceback.print_exc()
-            self.message('I am having trouble with that command.')
-            if section==wizard:
-                prefix = '@'
-            elif section==admin:
-                prefix = '!'
-            else:
-                prefix = ''
-            self.message(u'Try "%shelp %s"' % (prefix, cmd))
+            if func is not None:
+                self.message('I am having trouble with that command.')
+                self.message(u'Try "%shelp %s"' % (first, cmd))
 
-            if conf.debug:
-                self.simessage('Debug')
-                self.simlmessage(e)
+                if conf.debug:
+                    self.simessage('Debug')
+                    self.simlmessage(e)
+
+            elif funcs:
+                self.message('Not sure what you mean. Maybe:')
+                self.message(', '.join(funcs))
+
+            else:
+                self.message('I have no idea.')
 
             #raise
             #self.dispatch(section, 'help', {'topic':cmd})

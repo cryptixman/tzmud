@@ -1445,6 +1445,21 @@ def upgradeall():
     commit()
 
 
+def nearest_cmd(section, cmd, all=False):
+    cmds = [c[4:] for c in dir(section) if c.startswith('cmd_')]
+    cmds = [c for c in cmds if c.startswith(cmd)]
+
+    if cmds and not all:
+        cmds.append(cmd)
+        cmds.sort()
+        c = cmds.index(cmd)
+        closest = cmds[c+1]
+        return getattr(section, 'cmd_%s' % closest)
+
+    else:
+        return cmds
+
+
 # Delay these imports due to circular dependencies
 import players
 import rooms

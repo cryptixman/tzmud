@@ -153,14 +153,13 @@ exits = CaselessLiteral('exits')('verb') + LineEnd()
 say_verb = oneOf('say "', caseless=True)('verb')
 say_verb.setParseAction(replaceWith('say'))
 words = Combine(OneOrMore(Word(printables)),
-                        joinString=' ', adjacent=False)('message')
-say = say_verb + words
+                        joinString=' ', adjacent=False)
+msg = words('message')
+say = say_verb + msg
 
 
 tell_verb = CaselessLiteral('tell')('verb')
-words = Combine(OneOrMore(Word(printables)),
-                        joinString=' ', adjacent=False)('message')
-tell = tell_verb + words
+tell = tell_verb + msg
 
 
 to_to_ = CaselessLiteral('to ')
@@ -173,12 +172,12 @@ listen = listen_verb + Optional(to_) + objref
 
 
 shout_verb = CaselessLiteral('shout')('verb')
-shout = shout_verb + words
+shout = shout_verb + msg
 
 
 emote_verb = oneOf('emote :', caseless=True)('verb')
 emote_verb.setParseAction(replaceWith('emote'))
-emote = emote_verb + words
+emote = emote_verb + msg
 
 
 quit_verb = oneOf('quit', caseless=True)('verb')
@@ -220,7 +219,7 @@ help = help_verb + Optional(Word(alphas)('topic')) + LineEnd()
 xyzzy = CaselessLiteral('xyzzy')('verb') + LineEnd()
 
 
-catchall = objnameref('verb')
+catchall = Word(alphanums)('verb') + Optional(words)('rest') + LineEnd()
 
 
 section = Empty()('section')

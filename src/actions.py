@@ -493,6 +493,11 @@ def cmd_go(s, r):
 
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
+    implied = r.get('implied', False) # set True in tzprotocol.py::dispatch
+                                        # when text is not found to be a
+                                        # command and we are not looking to
+                                        # see if is the name of a place the
+                                        # player is trying to go to
 
     origin = s.room
     x = origin.exitname(objname) or origin.exit(objtzid)
@@ -530,10 +535,11 @@ def cmd_go(s, r):
                 if not objname:
                     objname = 'go'
                 s.message(objname, 'through which exit?')
-                return
+                return False
         else:
-            s.message("You can't go that way.")
-            return
+            if not implied:
+                s.message("You can't go that way.")
+            return False
 
     success, msg = s.player.go(x)
 
@@ -556,6 +562,7 @@ def cmd_go(s, r):
     else:
         s.message(msg)
 
+    return success
 
 def cmd_lock(s, r):
     '''lock <door> [with <key>]
