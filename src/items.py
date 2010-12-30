@@ -405,7 +405,7 @@ class Key(Item):
         return self._key in door._keys
 
     def __copy__(self):
-        new_key = Key(self.name, self.short, self.long)
+        new_key = Item.__copy__(self)
         new_key._key = self._key
         return new_key
 

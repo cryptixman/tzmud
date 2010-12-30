@@ -26,6 +26,7 @@ for mobs. It works out best to keep these object types separated.
 '''
 
 import time
+import copy
 import random
 
 from twisted.internet import reactor
@@ -596,14 +597,13 @@ class Room(TZContainer):
 
         '''
 
-        c = Room(self.name, self.short, self.long, self.owner)
+        new_room = TZContainer.__copy__(self)
 
         for x in self.exits():
-            new_x = exits.Exit(x.name, x.short, x.long,
-                            room=c, destination=x.destination)
-            c.addexit(new_x)
+            new_x = copy.copy(x)
+            new_room.addexit(new_x)
 
-        return c
+        return new_room
 
     def teleport(self, destination):
         'This makes no sense.'

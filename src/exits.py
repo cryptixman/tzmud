@@ -132,6 +132,14 @@ class Exit(TZObj):
 
         add(self)
 
+    def __copy__(self):
+        newx = TZObj.__copy__(self)
+        newx.room = self.room
+        newx.destination = self.destination
+        for _key in self._keys:
+            newx._keys.append(_key)
+        return newx
+
     def autoreturn(self):
         opposite = {'north': 'south',
                     'south': 'north',
@@ -140,7 +148,11 @@ class Exit(TZObj):
                     'northeast': 'southwest',
                     'northwest': 'southeast',
                     'southeast': 'northwest',
-                    'southwest': 'northeast',}
+                    'southwest': 'northeast',
+                    'ne': 'sw',
+                    'nw': 'se',
+                    'se': 'nw',
+                    'sw': 'ne',}
         if self.name in opposite:
             return opposite[self.name]
         else:

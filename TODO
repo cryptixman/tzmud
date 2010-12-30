@@ -48,6 +48,7 @@
     formatted.
 - plain @info should show something more useful
 - mobs should not have "the" placed in front of their names
+- add a way to see which keys can unlock a door
 
 # Web Server
 - Build MUD areas by web.

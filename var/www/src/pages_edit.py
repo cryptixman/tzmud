@@ -83,6 +83,9 @@ class Edit(pages_base.TZPage):
 
                 if s == 'owner' and val != 'None':
                     val = '#%s' % val
+                elif s == 'name_aka':
+                    val = val.split('\n')
+                    val = [v.strip() for v in val]
 
                 try:
                     self.obj.setting(s, val)

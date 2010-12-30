@@ -124,7 +124,11 @@ def str_list_attr(name):
             sl = PersistentList()
             setattr(self, var, sl)
 
-        if not val.startswith('-DEL-'):
+        if isinstance(val, list) or isinstance(val, PersistentList):
+            sl[:] = []
+            for v in val:
+                sl.append(v)
+        elif not val.startswith('-DEL-'):
             if val not in sl:
                 sl.append(val)
         else:
@@ -327,20 +331,6 @@ class TZObj(Persistent):
         else:
             return True
 
-    def set_name_aka(self, val):
-        if '\n' not in val:
-            self.name_aka = val
-        else:
-            ovals = self.name_aka
-            for v in ovals[:]:
-                rv = '-DEL-'+v
-                self.name_aka = rv
-            for v in val.split('\n'):
-                vs = v.strip()
-                if vs:
-                    self.name_aka = vs
-        return True
-
     def _set_owner(self, owner):
         'Setter for the owner property.'
         if owner is not None:
@@ -512,10 +502,10 @@ class TZObj(Persistent):
             except AttributeError:
                 try:
                     val = int(val)
-                except ValueError:
+                except (ValueError, TypeError):
                     try:
                         val = float(val)
-                    except ValueError:
+                    except (ValueError, TypeError):
                         pass
 
             if hasattr(self, var):
