@@ -301,7 +301,7 @@ class Edit(pages_base.TZPage):
 
         return T.input(name='%s_orig'%name, _type='hidden', value=data)
 
-    def str_widget(self, name, data, size=60):
+    def str_widget(self, name, data, size=40):
         disabled = ''
         if name=='name':
             if self.bse=='Player':
