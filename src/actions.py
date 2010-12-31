@@ -123,7 +123,8 @@ def cmd_get(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: get <item>')
+        raise SyntaxError
 
     if objname == 'all':
         for item in filter(s.player.can_see, s.room.items()):
@@ -167,7 +168,8 @@ def cmd_drop(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: drop <item>')
+        raise SyntaxError
 
     number = r.get('number', '')
 
@@ -208,7 +210,8 @@ def cmd_put(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: put <item> in <container>')
+        raise SyntaxError
 
     obj2name = r.get('obj2name', '')
     obj2tzid = r.get('obj2tzid', 0)
@@ -268,7 +271,8 @@ def cmd_take(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: take <item> from <container>')
+        raise SyntaxError
     number = r.get('number', '')
 
     obj2name = r.get('obj2name', '')
@@ -337,7 +341,8 @@ def cmd_use(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: use <item>')
+        raise SyntaxError
 
     obj2name = r.get('obj2name', '')
     obj2tzid = r.get('obj2tzid', 0)
@@ -394,7 +399,8 @@ def cmd_wear(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: wear <item>')
+        raise SyntaxError
 
     player = s.player
 
@@ -437,7 +443,8 @@ def cmd_remove(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: remove <item>')
+        raise SyntaxError
 
     player = s.player
 
@@ -491,13 +498,22 @@ def cmd_go(s, r):
 
     '''
 
+    # return True if the player has successfully taken the exit to
+    #   its destination.
+    # return False if that is a possible exit, but something prevented
+    #   the player from taking the exit, ie it is locked or it weighs
+    #   too much to push it open.
+    # return None if there is no such exit or room that can be taken
+    #   from this location.
+
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
     implied = r.get('implied', False) # set True in tzprotocol.py::dispatch
                                         # when text is not found to be a
-                                        # command and we are not looking to
-                                        # see if is the name of a place the
-                                        # player is trying to go to
+                                        # command and we are looking to
+                                        # see if the word is the name of a
+                                        # place the player is trying to go to
+                                        # or the name of an exit to take
 
     origin = s.room
     x = origin.exitname(objname) or origin.exit(objtzid)
@@ -535,11 +551,11 @@ def cmd_go(s, r):
                 if not objname:
                     objname = 'go'
                 s.message(objname, 'through which exit?')
-                return False
+                return None
         else:
             if not implied:
                 s.message("You can't go that way.")
-            return False
+            return None
 
     success, msg = s.player.go(x)
 
@@ -780,7 +796,8 @@ def cmd_listen(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', '')
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used incorrectly.'
+        s.message('Try: listen to <object>')
+        raise SyntaxError
 
     player = s.player
     room = s.room

@@ -172,6 +172,10 @@ class Exit(TZObj):
         returns (True, None) if it works.
         returns (False, 'Some message explaining why not.') if not.
 
+        Could also return (None, None) if you want to pretend that
+            this exit is not really even here at all. (Not tested.
+            let me know how that works out for you...)
+
         '''
 
         if self.destination is None:

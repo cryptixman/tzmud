@@ -380,32 +380,53 @@ class TZ(basic.LineReceiver):
             else:
                 line = cmd
 
-            if section==actions and actions.cmd_go(self,
-                                        dict(objname=line, implied=True)):
-                return
-            else:
-                funcs = share.nearest_cmd(section, cmd, all=True)
-                if len(funcs) == 1:
-                    if section == admin:
-                        return self.dispatch(section, funcs[0], restline)
 
-                    cmd = first + funcs[0]
-                    line = cmd + ' ' + restline
-
-                    try:
-                        result = parse.full_parser.parseString(line)
-                    except parse.ParseException:
-                        cmd = '##parseproblem'
-                    else:
-                        cmd = result.asDict().get('verb', '##noverb')
-                        rest = result.asDict()
-                        return self.dispatch(section, cmd, rest)
-
+            if section == actions:
+                # cmd is not a command. Check to see if it is the bare name
+                # of a place to go or an exit to take.
+                trygo = actions.cmd_go(self, dict(objname=line, implied=True))
+                if trygo is None:
+                    # no such exit or room can be reached from here
+                    pass
+                elif trygo:
+                    # success. Went that way
+                    return
                 else:
-                    func = None
+                    # failed. Tried to go that way but something prevented
+                    # player from going that way. In any case, something
+                    # happened. Stop trying to find something to do.
+                    return
+
+            funcs = share.nearest_cmd(section, cmd, all=True)
+            if len(funcs) == 1:
+                if section == admin:
+                    return self.dispatch(section, funcs[0], restline)
+
+                cmd = first + funcs[0]
+                line = cmd + ' ' + restline
+
+                try:
+                    result = parse.full_parser.parseString(line)
+                except parse.ParseException:
+                    cmd = '##parseproblem'
+                else:
+                    cmd = result.asDict().get('verb', '##noverb')
+                    rest = result.asDict()
+                    return self.dispatch(section, cmd, rest)
+
+            else:
+                func = None
 
         else:
             funcs = []
+
+        if func is None:
+            if funcs:
+                self.message('Not sure what you mean. Maybe:')
+                self.message(', '.join(funcs))
+            else:
+                self.message('I have no idea.')
+            return
 
         try:
             if rest:
@@ -418,24 +439,30 @@ class TZ(basic.LineReceiver):
             traceback.print_exc()
             self.message('Attempting to use deprecated code.')
             self.message('Check error log for details.')
+        except SyntaxError, e:
+            # This should be a user syntax problem, for instance, the
+            #   player said "get" and not "get thing" Not really an
+            #   error, but should show in the log if in debug mode
+            #   just in case there is a problem with the MUD code.
+            self.message(u'"%shelp %s" may also have more information.' % (
+                                                                first, cmd))
+
+            if conf.debug:
+                import traceback
+                traceback.print_exc()
+                self.simessage('Debug')
+                self.simlmessage(e)
         except Exception, e:
             abort()
-            import traceback
-            traceback.print_exc()
-            if func is not None:
-                self.message('I am having trouble with that command.')
-                self.message(u'Try "%shelp %s"' % (first, cmd))
+            self.message('I am having trouble with that command.')
+            self.message(u'Try "%shelp %s" for more information.' % (
+                                                                first, cmd))
 
-                if conf.debug:
-                    self.simessage('Debug')
-                    self.simlmessage(e)
-
-            elif funcs:
-                self.message('Not sure what you mean. Maybe:')
-                self.message(', '.join(funcs))
-
-            else:
-                self.message('I have no idea.')
+            if conf.debug:
+                import traceback
+                traceback.print_exc()
+                self.simessage('Debug')
+                self.simlmessage(e)
 
             #raise
             #self.dispatch(section, 'help', {'topic':cmd})

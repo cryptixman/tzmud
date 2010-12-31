@@ -292,7 +292,8 @@ def cmd_dig(s, r):
     destname = r.get('destname', '')
     desttzid = r.get('desttzid', 0)
     if not destname and not desttzid:
-        raise SyntaxError, 'Command used improperly.'
+        s.message('Try: @dig <exit> to <destination>')
+        raise SyntaxError
     destination = rooms.getname(destname) or rooms.get(desttzid)
 
     if destination is None and destname:
@@ -355,7 +356,8 @@ def cmd_lock(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used improperly.'
+        s.message('Try: @lock <door> with <key>')
+        raise SyntaxError
     x = s.room.exitname(objname) or s.room.exit(objtzid)
     if x is None:
         s.message('No such exit.')
@@ -432,7 +434,8 @@ def cmd_clone(s, r):
     objtzid = r.get('objtzid', 0)
 
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used improperly.'
+        s.message('Try: @clone <object>')
+        raise SyntaxError
 
     newname = r.get('new', '')
 
@@ -561,7 +564,8 @@ def cmd_study(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used improperly.'
+        s.message('Try: @study <object>')
+        raise SyntaxError
 
     obj = find(r, s.room, s.player, s.room)
     if obj is not None:
@@ -658,7 +662,8 @@ def cmd_destroy(s, r):
     objname = r.get('objname', '')
     objtzid = r.get('objtzid', 0)
     if not objname and not objtzid:
-        raise SyntaxError, 'Command used improperly.'
+        s.message('Try: @destroy <object>')
+        raise SyntaxError
 
     player = s.player
     room = s.room
