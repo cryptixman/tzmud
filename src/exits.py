@@ -179,7 +179,7 @@ class Exit(TZObj):
         '''
 
         if self.destination is None:
-            return (False, u'Exit %s is broken....'%self)
+            return (False, u"Exit %s is not finished. You can't go that way yet."%self)
         if self.locked:
             return (False, 'The door is locked.')
         elif self.weight:
