@@ -269,6 +269,12 @@ class TZ(basic.LineReceiver):
             elif not self.logged_in:
                 self.simessage('Must log in with "login <name> <password>"')
 
+            elif self.room is None:
+                # log in not complete yet. Try waiting a bit and sending
+                #   this command through again later.
+                reactor.callLater(0.6, self.lineReceived, line)
+                return
+
             else:
                 t = time.time()
                 self.player.active = t
