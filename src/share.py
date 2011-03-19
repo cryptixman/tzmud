@@ -1072,6 +1072,10 @@ def cmd_tell(s, r):
     if player is None:
         s.message('No player by that name.')
         return
+    elif player == s.player:
+        # Talking to yourself
+        s.player.message('Hmmm. Talking to ourself again, are we?')
+        return
     else:
         messagewords = wordslist[len(trynameparts):]
         message = ' '.join(messagewords)
