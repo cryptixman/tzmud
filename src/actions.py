@@ -870,6 +870,16 @@ def cmd_who(s, r=None):
         s.message(player, indent=4)
 
 
+def cmd_cls(s, r=None):
+    '''cls
+
+    Clears your screen.
+
+    '''
+    for lines in range(60): # TODO: of course, we could make the number of lines a configurable number...
+        s.message()
+
+ 
 def cmd_set(s, r=None):
     '''set <var> [= <value>]
 
