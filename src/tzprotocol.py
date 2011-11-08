@@ -246,7 +246,7 @@ class TZ(basic.LineReceiver):
 
         try:
             line = line.decode('utf-8')
-        except UnicodeEncodeError:
+        except UnicodeDecodeError:
             print 'Cannot decode as utf-8'
 
         line = line.strip()
