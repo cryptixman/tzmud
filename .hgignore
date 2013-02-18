@@ -1,0 +1,5 @@
+syntax:glob
+*.pyc
+etc/conf.py
+var/db/Data.fs*
+var/log/*.log
