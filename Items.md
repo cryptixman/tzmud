@@ -1,0 +1,11 @@
+  * Rose
+  * Cup
+  * Bag
+  * Mirror
+  * WizRing
+  * Key
+  * SkeletonKey
+  * Coins
+  * Hat
+  * Camera
+  * Photograph
